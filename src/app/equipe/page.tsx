@@ -84,6 +84,11 @@ const lastSectionMembers: TeamMember[] = [
     role: "Desenvolvedor Full Stack",
     image: "/images/team/dev-rodrigo.avif",
   },
+  {
+    name: "Thiago Silva",
+    role: "Desenvolvedor Full Stack",
+    image: "/images/team/dev-thiago.avif",
+  },
 ];
 
 export default function TeamPage() {

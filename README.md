@@ -78,3 +78,5 @@ Durante o desenvolvimento, trabalhamos em diversas melhorias relacionadas à usa
 <a href="https://github.com/RaCinthia"><img src="https://avatars.githubusercontent.com/u/144265210?v=4" width="50" height="50" alt="Radrígyla Fonseca" /></a>
 
 <a href="https://github.com/rodrigoacm10"><img src="https://avatars.githubusercontent.com/u/137843317?v=4" width="50" height="50" alt="Rodrigo Andrade" /></a>
+
+<a href="https://github.com/ThiSilva49"><img src="https://github.com/ThiSilva49.png?size=512" width="50" height="50" alt="Thiago Silva" /></a>
