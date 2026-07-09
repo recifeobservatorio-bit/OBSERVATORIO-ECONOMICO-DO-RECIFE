@@ -707,8 +707,7 @@ export const iconsExplore = [
                 tags: [
                     "CAPAG",
                     "capacidade de pagamentos"
-                ],
-                bundleKey: "capag"
+                ]
             },
             {
                 id: 10,
@@ -769,8 +768,7 @@ export const iconsExplore = [
                     "tributação sobre propriedade",
                     "tributação sobre consumo",
                     "tributação sobre renda"
-                ],
-                bundleKey: "tributos"
+                ]
             },
             {
                 id: 11,
