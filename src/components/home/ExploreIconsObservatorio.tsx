@@ -54,7 +54,6 @@ export const iconsExplore = [
                     "aeronaves",
                     "frete aéreo"
                 ],
-                bundleKey: "aeroporto"
             },
             {   
                 id: 2,
@@ -104,7 +103,6 @@ export const iconsExplore = [
                     "frete marítimo",
                     "operações portuárias"
                   ],
-                bundleKey: "porto"
             },
             {   
                 id: 3,
@@ -149,7 +147,6 @@ export const iconsExplore = [
                     "estatísticas de preços",
                     "ajustes inflacionários"
                   ],
-                bundleKey: "ipca"
             },
             {   
                 id: 4,
@@ -201,7 +198,6 @@ export const iconsExplore = [
                     "mercado externo",
                     "relações comerciais"
                   ],
-                bundleKey: "balanco-comercial"
             },
             {   
                 id: 5,
@@ -278,8 +274,6 @@ export const iconsExplore = [
                     "governança local",
                     "políticas públicas municipais"
                   ],
-                bundleKey: "ranking"
-                  
             },
             {   
                 id: 6,
@@ -337,7 +331,6 @@ export const iconsExplore = [
                     "PMEs de Recife",
                     "mercado de trabalho"
                   ],
-                bundleKey: "empresas"
             },
             {   
                 id: 7,
@@ -384,8 +377,6 @@ export const iconsExplore = [
                     "nível de atividade",
                     "estatísticas de trabalho"
                   ],
-                bundleKey: "empregos"
-                  
             },
             {   
                 id: 8,
