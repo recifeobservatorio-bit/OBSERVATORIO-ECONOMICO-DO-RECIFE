@@ -4,6 +4,7 @@ import { IpcaTabelaHeaders } from "@/@types/observatorio/@fetch/ipca";
 import { DataWithFilters, Filters } from "@/@types/observatorio/shared";
 import { getRawData } from "@/utils/filters/@data/getRawData";
 import { applyGenericFilters } from "@/utils/filters/@features/applyGenericFilters";
+import { filterByYear } from "@/utils/filters/@features/filterByYear";
 
 export class IpcaDataService {
   private static instance: IpcaDataService;
@@ -32,9 +33,9 @@ export class IpcaDataService {
   private async fetchIpcaGeralData(filters: Filters): Promise<{ id: "ipca"; geral: IpcaGeralData }> {
 
     const ipcaService = new IpcaData(this.currentYear);
-    const geral = await ipcaService.fetchProcessedGeralData();
+    const geralAllYears = await ipcaService.fetchProcessedGeralData();
+    const geral = filterByYear(geralAllYears, this.currentYear, "Ano");
     const rawData = applyGenericFilters(geral, filters, ['Capital'])
-    // const rawData = await getRawData({applyGenericFilters, service: ipcaService, nameFunc: 'fetchProcessedGeralData', currentYear: this.currentYear, years: filters.years, keyName: 'Capital', filters, lengthIgnore: 1})
     const geralFiltered = {...applyGenericFilters(geral, filters, ['MÊS']), rawData: rawData.filteredData};
 
     return { geral: geralFiltered, id: "ipca" };
@@ -42,7 +43,8 @@ export class IpcaDataService {
 
   private async fetchIpcaGruposData(filters: Filters): Promise<{ id: "ipca-grupos"; grupos: IpcaGrupoData }> {
     const ipcaService = new IpcaData(this.currentYear);
-    const grupos = await ipcaService.fetchProcessedGruposData();
+    const gruposAllYears = await ipcaService.fetchProcessedGruposData();
+    const grupos = filterByYear(gruposAllYears, this.currentYear, "ANO");
     const gruposFiltered = applyGenericFilters(grupos, filters);
 
     return { grupos: gruposFiltered, id: "ipca-grupos" };
@@ -51,10 +53,12 @@ export class IpcaDataService {
   private async fetchIpcaTabelasData(filters: Filters): Promise<{ id: "ipca-tabelas"; tabelas: DataWithFilters<IpcaTabelaHeaders>; geral: IpcaGeralData }> {
     const ipcaService = new IpcaData(this.currentYear);
 
-    const [tabelas, geral] = await Promise.all([
+    const [tabelasAllYears, geralAllYears] = await Promise.all([
       ipcaService.fetchProcessedTabelasData(),
       ipcaService.fetchProcessedGeralData(),
     ]);
+    const tabelas = filterByYear(tabelasAllYears, this.currentYear, "Ano");
+    const geral = filterByYear(geralAllYears, this.currentYear, "Ano");
 
     const tabelasFiltered = applyGenericFilters(tabelas, filters);
     const geralFiltered = applyGenericFilters(geral, filters);

@@ -19,9 +19,11 @@ export interface IpcaGrupoHeaders {
 }
 
 export interface IpcaTabelaHeaders {
+    Ano: number;
+    MÊS: number;
     Grupo: string;
     Capital: string;
     Acumulado: number;
     Mensal: number;
     Peso: number;
-}  
+}
