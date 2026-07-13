@@ -1,6 +1,6 @@
 export const updatedMonthChartData = (chartData: any[], months: number) => {
     const chartDataCopy = [...chartData]
-    
+
      if (months < 12) {
        const restant = chartDataCopy.length - months
        

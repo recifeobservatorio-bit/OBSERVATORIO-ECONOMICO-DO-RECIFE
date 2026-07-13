@@ -53,13 +53,13 @@ export class AeroportoData {
   }
 
   async fetchProcessedAenaPassageirosData(): Promise<AenaPassageirosHeaders[]> {
-    const rows = filterByYear(await aenaPassageirosFetcher.fetchAll(), this.year, "Ano");
-    return rows.map((r) => ({ ...r, "Mês": r.Mes }));
+    // aena_passageiros.parquet already has a "Mês" column (written with the accent by the
+    // conversion script) — no remapping needed here.
+    return filterByYear(await aenaPassageirosFetcher.fetchAll(), this.year, "Ano");
   }
 
   async fetchProcessedAenaCargasData(): Promise<AenaCargasHeaders[]> {
-    const rows = filterByYear(await aenaCargasFetcher.fetchAll(), this.year, "Ano");
-    return rows.map((r) => ({ ...r, "Mês": r.Mes }));
+    return filterByYear(await aenaCargasFetcher.fetchAll(), this.year, "Ano");
   }
 
   clearCache(): void {
