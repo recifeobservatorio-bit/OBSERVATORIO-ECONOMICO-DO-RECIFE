@@ -1,26 +1,37 @@
 export function geralAccFunction(dataArray: any, params: any) {
-    return dataArray.reduce((acc: any, item: any) => {
+    const initial = params.reduce((acc: any, param: any) => {
+        acc[param] = {};
+        return acc;
+    }, {});
+
+    return (dataArray || []).reduce((acc: any, item: any) => {
         params.forEach((param: any) => {
-            if (!acc[param]) acc[param] = {};
             const value = item[param];
+            if (value === null || value === undefined) return;
             acc[param][value] = (acc[param][value] || 0) + 1;
         });
         return acc;
-    }, {});
+    }, initial);
 }
 
 export const geralAccFieldFunction = (data: any, params: string[], accParam: string) => {
-    return data.reduce((acc: any, obj: any) => {
+    const initial = params.reduce((acc: any, param: string) => {
+        acc[param] = {};
+        return acc;
+    }, {});
+
+    return (data || []).reduce((acc: any, obj: any) => {
         params.forEach((param) => {
-          if (!acc[param]) acc[param] = {} 
+          const key = obj[param]
+          if (key === null || key === undefined) return
 
-          if (!acc[param][obj[param]]) acc[param][obj[param]] = 0
+          if (!acc[param][key]) acc[param][key] = 0
 
-          acc[param][obj[param]] += obj[accParam]
+          acc[param][key] += obj[accParam]
         })
 
         return acc
-      }, {})
+      }, initial)
   }
 
 

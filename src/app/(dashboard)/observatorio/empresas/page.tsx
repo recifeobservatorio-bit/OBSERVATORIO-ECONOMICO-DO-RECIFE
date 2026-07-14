@@ -120,9 +120,29 @@ const EmpresasPage = () => {
     if (isLoading) return <LoadingScreen />;
 
     
+  const isActiveTabDataReady = () => {
+    switch (activeTab) {
+      case "geral":
+      case "empresas-ativas":
+      case "empresas-inativas":
+        return !!dataArr?.length;
+      case "empresas-ativas-inativas":
+        return !!(dataObj?.ativas?.length || dataObj?.inativas?.length);
+      case "empresas-naturezas":
+      case "empresas-classes":
+      case "comparativo-empresas-classes":
+        return !!dataObjRawData?.empresas?.length;
+      case "empresas-abertas-fechadas":
+        return !!(dataTest?.empresas?.ativas?.length || dataTest?.empresas?.inativas?.length);
+      case "empresas-tempo-abertura":
+        return !!dataTestTwo?.empresas?.length;
+      default:
+        return !!dataArr?.length;
+    }
+  };
+
   const renderContent = () => {
-    console.log('DataOBJ', dataObj)
-    if (!data || !(dataArr?.length || dataObj?.ativas?.length || dataObjRawData?.empresas?.length || dataTest?.empresas?.ativas?.length || dataTestTwo?.empresas?.length) ) {
+    if (!data || !isActiveTabDataReady()) {
       return <div className="text-center text-gray-600">Construindo gráficos...</div>;
     }
 

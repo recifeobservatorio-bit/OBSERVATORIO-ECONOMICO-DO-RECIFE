@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 
 import { AdditionalFilter, Filters } from "@/@types/observatorio/shared";
 import { useDashboard } from "@/context/DashboardContext";
+import { isMonthFilterLabel, monthOptionIndex, monthOptionLabel } from "@/utils/filters/@global/monthFilterHelpers";
 
 import { ChevronIcon } from "./ChevronIcon";
 import FocusHidden from "../@global/features/FocusHidden";
@@ -141,7 +142,9 @@ const Navbar = () => {
               </li>
               {filters.additionalFilters?.map((f: AdditionalFilter) => {
                 if (f.selected?.length > 0) {
-                  const visible = f?.hash ? f.selected.map((item) => f.hash?.[item]).slice(0, 5).join(", ") : f.selected.slice(0, 5).join(", ");
+                  const visible = isMonthFilterLabel(f.label)
+                    ? [...f.selected].sort((a, b) => monthOptionIndex(a) - monthOptionIndex(b)).map((item) => monthOptionLabel(item)).slice(0, 5).join(", ")
+                    : f?.hash ? f.selected.map((item) => f.hash?.[item]).slice(0, 5).join(", ") : f.selected.slice(0, 5).join(", ");
                   const remaining = f.selected.length - 5;
                   return (
                     <li key={f.label}>
@@ -235,6 +238,10 @@ const Navbar = () => {
 
                             {f.options
                               .sort((a: string, b: string) => {
+                                if (isMonthFilterLabel(f.label)) {
+                                  return monthOptionIndex(a) - monthOptionIndex(b); // janeiro -> dezembro
+                                }
+
                                 // verifica se são números
                                 const numA = parseFloat(a);
                                 const numB = parseFloat(b);
@@ -246,7 +253,7 @@ const Navbar = () => {
                               })
                               .filter((op: string) => {
                                 const searchTerm = searchTerms[f.label] || "";
-                              
+
                                 if (typeof op === "string") {
                                   return op.toLowerCase().includes(searchTerm.toLowerCase());
                                 }
@@ -262,7 +269,7 @@ const Navbar = () => {
                                     }}
                                     className="h-4 w-4 text-blue-600"
                                   />
-                                  {f?.hash ? f.hash[`${op}`] : op}
+                                  {isMonthFilterLabel(f.label) ? monthOptionLabel(op) : (f?.hash ? f.hash[`${op}`] : op)}
                                 </label>
                               ))}
                           </div>

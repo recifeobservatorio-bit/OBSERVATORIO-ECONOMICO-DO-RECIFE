@@ -16,7 +16,7 @@ const EmpresasMediaMesTempoViabilidade = ({
   }: any) => {
     const dataCur = data['rawData'] || {}
 
-    const chartData = processEmpresasDataLineGraph(dataCur, toCompare, 'Tempo_Medio_Viabilidade').map((obj) => ({ ...obj, label: monthShortName(+obj.label) }))
+    const chartData = processEmpresasDataLineGraph(dataCur, toCompare, 'Tempo Médio de Viabilidade').map((obj) => ({ ...obj, label: monthShortName(+obj.label) }))
 
     return (
       <div className="chart-wrapper">
