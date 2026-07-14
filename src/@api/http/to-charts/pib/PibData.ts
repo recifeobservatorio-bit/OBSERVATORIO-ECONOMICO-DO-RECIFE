@@ -1,32 +1,58 @@
-import { fetchData } from "@/@api/config/dataFetcher";
+import { readParquetFromBuffer } from "@/@api/config/parquetReader";
 import { ProcessedDataPib } from "@/@types/observatorio/@data/ProcessedDataPib";
 
+function normalizeBigInt(rows: any[]) {
+  return rows.map((row) => {
+    const normalized: any = {};
+    for (const key of Object.keys(row)) {
+      const v = row[key];
+      normalized[key] = typeof v === "bigint" ? Number(v) : v;
+    }
+    return normalized;
+  });
+}
 
-const DB_NAME = "parquetDB";
-const STORE_NAME = "parquetFiles";
+function makeFlatFetcher(fileName: string) {
+  const url = `${process.env.NEXT_PUBLIC_API_BASE_LOGIN}/data/${fileName}`;
+  let cache: any[] | null = null;
+  let fetching: Promise<any[]> | null = null;
+
+  return {
+    async fetchAll(): Promise<any[]> {
+      if (cache) return cache;
+      if (fetching) return fetching;
+      fetching = (async () => {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`Erro ao buscar parquet: ${res.status}`);
+        const rows = normalizeBigInt(await readParquetFromBuffer(await res.arrayBuffer()));
+        cache = rows;
+        return rows;
+      })();
+      return fetching;
+    },
+    clearCache() {
+      cache = null;
+      fetching = null;
+    },
+  };
+}
+
+// Dados anuais de PIB dos municípios (2010-2023), sem filtro de ano na busca —
+// o filtro por ano é aplicado depois pelo PibDataService.
+const pibFetcher = makeFlatFetcher("pib.parquet");
 
 export class PibData {
-  private year: string;
-  private static cache: Record<string, any> = {}; // Cache estático para todas as instâncias
-
-  constructor(year: string) {
-    this.year = year;
-  }
-
+  constructor(private year: string) {}
 
   async fetchProcessedData(): Promise<ProcessedDataPib[]> {
-    const endpoint = `/pib/geral/anos`;
-    return fetchData<ProcessedDataPib[]>(endpoint, PibData.cache);
+    return pibFetcher.fetchAll();
   }
 
   async fetchProcessedDataByYear(year: string): Promise<ProcessedDataPib[]> {
-    const endpoint = `/pib/geral/anos`;
-    return fetchData<ProcessedDataPib[]>(endpoint, PibData.cache);
+    return pibFetcher.fetchAll();
   }
 
-  // Limpa o cache de dados
   clearCache(): void {
-    PibData.cache = {};
+    pibFetcher.clearCache();
   }
 }
-

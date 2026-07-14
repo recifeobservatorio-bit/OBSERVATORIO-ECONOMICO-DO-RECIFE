@@ -423,8 +423,6 @@ export const iconsExplore = [
                     "valores agregados",
                     "análise econômica"
                   ],
-                bundleKey: "pib"
-                  
             },
             {
                 id: 9,
