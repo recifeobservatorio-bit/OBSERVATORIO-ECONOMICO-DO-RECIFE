@@ -52,6 +52,10 @@ export class RankingData {
     return filterByYear(await geralFetcher.fetchAll(), this.year);
   }
 
+  async fetchProcessedGeralAllYears(): Promise<any[]> {
+    return geralFetcher.fetchAll();
+  }
+
   async fetchProcessedDimensaoData(): Promise<any[]> {
     return filterByYear(await dimensaoFetcher.fetchAll(), this.year);
   }

@@ -21,6 +21,9 @@ const CapagGeral = ({ data, year = "--", onSelectMunicipio }: CapagGeralProps) =
   const recife = data?.recife;
   const comparado = data?.comparado ?? null;
 
+  const anos = recife?.historico?.map((h) => h.ano) ?? [];
+  const periodo = anos.length ? `(${anos[0]}-${anos[anos.length - 1]})` : "";
+
   return (
     <div className="pb-4 flex flex-col gap-6">
       <div className="grid grid-cols-1 xl:grid-cols-[1.2fr_0.6fr_1.2fr] gap-6">
@@ -58,21 +61,21 @@ const CapagGeral = ({ data, year = "--", onSelectMunicipio }: CapagGeralProps) =
         </div>
       </div>
 
-      {/* Gráficos de linha (histórico 2021-2024) */}
+      {/* Gráficos de linha (histórico completo disponível) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="bg-white dark:bg-[#0C1B2B] rounded-lg border border-gray-200 dark:border-gray-700 p-3">
           <ErrorBoundary>
-            <EvolucaoIndicador data={data} campo="endividamento" title="Endividamento (2021-2024)" />
+            <EvolucaoIndicador data={data} campo="endividamento" title={`Endividamento ${periodo}`} />
           </ErrorBoundary>
         </div>
         <div className="bg-white dark:bg-[#0C1B2B] rounded-lg border border-gray-200 dark:border-gray-700 p-3">
           <ErrorBoundary>
-            <EvolucaoIndicador data={data} campo="liquidez" title="Liquidez (2021-2024)" />
+            <EvolucaoIndicador data={data} campo="liquidez" title={`Liquidez ${periodo}`} />
           </ErrorBoundary>
         </div>
         <div className="bg-white dark:bg-[#0C1B2B] rounded-lg border border-gray-200 dark:border-gray-700 p-3">
           <ErrorBoundary>
-            <EvolucaoIndicador data={data} campo="poupancaCorrente" title="Poupança Corrente (2021-2024)" />
+            <EvolucaoIndicador data={data} campo="poupancaCorrente" title={`Poupança Corrente ${periodo}`} />
           </ErrorBoundary>
         </div>
       </div>

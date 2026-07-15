@@ -134,7 +134,7 @@ const StackerBarChartVertical = ({
                     const anchor = isInside ? "end" : "start";
                 
                     const val1 = Number(entry[bars[0].dataKey]) || 0;
-                    const val2 = Number(entry[bars[1].dataKey]) || 0;
+                    const val2 = bars[1] ? Number(entry[bars[1].dataKey]) || 0 : 0;
                     const totalStack = val1 + val2;
                 
                     const stackPixelWidth = totalStack > 0 ? (1 / (valor / totalStack)) * width : width;

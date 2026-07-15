@@ -46,6 +46,7 @@ const ativasRecifeFetcher = makeFlatFetcher("empresas_ativas_recife.parquet");
 const naturezasFetcher = makeFlatFetcher("empresas_naturezas.parquet");
 const classesFetcher = makeFlatFetcher("empresas_classes.parquet");
 const abertasFetcher = makeFlatFetcher("empresas_abertas.parquet");
+const abertasSecaoFetcher = makeFlatFetcher("empresas_abertas_secao.parquet");
 const fechadasFetcher = makeFlatFetcher("empresas_fechadas.parquet");
 const tempoMedioFetcher = makeFlatFetcher("empresas_tempo_medio.parquet");
 
@@ -80,6 +81,10 @@ export class EmpresasData {
     return filterByYear(await abertasFetcher.fetchAll(), this.year, "Ano");
   }
 
+  async fetchProcessedAbertasPorSecao(): Promise<any[]> {
+    return filterByYear(await abertasSecaoFetcher.fetchAll(), this.year, "Ano");
+  }
+
   async fetchProcessedEmpresasFechadas(): Promise<any[]> {
     return filterByYear(await fechadasFetcher.fetchAll(), this.year, "Ano de Baixa");
   }
@@ -95,6 +100,7 @@ export class EmpresasData {
     naturezasFetcher.clearCache();
     classesFetcher.clearCache();
     abertasFetcher.clearCache();
+    abertasSecaoFetcher.clearCache();
     fechadasFetcher.clearCache();
     tempoMedioFetcher.clearCache();
   }
