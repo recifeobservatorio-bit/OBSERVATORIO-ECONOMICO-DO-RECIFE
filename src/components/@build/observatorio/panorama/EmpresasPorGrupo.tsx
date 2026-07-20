@@ -39,7 +39,7 @@ const EmpresasPorGrupo = () => {
         xKey="label"
         colors={ColorPalette.default}
         bars={[{ dataKey: "value", name: "Empresas", showPercentage: true }]}
-        heightPerCategory={50}
+        heightPerCategory={55}
         visibleHeight={300}
         widthY={130}
       />

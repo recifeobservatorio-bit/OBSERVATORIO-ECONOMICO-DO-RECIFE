@@ -16,7 +16,7 @@ const RelatorioAno = ({
   months,
 }: any) => {
   
-  const chartData = data['municipios'].sort((a: any, b: any) => a["Mês"] - b["Mês"]).map((data: any) => ({ ...data, "Mês": monthShortName(data['Mês'])}));
+  const chartData = data['municipios'].sort((a: any, b: any) => a["Mes"] - b["Mes"]).map((data: any) => ({ ...data, "Mês": monthShortName(data['Mes'])}));
 
   const updatedData = updatedMonthChartData(chartData, months ?? 1);
   

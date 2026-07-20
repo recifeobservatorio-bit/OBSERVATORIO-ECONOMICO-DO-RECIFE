@@ -43,8 +43,8 @@ const EmpregosMovimentacao = () => {
         colors={ColorPalette.default}
         bars={[{ dataKey: "value", name: "Pessoas" }]}
         highlightValues={[]}
-        visibleHeight={220}
-        widthY={110}
+        visibleHeight={280}
+        widthY={130}
       />
     </PanoramaCard>
   );

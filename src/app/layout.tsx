@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 
 import "./globals.css";
 import { LoadingScreen } from "@/components/home/LoadingScreen";
+import DataPrefetchGate from "@/components/@global/features/DataPrefetchGate";
 import { LoadingProvider, useLoading } from "@/context/LoadingContext";
 import { AuthProvider } from "@/context/AuthContext";
 
@@ -28,7 +29,9 @@ export default function RootLayout({
       <body className={poppins.className}>     
         <AuthProvider>
           <LoadingProvider>
-            <WithLoading>{children}</WithLoading>
+            <WithLoading>
+              <DataPrefetchGate>{children}</DataPrefetchGate>
+            </WithLoading>
           </LoadingProvider>
         </AuthProvider>
       </body>

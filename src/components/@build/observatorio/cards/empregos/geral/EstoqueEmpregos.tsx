@@ -9,9 +9,9 @@ const EstoqueEmpregos = ({
   color,
 }: any) => {
  
-  const recentMonth = data['municipios']?.reduce((acc: number, obj: any) => acc <= obj['Mês'] ? obj['Mês'] : acc , 0) || 1
+  const recentMonth = data['municipios']?.reduce((acc: number, obj: any) => acc <= obj['Mes'] ? obj['Mes'] : acc , 0) || 1
 
-  const chartData = data['municipios']?.filter((obj: any) => obj['Mês'] == recentMonth).reduce((acc: number, obj: any) => acc += obj['Estoque'] , 0) || 0
+  const chartData = data['municipios']?.filter((obj: any) => obj['Mes'] == recentMonth).reduce((acc: number, obj: any) => acc += obj['Estoque'] , 0) || 0
 
   return (
     <Card

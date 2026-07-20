@@ -4,8 +4,8 @@ export const empregosCagedFilters = {
     years: ["2023", "2024"], 
     additionalFilters: [
       {
-        label: "Mês",  
-        options: [],  
+        label: "Mes",
+        options: [],
         selected: [],
         hash: monthHash
       },

@@ -69,7 +69,7 @@ const PibPerCapitaNE = () => {
         colors={ColorPalette.default}
         bars={[{ dataKey: "value", name: "PIB per capita (R$)" }]}
         highlightValues={["Recife"]}
-        visibleHeight={300}
+        visibleHeight={320}
         widthY={130}
       />
     </PanoramaCard>

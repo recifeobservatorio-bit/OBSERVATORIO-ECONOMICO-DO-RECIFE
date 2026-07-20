@@ -10,24 +10,26 @@ import RankingCompetitividade from "@/components/@build/observatorio/panorama/Ra
 import TaxaSelic from "@/components/@build/observatorio/panorama/TaxaSelic";
 import ErrorBoundary from "@/utils/loader/errorBoundary";
 
-const linhaSuperior = [AeroportoMovimentacao, PibPerCapitaNE, EmpresasPorGrupo, TaxaSelic];
-const linhaInferior = [BalancaComercialMovimentacao, EmpregosMovimentacao, IpcaMensal, RankingCompetitividade];
+const graficos = [
+  PibPerCapitaNE,
+  EmpresasPorGrupo,
+  AeroportoMovimentacao,
+  TaxaSelic,
+  BalancaComercialMovimentacao,
+  EmpregosMovimentacao,
+  IpcaMensal,
+  RankingCompetitividade,
+];
 
 const PanoramaPage = () => {
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center">Panorama Recife</h1>
+    <div className="p-6 min-h-screen mt-48">
+      <h1 className="text-4xl font-bold text-gray-800 text-center mb-10 tracking-wide dark:text-gray-200">
+        Panorama Recife
+      </h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
-        {linhaSuperior.map((Component, index) => (
-          <ErrorBoundary key={index}>
-            <Component />
-          </ErrorBoundary>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-        {linhaInferior.map((Component, index) => (
+      <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {graficos.map((Component, index) => (
           <ErrorBoundary key={index}>
             <Component />
           </ErrorBoundary>
