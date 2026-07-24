@@ -12,6 +12,30 @@ function normalizeBigInt(rows: any[]) {
   });
 }
 
+const PT_LOWERCASE_CONNECTORS = new Set(["de", "do", "da", "dos", "das", "e"]);
+
+// "FERNANDO DE NORONHA" -> "Fernando de Noronha". AnacEmbarqueDesembarque's text columns are
+// all-caps in the source, but the frontend's default filter selections (e.g. AEROPORTO NOME:
+// "Recife") and Aena's own data assume Title Case — mismatched casing means an exact-match
+// filter silently matches zero rows instead of erroring.
+function titleCasePt(s: unknown): unknown {
+  if (s == null) return s;
+  return String(s)
+    .toLowerCase()
+    .split(" ")
+    .map((word, i) => (i > 0 && PT_LOWERCASE_CONNECTORS.has(word) ? word : word.charAt(0).toUpperCase() + word.slice(1)))
+    .join(" ");
+}
+
+function normalizeAnacText(rows: any[]) {
+  return rows.map((row) => ({
+    ...row,
+    "AEROPORTO NOME": titleCasePt(row["AEROPORTO NOME"]),
+    "AEROPORTO REGIÃO": titleCasePt(row["AEROPORTO REGIÃO"]),
+    NATUREZA: titleCasePt(row.NATUREZA),
+  }));
+}
+
 function makeFlatFetcher(fileName: string) {
   const url = `${process.env.NEXT_PUBLIC_API_BASE_LOGIN}/data/${fileName}`;
   let cache: any[] | null = null;
@@ -37,9 +61,16 @@ function makeFlatFetcher(fileName: string) {
   };
 }
 
-const anacFetcher = makeFlatFetcher("anac.parquet");
+const anacFetcher = makeFlatFetcher("AnacEmbarqueDesembarque.parquet");
 const aenaCargasFetcher = makeFlatFetcher("aena_cargas.parquet");
 const aenaPassageirosFetcher = makeFlatFetcher("aena_passageiros.parquet");
+
+let normalizedAnacCache: AnacGeralHeaders[] | null = null;
+async function fetchNormalizedAnac(): Promise<AnacGeralHeaders[]> {
+  if (normalizedAnacCache) return normalizedAnacCache;
+  normalizedAnacCache = normalizeAnacText(await anacFetcher.fetchAll()) as AnacGeralHeaders[];
+  return normalizedAnacCache;
+}
 
 function filterByYear(rows: any[], year: string, field: string): any[] {
   return rows.filter((r) => String(r[field]) === String(year));
@@ -49,7 +80,7 @@ export class AeroportoData {
   constructor(private year: string) {}
 
   async fetchProcessedData(): Promise<AnacGeralHeaders[]> {
-    return filterByYear(await anacFetcher.fetchAll(), this.year, "ANO");
+    return filterByYear(await fetchNormalizedAnac(), this.year, "ANO");
   }
 
   async fetchProcessedAenaPassageirosData(): Promise<AenaPassageirosHeaders[]> {
@@ -64,6 +95,7 @@ export class AeroportoData {
 
   clearCache(): void {
     anacFetcher.clearCache();
+    normalizedAnacCache = null;
     aenaCargasFetcher.clearCache();
     aenaPassageirosFetcher.clearCache();
   }
