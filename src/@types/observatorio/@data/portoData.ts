@@ -5,6 +5,10 @@ export interface PortoGeralData {
   id: "porto";
   atracacao: DataWithFilters<PortoAtracacaoHeaders> | PortoAtracacaoHeaders[];
   carga: PortoCargaHeaders[];
+  /** Mesmo recorte de atracacao/carga, mas ignorando o filtro de Mes — usado pelos
+   * gráficos de linha (CargasAno/OperacaoCargasAno) pra não colapsar num ponto só. */
+  atracacaoSemMes?: PortoAtracacaoHeaders[];
+  cargaSemMes?: PortoCargaHeaders[];
   months?: PortoMeses;
   coords: [PortoCoordHeaders[], number[]];
   dictionaries: {

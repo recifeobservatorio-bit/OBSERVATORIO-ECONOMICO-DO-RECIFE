@@ -12,11 +12,12 @@ import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
 const PassageirosAno = ({
   data,
+  dataSemMes,
   colors = ColorPalette.default,
   title = "Passageiros ao Longo do Ano",
   months
 }: ChartBuild<AnacGeralHeaders[]>) => {
-  const chartData = processPassageirosAno(data);
+  const chartData = processPassageirosAno(dataSemMes ?? data);
 
   const updatedData = updatedMonthChartData(chartData, months ?? 1);
 

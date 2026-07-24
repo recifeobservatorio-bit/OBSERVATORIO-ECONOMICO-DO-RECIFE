@@ -32,7 +32,10 @@ export class BalancaDataService {
 
     const raw = await balancaService.fetchProcessedData();
 
-    const filtered = applyGenericFilters(raw, filters);
+    const filtered = {
+      ...applyGenericFilters(raw, filters),
+      filteredDataSemMes: applyGenericFilters(raw, filters, ["Mês"]).filteredData,
+    };
 
 
     console.log('FEtchedBal', filtered)

@@ -9,13 +9,14 @@ import { updatedMonthChartData } from "@/utils/filters/@global/updateMonthChartD
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
 const PassageirosAnoAena = ({
-  rawData = [],
+  data = [],
+  dataSemMes,
   colors = ColorPalette.default,
   title = "Passageiros ao Longo do Ano",
   months
   }: ChartBuild<AenaPassageirosHeaders[]>) => {
- 
-    const chartData = processPassageirosAnoAena(rawData);
+
+    const chartData = processPassageirosAnoAena(dataSemMes ?? data);
 
     const updatedData = updatedMonthChartData(chartData, months ?? 1);
 

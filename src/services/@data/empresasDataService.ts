@@ -27,13 +27,16 @@ export class EmpresasDataService {
     return `${tab}-${this.currentYear}-${JSON.stringify(filters.additionalFilters)}`;
   }
 
-  // tab1   
+  // tab1
   private async fetchGeral(filters: any) {
     const empresasData = new EmpresasData(this.currentYear);
 
-    const fetchData = await empresasData.fetchProcessedEmpresasAtivasRecife() 
+    const fetchData = await empresasData.fetchProcessedEmpresasAtivasRecife()
 
-    const filteredData = applyGenericFilters(fetchData, filters);
+    const filteredData = {
+      ...applyGenericFilters(fetchData, filters),
+      filteredDataSemMes: applyGenericFilters(fetchData, filters, ["mes"]).filteredData,
+    };
 
     return {
       empresas: filteredData,
@@ -41,13 +44,16 @@ export class EmpresasDataService {
     };
   }
 
-  // tab2   
+  // tab2
   private async fetchEmpresasAtivas(filters: any) {
     const empresasData = new EmpresasData(this.currentYear);
 
-    const fetchData = await empresasData.fetchProcessedEmpresasAtivas() 
+    const fetchData = await empresasData.fetchProcessedEmpresasAtivas()
 
-    const filteredData = applyGenericFilters(fetchData, filters);
+    const filteredData = {
+      ...applyGenericFilters(fetchData, filters),
+      filteredDataSemMes: applyGenericFilters(fetchData, filters, ["mes"]).filteredData,
+    };
 
     return {
       empresas: filteredData,
@@ -119,15 +125,20 @@ export class EmpresasDataService {
       const filteredData = applyGenericFilters(fetchData, filters);
       const filteredDataRawDataMunicipio = applyGenericFilters(fetchData, filters, ['Municipio']);
       const filteredDataRawDataMes = applyGenericFilters(fetchData, filters, ['mes']);
+      // comparativo-empresas-classes builds its 'mes' breakdown from rawData.municipio (it needs
+      // all municípios, not just the selected one) — but that skip list doesn't include 'mes',
+      // so its line chart collapses to one point when a month is selected. This variant skips both.
+      const filteredDataRawDataMunicipioSemMes = applyGenericFilters(fetchData, filters, ['Municipio', 'mes']);
 
       return {
         empresas: {
           empresas: filteredData,
           rawData: {
-            mes: filteredDataRawDataMes, 
-            municipio: filteredDataRawDataMunicipio
-          },   
-        },      
+            mes: filteredDataRawDataMes,
+            municipio: filteredDataRawDataMunicipio,
+            municipioSemMes: filteredDataRawDataMunicipioSemMes,
+          },
+        },
         id: "empresas-empresas-classes",
       };
   }

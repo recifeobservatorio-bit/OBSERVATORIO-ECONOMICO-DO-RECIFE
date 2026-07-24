@@ -45,13 +45,18 @@ const ComparativoClasses = ({
 
      toCompare.map((muni: string) => {
       const dataFiltred =  data['rawData']['municipio']?.filter((micro: any) => micro['Municipio'] === muni) || []
-      if (!dataMuni[muni]) dataMuni[muni] = {}  
+      const dataFiltredSemMes = data['rawData']['municipioSemMes']?.filter((micro: any) => micro['Municipio'] === muni) || []
+      if (!dataMuni[muni]) dataMuni[muni] = {}
 
+      const municipioAcc = geralAccFieldFunction(dataFiltred, params, 'Estabelecimentos')
+      // 'mes' alimenta o gráfico de linha (EmpresasAtivasClassesMes) — usa a série sem o
+      // filtro de mês aplicado, senão a linha vira um ponto só quando um mês é selecionado.
+      municipioAcc.mes = geralAccFieldFunction(dataFiltredSemMes, ['mes'], 'Estabelecimentos').mes
 
       dataMuni[muni] = {
-        municipio: geralAccFieldFunction(dataFiltred, params, 'Estabelecimentos'),
+        municipio: municipioAcc,
       }
-    }) 
+    })
 
     setChartData(dataMuni)
   }, [data])

@@ -18,6 +18,8 @@ const AenaPage = ({ months}: {months: number}) => {
   const { data, isLoading } = useDashboard();
   const [filteredPassageiros, setFilteredPassageiros] = useState<AenaPassageirosHeaders[]>([]);
 const [filteredCargas, setFilteredCargas] = useState<AenaCargasHeaders[]>([]);
+  const [filteredPassageirosSemMes, setFilteredPassageirosSemMes] = useState<AenaPassageirosHeaders[]>([]);
+  const [filteredCargasSemMes, setFilteredCargasSemMes] = useState<AenaCargasHeaders[]>([]);
 
   const [chartOrder, setChartOrder] = useState([...chartsCargas, ...chartsPassageiros].map((_, index) => index));
 
@@ -28,6 +30,8 @@ const [filteredCargas, setFilteredCargas] = useState<AenaCargasHeaders[]>([]);
     if (data?.id === "aena") {
       setFilteredPassageiros(data.passageiros?.filteredData || []);
       setFilteredCargas(data.cargas?.filteredData || []);
+      setFilteredPassageirosSemMes(data.passageiros?.filteredDataSemMes || []);
+      setFilteredCargasSemMes(data.cargas?.filteredDataSemMes || []);
     }
   }, [data]);
 
@@ -70,12 +74,13 @@ const [filteredCargas, setFilteredCargas] = useState<AenaCargasHeaders[]>([]);
           const { Component, type } = charts[index]; // 'type' pode indicar se é carga ou passageiro
           if (data?.id === "aena") {
             const filteredData = type === 'carga' ? filteredCargas: filteredPassageiros;
+            const filteredDataSemMes = type === 'carga' ? filteredCargasSemMes : filteredPassageirosSemMes;
             const rawData = type === 'carga' ? data?.cargas?.rawDataCargas|| [] : data?.passageiros?.rawDataPassageiros || [];
-          
+
             return (
               <div key={`chart-${index}`} className="chart-content-wrapper">
                 <React.Suspense fallback={<GraphSkeleton />}>
-                <Component data={filteredData as AenaCargasHeaders[] & AenaPassageirosHeaders[]} rawData={rawData as AenaCargasHeaders[] & AenaPassageirosHeaders[]} months={months} />
+                <Component data={filteredData as AenaCargasHeaders[] & AenaPassageirosHeaders[]} dataSemMes={filteredDataSemMes as AenaCargasHeaders[] & AenaPassageirosHeaders[]} rawData={rawData as AenaCargasHeaders[] & AenaPassageirosHeaders[]} months={months} />
                 </React.Suspense>
               </div>
             );

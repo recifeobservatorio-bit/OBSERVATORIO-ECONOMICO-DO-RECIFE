@@ -16,6 +16,7 @@ import tables from "./@imports/tables";
 const ComparativoMov = ({
   year,
   data,
+  dataSemMes,
   toCompare = getUniqueValues<any, "município">(
     data,
     "município"
@@ -24,6 +25,7 @@ const ComparativoMov = ({
   year: string;
   toCompare?: any;
   data: any;
+  dataSemMes?: any;
 }) => {
   const [pageCompare, setPageCompare] = useState(0);
   const [tempFiltred, setTempFiltred] = useState([]);
@@ -35,6 +37,7 @@ const ComparativoMov = ({
   const [chartOrder, setChartOrder] = useState(charts.map((_, index) => index));
 
   const [chartData, setChartData] = useState({})
+  const [chartDataSemMes, setChartDataSemMes] = useState({})
 
   const sortableContainerRef = useRef<HTMLDivElement>(null);
 
@@ -43,7 +46,7 @@ const ComparativoMov = ({
 
      toCompare.map((muni: string) => {
       const dataFiltred = data?.filter((micro: any) => micro['município'] === muni) || []
-      if (!dataMuni[muni]) dataMuni[muni] = {}  
+      if (!dataMuni[muni]) dataMuni[muni] = {}
 
       const dataAdmitidos = geralAccFunction(dataFiltred.filter((obj: any) => obj['saldomovimentação'] === "Admitidos") || [], ['mês'])
       const dataDemitidos = geralAccFunction(dataFiltred.filter((obj: any) => obj['saldomovimentação'] === "Demitidos") || [], ['mês'])
@@ -51,11 +54,33 @@ const ComparativoMov = ({
       const { 'mês': admitidos  } = dataAdmitidos
       const { 'mês': demitidos  } = dataDemitidos
 
-      dataMuni[muni] = { admitidos, demitidos } 
-    }) 
+      dataMuni[muni] = { admitidos, demitidos }
+    })
 
     setChartData(dataMuni)
   }, [data])
+
+  // Mesma série, mas ignorando o filtro de mês — usada só pelos gráficos de linha
+  // (ComparativoMovimentacao/ComparativoSaldo), senão a linha vira um ponto só quando
+  // um mês específico é selecionado.
+  useEffect(() => {
+    const dataMuni: { [key: string]: any } = {}
+
+    toCompare.map((muni: string) => {
+      const dataFiltred = (dataSemMes ?? data)?.filter((micro: any) => micro['município'] === muni) || []
+      if (!dataMuni[muni]) dataMuni[muni] = {}
+
+      const dataAdmitidos = geralAccFunction(dataFiltred.filter((obj: any) => obj['saldomovimentação'] === "Admitidos") || [], ['mês'])
+      const dataDemitidos = geralAccFunction(dataFiltred.filter((obj: any) => obj['saldomovimentação'] === "Demitidos") || [], ['mês'])
+
+      const { 'mês': admitidos } = dataAdmitidos
+      const { 'mês': demitidos } = dataDemitidos
+
+      dataMuni[muni] = { admitidos, demitidos }
+    })
+
+    setChartDataSemMes(dataMuni)
+  }, [data, dataSemMes])
 
   useEffect(() => {
     const getNewTables = tempFiltred.map((val) => {
@@ -209,7 +234,7 @@ const ComparativoMov = ({
                 <Component
                   toCompare={[...tempFiltred][index]}
                   color={ColorPalette.default[index]}
-                  data={chartData}
+                  data={chartDataSemMes}
                   year={year}
                 />
               </React.Suspense>
@@ -232,7 +257,7 @@ const ComparativoMov = ({
                 <Component
                   toCompare={[...tempFiltred][index]}
                   color={ColorPalette.default[index]}
-                  data={chartData}
+                  data={chartDataSemMes}
                   year={year}
                 />
               </React.Suspense>

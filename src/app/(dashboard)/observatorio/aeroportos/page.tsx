@@ -19,6 +19,7 @@ const AeroportosPage = () => {
   const searchParams = useSearchParams();
   const { isLoading, data, filters } = useDashboard();
   const [anac, setAnac] = useState<AnacGeralHeaders[]>([]);
+  const [anacSemMes, setAnacSemMes] = useState<AnacGeralHeaders[]>([]);
   const [activeTab, setActiveTab] = useState("geral");
   const router = useRouter();
 
@@ -38,6 +39,7 @@ const AeroportosPage = () => {
         if (data) {
           if (data?.id === "anac") {
             setAnac(data.geral?.filteredData || []);
+            setAnacSemMes(data.geral?.filteredDataSemMes || []);
           }
           
           clearInterval(intervalId);
@@ -56,8 +58,9 @@ const AeroportosPage = () => {
 
     switch (activeTab) {
       case "geral":
-        return <Geral 
+        return <Geral
           data={anac || []}
+          dataSemMes={anacSemMes || []}
           rawData={data?.id === "anac" ? data.geral?.rawData || [] : []}
           year={getYearSelected(filters)}
           months={getMonths(filters)}
@@ -66,7 +69,8 @@ const AeroportosPage = () => {
         // DEFAULTFILTERS E CONSEGUIR PASSAR SOMENTE O ANO.
       case "comparativo":
         return <Comparativo
-          data={anac || []} 
+          data={anac || []}
+          dataSemMes={anacSemMes || []}
           year={getYearSelected(filters)}
           months={getMonths(filters)}
         />;
@@ -78,8 +82,9 @@ const AeroportosPage = () => {
       case "aena":
         return <AenaPage months={getMonths(filters)} />;
       default:
-        return <Geral 
+        return <Geral
         data={anac || []}
+        dataSemMes={anacSemMes || []}
         rawData={data?.id === "anac" ? data.geral?.rawData || [] : []}
         year={getYearSelected(filters)}
         months={getMonths(filters)}

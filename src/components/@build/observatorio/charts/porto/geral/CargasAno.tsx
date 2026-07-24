@@ -17,7 +17,10 @@ const CargasAno = ({
   title = "Movimentação de Cargas (Ton)",
   months
 }: ChartBuild<PortoGeralData>) => {
-  const chartData = processAtracacoesPorMes(data.atracacao as PortoAtracacaoHeaders[], data.carga)
+  const chartData = processAtracacoesPorMes(
+    (data.atracacaoSemMes ?? data.atracacao) as PortoAtracacaoHeaders[],
+    data.cargaSemMes ?? data.carga
+  )
 
   const updatedData = updatedMonthChartData(chartData, months?.options.length);
 

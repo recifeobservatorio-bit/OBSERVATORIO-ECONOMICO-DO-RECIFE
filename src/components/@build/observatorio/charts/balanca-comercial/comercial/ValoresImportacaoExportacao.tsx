@@ -10,12 +10,13 @@ import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
 const CargasAnoComparativo = ({
   data = [],
+  dataSemMes,
   colors = ColorPalette.default,
   title = "Valores Importação e Exportação",
   months
 }: ChartBuild<BalancaHeaders[]>) => {
 
-  const chartData = processValoresImportacaoExportacao(data);
+  const chartData = processValoresImportacaoExportacao(dataSemMes ?? data);
 
   const updatedData = updatedMonthChartData(chartData, months ?? 1);
 

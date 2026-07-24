@@ -24,6 +24,7 @@ const BalancaComercialPage = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [balanca, setBalanca] = useState<BalancaHeaders[]>([]);
+  const [balancaSemMes, setBalancaSemMes] = useState<BalancaHeaders[]>([]);
 
   const { isLoading, data, filters } = useDashboard();
 
@@ -43,6 +44,7 @@ const BalancaComercialPage = () => {
           if (data?.id === "balanca") {
             const balancaData = data?.geral || {};
             setBalanca(balancaData?.filteredData || {});
+            setBalancaSemMes(balancaData?.filteredDataSemMes || []);
 
           }
 
@@ -71,6 +73,7 @@ const BalancaComercialPage = () => {
         return (
           <Geral
             data={balanca}
+            dataSemMes={balancaSemMes}
             year={getYearSelected(filters)}
             months={getMonths(filters)}
           />

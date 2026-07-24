@@ -18,6 +18,7 @@ import Saldo from "./(saldo)/saldo";
 const MicroCagedPage = () => {
   const { isLoading, data, filters } = useDashboard() as any;
   const [microCaged, setMicroCaged] = useState<any>([]);
+  const [microCagedSemMes, setMicroCagedSemMes] = useState<any>([]);
   const [microCagedMedia, setMicroCagedMedia] = useState<any>([]);
   const [activeTab, setActiveTab] = useState("geral");
 
@@ -42,10 +43,12 @@ const MicroCagedPage = () => {
           const microCagedData = data?.microCaged || [];
 
           setMicroCaged(microCagedData.filteredData);
+          setMicroCagedSemMes(microCagedData.filteredDataSemMes || []);
 
           clearInterval(intervalId);
         } else {
             setMicroCaged([]);
+            setMicroCagedSemMes([]);
           }
 
         if (data?.id === 'empregos-micro-caged-media' as 'porto') {
@@ -89,9 +92,10 @@ const MicroCagedPage = () => {
         /> 
       case "comparativo-mov":
         return <ComparativoMov
-        data={microCaged} 
-        year={getYearSelected(filters)} 
-        /> 
+        data={microCaged}
+        dataSemMes={microCagedSemMes}
+        year={getYearSelected(filters)}
+        />
       case "comparativo-med":
         return <ComparativoMed
         data={microCagedMedia} 

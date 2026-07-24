@@ -15,9 +15,11 @@ import tables from "./@imports/tables";
 
 const EmpresasAtivasRecife = ({
   data,
+  dataSemMes,
   year,
 }: {
   data: any;
+  dataSemMes?: any;
   year: string;
 }) => {
   const [chartOrder, setChartOrder] = useState(charts.map((_, index) => index));
@@ -52,7 +54,7 @@ const EmpresasAtivasRecife = ({
             >
               <React.Suspense fallback={<GraphSkeleton />}>
                 <ErrorBoundary>
-                  <Component data={data} />
+                  <Component data={dataSemMes ?? data} />
                 </ErrorBoundary>
               </React.Suspense>
             </div>

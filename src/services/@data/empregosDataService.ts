@@ -31,8 +31,10 @@ export class EmpregosDataService {
 
     const fetchData = await empregosData.fetchProcessedDataCaged();
 
-    // tanto faz, o ideial é filtrar somente por municipio
-    const filteredMunicipioData = applyGenericFilters(fetchData,  filters, ['Região', 'UF']);
+    // tanto faz, o ideial é filtrar somente por municipio. Ignora também 'Mes' porque
+    // esse campo alimenta gráficos de linha (RelatorioAno/SaldoAno) que mostram o ano inteiro —
+    // filtrar por um mês selecionado faria a linha virar um ponto só.
+    const filteredMunicipioData = applyGenericFilters(fetchData,  filters, ['Região', 'UF', 'Mes']);
     // tudo menos filtrar por municipio
     const filteredCagedData = applyGenericFilters(fetchData, filters, ['Municipio']);
 

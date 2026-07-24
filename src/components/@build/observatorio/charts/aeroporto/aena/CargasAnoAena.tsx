@@ -10,12 +10,13 @@ import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
 const CargasAnoAena = ({
     data = [],
+    dataSemMes,
     colors = ColorPalette.default,
     title = "Cargas ao Longo do Ano",
     months
   }: ChartBuild<AenaCargasHeaders[]>) => {
- 
-    const chartData = processCargaAnoAena(data);
+
+    const chartData = processCargaAnoAena(dataSemMes ?? data);
   
     const updatedData = updatedMonthChartData(chartData, months ?? 1);
 

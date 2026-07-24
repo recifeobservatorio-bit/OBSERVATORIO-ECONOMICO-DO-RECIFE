@@ -55,11 +55,22 @@ export class PortoDataService {
         (item) => atracacaoIds.has(item.IDAtracacao) && item['FlagMCOperacaoCarga']
       );
 
+      // Mesmo recorte, ignorando o filtro de Mes — usado só pelos gráficos de linha
+      // (CargasAno/OperacaoCargasAno), senão a linha vira um ponto só quando um mês é
+      // selecionado. Continua respeitando Porto Atracação/Município/SGUF/Ação.
+      const atracacaoSemMesFiltered = applyGenericFilters(atracacao, filters, ["Mes"]);
+      const atracacaoSemMesIds = new Set(atracacaoSemMesFiltered.filteredData.map((atracacao) => atracacao.IDAtracacao));
+      const cargaSemMesFiltered = carga.filter(
+        (item) => atracacaoSemMesIds.has(item.IDAtracacao) && item['FlagMCOperacaoCarga']
+      );
+
       const portosSelected = filters?.additionalFilters.find((item) => item.label === "Porto Atracação")?.selected ?? [];
-      
+
       return {
         atracacao: atracacaoFiltered,
         carga: cargaFiltered,
+        atracacaoSemMes: atracacaoSemMesFiltered.filteredData,
+        cargaSemMes: cargaSemMesFiltered,
         rawData: { atracacao, carga },
         dictionaries: {
           origem: origemDictionary,

@@ -70,7 +70,7 @@ function applyItbiFilters(rows: any[], f: ReturnType<typeof getItbiFilters>, yea
   });
 }
 
-function processItbiContribuintes(rows: any[], prevYearRows: any[], year: string) {
+function processItbiContribuintes(rows: any[], prevYearRows: any[], year: string, rowsSemMes: any[] = rows) {
   const totalAtual = rows.length;
   const totalAnterior = prevYearRows.length;
   const variacao = totalAnterior ? parseFloat((((totalAtual - totalAnterior) / totalAnterior) * 100).toFixed(2)) : 0;
@@ -84,7 +84,9 @@ function processItbiContribuintes(rows: any[], prevYearRows: any[], year: string
   const byMonth = groupBy(rows, (r) => String(getItbiMonth(r)));
   const byMonthPrev = groupBy(prevYearRows, (r) => String(getItbiMonth(r)));
 
-  const linhaTransmissoes = MESES.map((mes, i) => ({ mes, quantidade: byMonth[i]?.length ?? 0 }));
+  // Ignora o filtro de MÊS — senão a linha vira um ponto só quando um mês é selecionado.
+  const byMonthSemMes = groupBy(rowsSemMes, (r) => String(getItbiMonth(r)));
+  const linhaTransmissoes = MESES.map((mes, i) => ({ mes, quantidade: byMonthSemMes[i]?.length ?? 0 }));
 
   const tabelaAnual = MESES.map((mes, i) => {
     const total = byMonth[i]?.length ?? 0;
@@ -106,7 +108,7 @@ function processItbiContribuintes(rows: any[], prevYearRows: any[], year: string
   return { cards, linhaTransmissoes, tabelaAnual, porBairro, porConstrucao, porUso };
 }
 
-function processItbiAvaliacoes(rows: any[]) {
+function processItbiAvaliacoes(rows: any[], rowsSemMes: any[] = rows) {
   const valores = rows.map((r) => parseDecimal(r.valor_avaliacao)).filter((v) => !isNaN(v));
   const maior = valores.length ? Math.max(...valores) : 0;
   const menor = valores.length ? Math.min(...valores) : 0;
@@ -118,9 +120,11 @@ function processItbiAvaliacoes(rows: any[]) {
   ];
 
   const byMonth = groupBy(rows, (r) => String(getItbiMonth(r)));
+  // Ignora o filtro de MÊS — senão a linha vira um ponto só quando um mês é selecionado.
+  const byMonthSemMes = groupBy(rowsSemMes, (r) => String(getItbiMonth(r)));
   const medianaAvaliacoes = MESES.map((mes, i) => ({
     mes,
-    mediana: parseFloat(median((byMonth[i] ?? []).map((r: any) => parseDecimal(r.valor_avaliacao))).toFixed(2)),
+    mediana: parseFloat(median((byMonthSemMes[i] ?? []).map((r: any) => parseDecimal(r.valor_avaliacao))).toFixed(2)),
   }));
 
   // Amostra das transações mais recentes (a tabela renderiza tudo no cliente, então não manda o dataset inteiro)
@@ -316,6 +320,9 @@ export class TributosDataService {
       const allRows = await fetchItbiRaw();
       const f = getItbiFilters({ ...filters, year: this.currentYear });
       const rows = applyItbiFilters(allRows, f);
+      // Mesmo recorte, ignorando o filtro de MÊS — usado só pelas linhas (linhaTransmissoes/
+      // medianaAvaliacoes), pra não colapsar num ponto só quando um mês é selecionado.
+      const rowsSemMes = applyItbiFilters(allRows, { ...f, meses: [] });
 
       const additionalFiltersOptions = [
         { label: "MÊS", options: ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"] },
@@ -327,7 +334,7 @@ export class TributosDataService {
 
       switch (tab) {
         case "itbi-avaliacoes":
-          processed = { id: "tributos", itbiAvaliacoes: { ...processItbiAvaliacoes(rows), additionalFiltersOptions } };
+          processed = { id: "tributos", itbiAvaliacoes: { ...processItbiAvaliacoes(rows, rowsSemMes), additionalFiltersOptions } };
           break;
         case "itbi-pesquisa":
           processed = { id: "tributos", itbiPesquisa: { ...processItbiPesquisa(rows), additionalFiltersOptions } };
@@ -336,7 +343,7 @@ export class TributosDataService {
           const prevYearRows = applyItbiFilters(allRows, f, String(Number(this.currentYear) - 1));
           processed = {
             id: "tributos",
-            itbiContribuintes: { ...processItbiContribuintes(rows, prevYearRows, this.currentYear), additionalFiltersOptions },
+            itbiContribuintes: { ...processItbiContribuintes(rows, prevYearRows, this.currentYear, rowsSemMes), additionalFiltersOptions },
           };
         }
       }

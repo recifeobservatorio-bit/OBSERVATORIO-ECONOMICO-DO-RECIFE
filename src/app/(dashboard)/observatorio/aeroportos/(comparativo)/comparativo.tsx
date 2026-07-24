@@ -18,6 +18,7 @@ import tables from "./@imports/tables";
 
 const Comparativo: React.FC<ChartBuild> = ({
   data,
+  dataSemMes,
   toCompare = getUniqueValues<AnacGeralHeaders, "AEROPORTO NOME">(data as AnacGeralHeaders[], "AEROPORTO NOME"),
   months,
   year
@@ -179,7 +180,7 @@ const Comparativo: React.FC<ChartBuild> = ({
             >
               <React.Suspense fallback={<GraphSkeleton />}>
                 <Component
-                  data={(data as AnacGeralHeaders[])}
+                  data={(dataSemMes ?? data) as AnacGeralHeaders[]}
                   toCompare={[...tempFiltred]}
                   months={months}
                 />

@@ -15,6 +15,7 @@ import charts from "./@imports/charts";
 
 const Geral: React.FC<ChartBuild> = ({
   data,
+  dataSemMes,
   rawData,
   months,
 }) => {
@@ -41,7 +42,7 @@ const Geral: React.FC<ChartBuild> = ({
             >
               <React.Suspense fallback={<GraphSkeleton />}>
                 <ErrorBoundary>
-                  <Component data={data as AnacGeralHeaders[]} rawData={rawData as AnacGeralHeaders[]} months={months} />
+                  <Component data={data as AnacGeralHeaders[]} dataSemMes={dataSemMes as AnacGeralHeaders[]} rawData={rawData as AnacGeralHeaders[]} months={months} />
                 </ErrorBoundary>
               </React.Suspense>
             </div>

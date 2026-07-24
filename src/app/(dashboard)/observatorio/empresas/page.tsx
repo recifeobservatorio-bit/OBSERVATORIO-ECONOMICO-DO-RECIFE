@@ -24,6 +24,7 @@ import EmpresasTempoAbertura from "./(empresas-tempo-abertura)/empresas-tempo-ab
 const EmpresasPage = () => {
   const { isLoading, data, filters } = useDashboard() as any;
   const [dataArr, setDataArr] = useState<any>([]);
+  const [dataArrSemMes, setDataArrSemMes] = useState<any>([]);
   const [dataObjRawData, setDataObjRawData] = useState<any>({});
   const [dataObj, setDataObj] = useState<any>({});
   const [dataTest, setDataTest] = useState<any>({});
@@ -58,10 +59,12 @@ const EmpresasPage = () => {
           const empresasDataObj = data?.empresas || [];
 
           setDataArr(empresasDataObj.filteredData);
+          setDataArrSemMes(empresasDataObj.filteredDataSemMes || []);
 
           clearInterval(intervalId);
         } else {
             setDataArr([]);
+            setDataArrSemMes([]);
           }
         
         if (idTest.includes(data?.id)) {
@@ -104,7 +107,7 @@ const EmpresasPage = () => {
           }
 
         if (idObjsRawData.includes(data?.id)) {
-          const empresasDataObj = { empresas: data?.empresas?.empresas?.filteredData || [], rawData: { mes: data?.empresas?.rawData?.mes?.filteredData || [], municipio: data?.empresas?.rawData?.municipio?.filteredData || [] } };
+          const empresasDataObj = { empresas: data?.empresas?.empresas?.filteredData || [], rawData: { mes: data?.empresas?.rawData?.mes?.filteredData || [], municipio: data?.empresas?.rawData?.municipio?.filteredData || [], municipioSemMes: data?.empresas?.rawData?.municipioSemMes?.filteredData || [] } };
           
           setDataObjRawData(empresasDataObj);
 
@@ -149,14 +152,16 @@ const EmpresasPage = () => {
     switch (activeTab) {
       case "geral":
         return <EmpresasAtivasRecife
-        data={dataArr} 
-        year={getYearSelected(filters)} 
-        />  
+        data={dataArr}
+        dataSemMes={dataArrSemMes}
+        year={getYearSelected(filters)}
+        />
       case "empresas-ativas":
         return <EmpresasAtivas
-        data={dataArr} 
-        year={getYearSelected(filters)} 
-        /> 
+        data={dataArr}
+        dataSemMes={dataArrSemMes}
+        year={getYearSelected(filters)}
+        />
       case "empresas-inativas":
         return <EmpresasInativas
         data={dataArr} 
@@ -211,9 +216,10 @@ const EmpresasPage = () => {
       //   year={getYearSelected(filters)} 
       //   /> 
       default:
-        return <EmpresasAtivasRecife 
-        data={dataArr} 
-        year={getYearSelected(filters)} 
+        return <EmpresasAtivasRecife
+        data={dataArr}
+        dataSemMes={dataArrSemMes}
+        year={getYearSelected(filters)}
         />
     }
   };

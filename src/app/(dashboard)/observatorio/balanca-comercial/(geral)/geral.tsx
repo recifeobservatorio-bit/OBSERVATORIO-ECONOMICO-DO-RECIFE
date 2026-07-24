@@ -9,7 +9,7 @@ import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 import cards from "./@imports/cards";
 import charts from "./@imports/charts";
 
-const Geral = ({ data, year, months }: { data: BalancaHeaders[]; year: string, months: number }) => {
+const Geral = ({ data, dataSemMes, year, months }: { data: BalancaHeaders[]; dataSemMes?: BalancaHeaders[]; year: string, months: number }) => {
   const [chartOrder, setChartOrder] = useState(charts.map((_, index) => index));
 
   // REF do container e REF da instância do Sortable
@@ -42,7 +42,7 @@ const Geral = ({ data, year, months }: { data: BalancaHeaders[]; year: string, m
             >
               <React.Suspense fallback={<GraphSkeleton />}>
                 <ErrorBoundary>
-                  <Component data={data} months={months} />
+                  <Component data={data} dataSemMes={dataSemMes} months={months} />
                 </ErrorBoundary>
               </React.Suspense>
             </div>

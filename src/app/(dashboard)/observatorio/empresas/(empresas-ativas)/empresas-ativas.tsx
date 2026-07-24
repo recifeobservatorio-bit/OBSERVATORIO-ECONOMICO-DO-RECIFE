@@ -17,9 +17,11 @@ import maps from "./@imports/maps";
 
 const EmpresasAtivas = ({
   data,
+  dataSemMes,
   year,
 }: {
   data: any;
+  dataSemMes?: any;
   year: string;
 }) => {
   const [chartOrder, setChartOrder] = useState(charts.map((_, index) => index));
@@ -29,8 +31,12 @@ const EmpresasAtivas = ({
   const params = ['nome_bairro', 'Grupo', 'desc_atividade', 'mes']
 
   const chartData = useMemo(() => {
-    return geralAccFunction(data, params)
-  }, [data, params])  
+    const acc = geralAccFunction(data, params)
+    // 'mes' alimenta um gráfico de linha (EmpresasMes) — usa a série sem o filtro de mês
+    // aplicado, senão a linha vira um ponto só quando um mês específico é selecionado.
+    if (dataSemMes) acc.mes = geralAccFunction(dataSemMes, ['mes']).mes
+    return acc
+  }, [data, dataSemMes, params])
   
   const { Component }: any = maps[0]
 

@@ -39,8 +39,16 @@ export class AeroportoDataService implements Service<AeroportoDataResult> {
       getRawData({applyGenericFilters, service: aeroportoService, nameFunc:'fetchProcessedAenaCargasData', currentYear: this.currentYear, years: filters.years, keyName: 'Aeroporto', filters, lengthIgnore: 1})
     ]);
 
-    const passageirosFiltered = {...applyGenericFilters(passageiros, filters), rawDataPassageiros};
-    const cargasFiltered = {...applyGenericFilters(cargas, filters), rawDataCargas};
+    const passageirosFiltered = {
+      ...applyGenericFilters(passageiros, filters),
+      rawDataPassageiros,
+      filteredDataSemMes: applyGenericFilters(passageiros, filters, ["Mês"]).filteredData,
+    };
+    const cargasFiltered = {
+      ...applyGenericFilters(cargas, filters),
+      rawDataCargas,
+      filteredDataSemMes: applyGenericFilters(cargas, filters, ["Mês"]).filteredData,
+    };
 
     return {
       passageiros: passageirosFiltered,
@@ -53,7 +61,11 @@ export class AeroportoDataService implements Service<AeroportoDataResult> {
     const aeroportoService = new AeroportoData(this.currentYear);
     const geral = await aeroportoService.fetchProcessedData();
     const rawData = await getRawData({applyGenericFilters, service: aeroportoService, nameFunc:'fetchProcessedData', currentYear: this.currentYear, years: filters.years, keyName: 'AEROPORTO NOME', filters, lengthIgnore: 1})
-    const geralFiltered = {...applyGenericFilters(geral, filters), rawData};
+    const geralFiltered = {
+      ...applyGenericFilters(geral, filters),
+      rawData,
+      filteredDataSemMes: applyGenericFilters(geral, filters, ["MÊS"]).filteredData,
+    };
 
     console.log('FetchAeroporto', geralFiltered)
 
