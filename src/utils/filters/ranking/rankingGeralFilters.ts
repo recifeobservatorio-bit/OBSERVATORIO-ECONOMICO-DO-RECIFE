@@ -1,5 +1,5 @@
 export const rankingGeralFilters = {
-    years: ["2021", "2022", "2023", "2024"], // Filtra por ano
+    years: ["2021", "2022", "2023", "2024", "2025"], // Filtra por ano
     additionalFilters: [
       {
         label: "Região",

@@ -1,5 +1,5 @@
 export const tributosIptuPesquisaFilters = {
-  years: ["2021", "2022", "2023", "2024", "2025"],
+  years: ["2021", "2022", "2023", "2024", "2025", "2026"],
   additionalFilters: [
     {
       label: "LOGRADOURO",

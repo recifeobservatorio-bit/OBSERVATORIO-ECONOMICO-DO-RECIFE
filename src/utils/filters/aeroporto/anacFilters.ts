@@ -1,7 +1,7 @@
 import { monthHash } from "@/utils/hashs/monthHash";
 
 export const anacFilters = {
-  years: ["2021", "2022", "2023", "2024"], // Filtra por ano
+  years: ["2021", "2022", "2023", "2024", "2025", "2026"], // Filtra por ano
   additionalFilters: [
     {
       label: "NATUREZA", // Deve corresponder exatamente à chave nos dados

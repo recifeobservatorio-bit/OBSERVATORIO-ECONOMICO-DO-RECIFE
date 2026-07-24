@@ -1,7 +1,7 @@
 import { monthHash } from "@/utils/hashs/monthHash";
 
 export const portoComparativoFilters = {
-    years: ["2023", "2024"], // Filtra por ano
+    years: ["2023", "2024", "2025", "2026"], // Filtra por ano
     additionalFilters: [
       {
         label: "Mes", // O Mês será preenchido dinamicamente
