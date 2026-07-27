@@ -17,6 +17,7 @@ import CustomTooltip from "../features/CustomTooltip";
 const LineChart = ({
   data,
   title,
+  underTitle,
   xKey,
   yAxis,
   lines,
@@ -34,6 +35,9 @@ const LineChart = ({
     <div className="relative bg-white w-full h-full dark:bg-[#0C1B2B]">
       <div className="flex flex-col items-center justify-center">
         <h3 className="text-center font-semibold w-[90%] text-gray-800 dark:text-gray-100">{title}</h3>
+        <div className="mb-2">
+          {underTitle}
+        </div>
       </div>
       <ResponsiveContainer width="100%" height={height}>
         <RechartsLineChart

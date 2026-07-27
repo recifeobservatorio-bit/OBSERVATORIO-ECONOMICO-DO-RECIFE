@@ -32,8 +32,11 @@ const EmpresasAtivas = ({
 
   const chartData = useMemo(() => {
     const acc = geralAccFunction(data, params)
-    // 'mes' alimenta um gráfico de linha (EmpresasMes) — usa a série sem o filtro de mês
-    // aplicado, senão a linha vira um ponto só quando um mês específico é selecionado.
+    // 'mesFiltrado' preserva a série respeitando o filtro de mês, para o toggle
+    // Mês/Ano de EmpresasMes escolher entre ela e a variante sem filtro abaixo.
+    acc.mesFiltrado = acc.mes
+    // 'mes' alimenta o modo "Ano" do gráfico de linha (EmpresasMes) — usa a série sem o
+    // filtro de mês aplicado, senão a linha vira um ponto só quando um mês é selecionado.
     if (dataSemMes) acc.mes = geralAccFunction(dataSemMes, ['mes']).mes
     return acc
   }, [data, dataSemMes, params])

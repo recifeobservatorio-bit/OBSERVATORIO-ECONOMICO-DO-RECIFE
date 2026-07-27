@@ -93,6 +93,19 @@ export class AeroportoData {
     return filterByYear(await aenaCargasFetcher.fetchAll(), this.year, "Ano");
   }
 
+  // Sem filtro de ano — usadas pela série histórica multianual ("Ano" no toggle Mês/Ano).
+  async fetchAllYearsAnac(): Promise<AnacGeralHeaders[]> {
+    return fetchNormalizedAnac();
+  }
+
+  async fetchAllYearsAenaCargas(): Promise<AenaCargasHeaders[]> {
+    return aenaCargasFetcher.fetchAll();
+  }
+
+  async fetchAllYearsAenaPassageiros(): Promise<AenaPassageirosHeaders[]> {
+    return aenaPassageirosFetcher.fetchAll();
+  }
+
   clearCache(): void {
     anacFetcher.clearCache();
     normalizedAnacCache = null;

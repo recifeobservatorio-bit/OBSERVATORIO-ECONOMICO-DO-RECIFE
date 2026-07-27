@@ -61,6 +61,11 @@ export class EmpresasData {
     return filterByYear(await ativasRecifeFetcher.fetchAll(), this.year, "Ano");
   }
 
+  // Sem filtro de ano — usada pela série histórica multianual ("Ano" no toggle Mês/Ano).
+  async fetchAllYearsEmpresasAtivasRecife(): Promise<any[]> {
+    return ativasRecifeFetcher.fetchAll();
+  }
+
   async fetchProcessedEmpresasAtivas(): Promise<any[]> {
     return ativasRegistroFetcher.fetchAll();
   }

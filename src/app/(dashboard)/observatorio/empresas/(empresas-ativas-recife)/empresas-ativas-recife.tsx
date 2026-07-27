@@ -54,7 +54,7 @@ const EmpresasAtivasRecife = ({
             >
               <React.Suspense fallback={<GraphSkeleton />}>
                 <ErrorBoundary>
-                  <Component data={dataSemMes ?? data} />
+                  <Component data={data} dataSemMes={dataSemMes} />
                 </ErrorBoundary>
               </React.Suspense>
             </div>

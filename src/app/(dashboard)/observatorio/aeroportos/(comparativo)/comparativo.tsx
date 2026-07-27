@@ -180,7 +180,8 @@ const Comparativo: React.FC<ChartBuild> = ({
             >
               <React.Suspense fallback={<GraphSkeleton />}>
                 <Component
-                  data={(dataSemMes ?? data) as AnacGeralHeaders[]}
+                  data={data as AnacGeralHeaders[]}
+                  dataSemMes={dataSemMes as AnacGeralHeaders[]}
                   toCompare={[...tempFiltred]}
                   months={months}
                 />

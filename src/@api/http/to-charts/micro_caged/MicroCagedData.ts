@@ -36,6 +36,11 @@ export class MicroCagedData {
     return rows.filter((r) => String(r["Ano"]) === String(this.year));
   }
 
+  // Sem filtro de ano — usada pela série histórica multianual ("Ano" no toggle Mês/Ano).
+  async fetchAllYearsMicroCaged(): Promise<any[]> {
+    return fetchAll();
+  }
+
   clearCache(): void {
     cache = null;
     fetching = null;

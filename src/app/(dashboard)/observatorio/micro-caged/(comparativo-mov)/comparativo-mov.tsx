@@ -234,7 +234,8 @@ const ComparativoMov = ({
                 <Component
                   toCompare={[...tempFiltred][index]}
                   color={ColorPalette.default[index]}
-                  data={chartDataSemMes}
+                  data={chartData}
+                  dataSemMes={chartDataSemMes}
                   year={year}
                 />
               </React.Suspense>

@@ -1,16 +1,45 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
+import { EmpresasData } from "@/@api/http/to-charts/empresas/EmpresasData";
 import LineChart from "@/components/@global/charts/LineChart";
 import ChartGrabber from "@/components/@global/features/ChartGrabber";
+import MesAnoToggle from "@/components/@global/features/MesAnoToggle";
+import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
+import { processEmpresasAtivasPorAno } from "@/functions/process_data/observatorio/empresas/empresas-ativas-recife/empresasAtivasPorAno";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
 const EmpresasAtivasMes = ({
   data = [],
   colors = ColorPalette.default,
   title = "Quantidade de Empresas Ativas no Recife",
-  }) => {
- 
-    const chartData = data.map((dataMap) => ({ mes: dataMap['Mês'], empresas: dataMap['Empresas Ativas'] }))
+  }: any) => {
+    const [mode, setMode] = useState<"ano" | "mes">("ano");
+    const [anoData, setAnoData] = useState<any[] | null>(null);
+
+    useEffect(() => {
+      let cancelled = false;
+      new EmpresasData("").fetchAllYearsEmpresasAtivasRecife().then((rows) => {
+        if (cancelled) return;
+        setAnoData(processEmpresasAtivasPorAno(rows));
+      });
+      return () => {
+        cancelled = true;
+      };
+    }, []);
+
+    if (mode === "ano" && !anoData) {
+      return (
+        <div className="chart-wrapper">
+          <GraphSkeleton />
+        </div>
+      );
+    }
+
+    const mesChartData = data.map((dataMap: any) => ({ mes: dataMap['Mês'], empresas: dataMap['Empresas Ativas'] }));
+    const chartData = mode === "ano" ? anoData : mesChartData;
+    const xKey = mode === "ano" ? "ano" : "mes";
 
     return (
       <div className="chart-wrapper">
@@ -18,8 +47,9 @@ const EmpresasAtivasMes = ({
           <LineChart
             data={chartData}
             title={title}
+            underTitle={<MesAnoToggle mode={mode} onChange={setMode} />}
             colors={colors}
-            xKey="mes"
+            xKey={xKey}
             lines={[{ dataKey: "empresas", name: "Empresas Ativas", strokeWidth: 2 }]}
           />
         </ChartGrabber>
