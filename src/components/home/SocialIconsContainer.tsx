@@ -30,7 +30,7 @@ export const SocialIconsContainer = () => {
         />
 
         <SocialIcon
-          link="https://www.instagram.com/sdec.recife/"
+          link="https://www.instagram.com/investerecifeoficial/"
           icon={
             <svg xmlns="http://www.w3.org/2000/svg" width="30px" height="30px" viewBox="0 0 32 32">
               {/* Ícone do Instagram */}
