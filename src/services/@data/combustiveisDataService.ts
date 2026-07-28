@@ -20,11 +20,15 @@ function safeMax(arr: (number | null | undefined)[]) {
 }
 
 function getYear(row: any) {
-  return new Date(row.Data).getFullYear().toString();
+  // ANP timestamps are UTC midnight on the 1st of the month (e.g. "2026-06-01T00:00:00Z").
+  // Reading with local getFullYear/getMonth shifts them into the previous day in any
+  // negative-UTC timezone (like America/Sao_Paulo), which lands on the previous month —
+  // or previous year, at the Jan 1st boundary. Use UTC accessors instead.
+  return new Date(row.Data).getUTCFullYear().toString();
 }
 
 function getMonth(row: any) {
-  return new Date(row.Data).getMonth(); // 0-indexed
+  return new Date(row.Data).getUTCMonth(); // 0-indexed
 }
 
 function getFiltersFromState(filters: Filters) {
@@ -70,14 +74,16 @@ function processGeral(rows: any[], capitaisRows: any[], regiaoRows: any[], rowsS
   const precoMin = safeMin(rows.map((r) => r["PREÇO MÍNIMO REVENDA"]));
   const precoMax = safeMax(rows.map((r) => r["PREÇO MÁXIMO REVENDA"]));
 
-  // Mês anterior: pegar o mês mais recente e o anterior
-  const byMonth = groupBy(rows, (r) => getMonth(r).toString());
-  const months = Object.keys(byMonth).map(Number).sort();
+  // Mês anterior: pegar o mês mais recente e o anterior. Usa rowsSemMes (ignora o filtro
+  // de MÊS) — senão, com um mês específico selecionado, sobra só um mês na lista e
+  // "Mês anterior" acaba repetindo o valor do mês atual.
+  const byMonth = groupBy(rowsSemMes, (r) => getMonth(r).toString());
+  const months = Object.keys(byMonth).map(Number).sort((a, b) => a - b);
   const lastMonth = months[months.length - 1];
   const prevMonth = months[months.length - 2];
   const precoMesAtual = lastMonth !== undefined ? avg(byMonth[lastMonth].map((r) => r["PREÇO MÉDIO REVENDA"])) : precoMedio;
   const precoMesAnterior = prevMonth !== undefined ? avg(byMonth[prevMonth].map((r) => r["PREÇO MÉDIO REVENDA"])) : precoMesAtual;
-  const variacao = precoMesAtual - precoMesAnterior;
+  const variacao = precoMesAnterior ? ((precoMesAtual - precoMesAnterior) / precoMesAnterior) * 100 : 0;
 
   const cards = [
     { title: "Preço médio", value: parseFloat(precoMedio.toFixed(2)) },
@@ -89,7 +95,7 @@ function processGeral(rows: any[], capitaisRows: any[], regiaoRows: any[], rowsS
 
   // Linha preço médio por mês — ignora o filtro de MÊS (senão a linha vira um ponto só)
   const byMonthSemMes = groupBy(rowsSemMes, (r) => getMonth(r).toString());
-  const monthsSemMes = Object.keys(byMonthSemMes).map(Number).sort();
+  const monthsSemMes = Object.keys(byMonthSemMes).map(Number).sort((a, b) => a - b);
   const linhaPrecoMedio = monthsSemMes.map((m) => ({
     mes: MESES[m],
     preco: parseFloat(avg(byMonthSemMes[m].map((r) => r["PREÇO MÉDIO REVENDA"])).toFixed(2)),
@@ -138,7 +144,7 @@ function processComparativo(rows: any[], barRows: any[], municipio?: string | nu
   // Linhas (Recife e comparativo) ignoram o filtro de MÊS — senão viram um ponto só
   const recifeSemMes = rowsSemMes.filter((r) => r["MUNICÍPIO"]?.includes("Recife") && r.UF === "PE");
   const byMonth = groupBy(recifeSemMes, (r) => getMonth(r).toString());
-  const months = Object.keys(byMonth).map(Number).sort();
+  const months = Object.keys(byMonth).map(Number).sort((a, b) => a - b);
 
   const linhaRecife = months.map((m) => ({
     mes: MESES[m],
@@ -165,7 +171,7 @@ function processComparativo(rows: any[], barRows: any[], municipio?: string | nu
     const mun = rows.filter((r) => r["MUNICÍPIO"] === municipio);
     const munSemMes = rowsSemMes.filter((r) => r["MUNICÍPIO"] === municipio);
     const byMonthMun = groupBy(munSemMes, (r) => getMonth(r).toString());
-    const monthsMun = Object.keys(byMonthMun).map(Number).sort();
+    const monthsMun = Object.keys(byMonthMun).map(Number).sort((a, b) => a - b);
     linhaComparativo = monthsMun.map((m) => ({
       mes: MESES[m],
       preco: parseFloat(avg(byMonthMun[m].map((r) => r["PREÇO MÉDIO REVENDA"])).toFixed(2)),
