@@ -339,12 +339,38 @@ header{
 
         .text-content{
             .description-content{
-                
+
                 .description-column{
 
                     font-size: 8px;
                 }
             }
         }
+    }
+}
+
+.highlights-scroller-viewport{
+    width: 100%;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+}
+
+.highlights-scroller-track{
+    display: flex;
+    width: max-content;
+    animation: highlights-scroll 40s linear infinite;
+
+    &:hover{
+        animation-play-state: paused;
+    }
+}
+
+@keyframes highlights-scroll{
+    0%{
+        transform: translateX(0);
+    }
+    100%{
+        transform: translateX(-50%);
     }
 }
