@@ -99,6 +99,15 @@ export const CardsContainer: React.FC = () => {
             route: "/observatorio/tributos",
             name: "Tributos",
         },
+        {
+            banner: "/images/banners/combustiveis_banner.avif",
+            title: "Combustíveis - ANP",
+            logo: "/images/logos/partners/anp_logo.png",
+            description: "Acompanhe a variação dos preços de combustíveis!",
+            detailedDescription: "Os dados de combustíveis, levantados pela ANP, abrangem os preços praticados nos postos de revenda em nível municipal, estadual e regional, permitindo acompanhar a variação de valores da gasolina, etanol, diesel e demais derivados ao longo do tempo.",
+            route: "/observatorio/combustiveis?tab=geral",
+            name: "Combustíveis",
+        },
     ];
 
     const filteredCards = cardsData.filter((card) =>
