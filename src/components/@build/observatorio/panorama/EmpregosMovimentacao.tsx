@@ -9,14 +9,13 @@ import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
 import PanoramaCard from "./PanoramaCard";
 
-const YEAR = "2026";
-
-const EmpregosMovimentacao = () => {
+const EmpregosMovimentacao = ({ year }: { year: string }) => {
   const [chartData, setChartData] = useState<any[] | null>(null);
   const [saldo, setSaldo] = useState(0);
 
   useEffect(() => {
-    new EmpregosData(YEAR).fetchProcessedDataCaged().then((rows: any[]) => {
+    setChartData(null);
+    new EmpregosData(year).fetchProcessedDataCaged().then((rows: any[]) => {
       let admissoes = 0;
       let demissoes = 0;
       let saldos = 0;
@@ -31,21 +30,29 @@ const EmpregosMovimentacao = () => {
       ]);
       setSaldo(saldos);
     });
-  }, []);
+  }, [year]);
 
   if (!chartData) return <GraphSkeleton />;
 
+  const hasData = chartData.some((d) => d.value > 0);
+
   return (
     <PanoramaCard title="Movimentação de Empregos" subtitle={`Saldo: ${saldo.toLocaleString("pt-BR")} vagas`}>
-      <VerticalScrollableBarChart
-        data={chartData}
-        xKey="label"
-        colors={ColorPalette.default}
-        bars={[{ dataKey: "value", name: "Pessoas" }]}
-        highlightValues={[]}
-        visibleHeight={280}
-        widthY={130}
-      />
+      {!hasData ? (
+        <p className="text-center text-sm text-gray-500 dark:text-gray-400 py-8">
+          Sem dados de empregos para {year}.
+        </p>
+      ) : (
+        <VerticalScrollableBarChart
+          data={chartData}
+          xKey="label"
+          colors={ColorPalette.default}
+          bars={[{ dataKey: "value", name: "Pessoas" }]}
+          highlightValues={[]}
+          visibleHeight={280}
+          widthY={130}
+        />
+      )}
     </PanoramaCard>
   );
 };

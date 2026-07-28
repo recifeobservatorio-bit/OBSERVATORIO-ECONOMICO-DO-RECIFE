@@ -9,8 +9,6 @@ import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
 import PanoramaCard from "./PanoramaCard";
 
-const YEAR = "2023";
-
 const NE_CAPITALS: Record<string, string> = {
   PE: "Recife",
   BA: "Salvador",
@@ -33,13 +31,14 @@ function normalize(s: string) {
 
 const PER_CAPITA_FIELD = "Produto Interno Bruto per capita,  a preços correntes (R$ 1,00)";
 
-const PibPerCapitaNE = () => {
+const PibPerCapitaNE = ({ year }: { year: string }) => {
   const [chartData, setChartData] = useState<any[] | null>(null);
 
   useEffect(() => {
-    new PibData(YEAR).fetchProcessedData().then((rows: any[]) => {
+    setChartData(null);
+    new PibData(year).fetchProcessedData().then((rows: any[]) => {
       const capitais = rows.filter((r) => {
-        if (String(r.Ano) !== YEAR || r["Nome da Grande Região"] !== "Nordeste") return false;
+        if (String(r.Ano) !== year || r["Nome da Grande Região"] !== "Nordeste") return false;
         const municipioUf = String(r["Município - UF"] || "");
         const parts = municipioUf.split(" - ");
         const uf = parts[parts.length - 1];
@@ -57,21 +56,27 @@ const PibPerCapitaNE = () => {
 
       setChartData(data);
     });
-  }, []);
+  }, [year]);
 
   if (!chartData) return <GraphSkeleton />;
 
   return (
     <PanoramaCard title="Recife: Maior PIB per capita entre as capitais do NE">
-      <VerticalScrollableBarChart
-        data={chartData}
-        xKey="label"
-        colors={ColorPalette.default}
-        bars={[{ dataKey: "value", name: "PIB per capita (R$)" }]}
-        highlightValues={["Recife"]}
-        visibleHeight={320}
-        widthY={130}
-      />
+      {chartData.length === 0 ? (
+        <p className="text-center text-sm text-gray-500 dark:text-gray-400 py-8">
+          Sem dados de PIB per capita para {year}.
+        </p>
+      ) : (
+        <VerticalScrollableBarChart
+          data={chartData}
+          xKey="label"
+          colors={ColorPalette.default}
+          bars={[{ dataKey: "value", name: "PIB per capita (R$)" }]}
+          highlightValues={["Recife"]}
+          visibleHeight={320}
+          widthY={130}
+        />
+      )}
     </PanoramaCard>
   );
 };

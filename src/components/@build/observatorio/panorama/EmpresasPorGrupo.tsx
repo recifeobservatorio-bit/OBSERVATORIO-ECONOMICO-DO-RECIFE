@@ -10,13 +10,12 @@ import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
 import PanoramaCard from "./PanoramaCard";
 
-const YEAR = "2026";
-
-const EmpresasPorGrupo = () => {
+const EmpresasPorGrupo = ({ year }: { year: string }) => {
   const [chartData, setChartData] = useState<any[] | null>(null);
 
   useEffect(() => {
-    new EmpresasData(YEAR).fetchProcessedAbertasPorSecao().then((rows: any[]) => {
+    setChartData(null);
+    new EmpresasData(year).fetchProcessedAbertasPorSecao().then((rows: any[]) => {
       const groups = [
         { name: "Indústria", includes: ["C", "E", "D", "B"], quantity: 0 },
         { name: "Comércio", includes: ["G"], quantity: 0 },
@@ -28,21 +27,29 @@ const EmpresasPorGrupo = () => {
       const dataArr = rows.map((r) => ({ label: r.secao, value: Number(r.Quantidade) || 0 }));
       setChartData(getAccTextGroup(dataArr, groups).sort((a, b) => b.value - a.value));
     });
-  }, []);
+  }, [year]);
 
   if (!chartData) return <GraphSkeleton />;
 
+  const hasData = chartData.some((d) => d.value > 0);
+
   return (
     <PanoramaCard title="Empresas Ativadas por Grupo Econômico">
-      <StackerBarChartVertical
-        data={chartData}
-        xKey="label"
-        colors={ColorPalette.default}
-        bars={[{ dataKey: "value", name: "Empresas", showPercentage: true }]}
-        heightPerCategory={55}
-        visibleHeight={300}
-        widthY={130}
-      />
+      {!hasData ? (
+        <p className="text-center text-sm text-gray-500 dark:text-gray-400 py-8">
+          Sem dados de empresas abertas para {year}.
+        </p>
+      ) : (
+        <StackerBarChartVertical
+          data={chartData}
+          xKey="label"
+          colors={ColorPalette.default}
+          bars={[{ dataKey: "value", name: "Empresas", showPercentage: true }]}
+          heightPerCategory={55}
+          visibleHeight={300}
+          widthY={130}
+        />
+      )}
     </PanoramaCard>
   );
 };
