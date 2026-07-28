@@ -34,7 +34,7 @@ export const NavBarHome: React.FC<NavBarHomeProps> = ({ simple }) => {
   const navItems = [
     {
       text: "Panorama",
-      href: "#",
+      href: "/observatorio/panorama",
       onClick: undefined,
       className: `${baseNavItemClass} px-[10px] py-[2px] bg-[#ec6625] rounded-full font-medium hover:bg-[#ce5a21] hover:scale-105`,
     },
