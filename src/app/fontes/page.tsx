@@ -80,6 +80,13 @@ const collaborators: Sources[] = [
     href: "https://www.gov.br/antaq/pt-br",
   },
   {
+    name: "ANP",
+    description:
+      "Agência Nacional do Petróleo, Gás Natural e Biocombustíveis, responsável pela regulação da indústria de petróleo, gás natural e biocombustíveis no Brasil.",
+    imageUrl: "/images/sources/anp-logo.png",
+    href: "https://www.gov.br/anp/pt-br",
+  },
+  {
     name: "Empresas & Negócios - Gov.br",
     description: "Plataforma de serviços para empresas e empreendedores, promovendo acesso e desburocratização.",
     imageUrl: "/images/sources/empresas&negocios-govbr-logo.png",
