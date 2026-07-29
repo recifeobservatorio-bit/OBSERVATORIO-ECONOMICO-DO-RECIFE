@@ -4,19 +4,29 @@ import { Filters } from "@/@types/observatorio/shared";
 const MESES = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 const REGIOES = ["Norte", "Nordeste", "Centro Oeste", "Sudeste", "Sul"];
 
-function avg(arr: (number | null | undefined)[]) {
+// Empty selections (e.g. a produto with no rows for the chosen município/mês, like
+// "Óleo Diesel" for Recife once ANP moved to reporting only "Óleo Diesel S10") must be
+// distinguished from a real 0 price. Returning null here — instead of 0 — lets the "—"
+// fallback in the card components actually trigger instead of rendering "R$ 0,00".
+function avg(arr: (number | null | undefined)[]): number | null {
   const valid = arr.filter((v): v is number => v != null && !isNaN(v as number));
-  return valid.length ? valid.reduce((a, b) => a + b, 0) / valid.length : 0;
+  return valid.length ? valid.reduce((a, b) => a + b, 0) / valid.length : null;
 }
 
-function safeMin(arr: (number | null | undefined)[]) {
+function safeMin(arr: (number | null | undefined)[]): number | null {
   const valid = arr.filter((v): v is number => v != null && !isNaN(v as number));
-  return valid.length ? valid.reduce((a, b) => (b < a ? b : a), valid[0]) : 0;
+  return valid.length ? valid.reduce((a, b) => (b < a ? b : a), valid[0]) : null;
 }
 
-function safeMax(arr: (number | null | undefined)[]) {
+function safeMax(arr: (number | null | undefined)[]): number | null {
   const valid = arr.filter((v): v is number => v != null && !isNaN(v as number));
-  return valid.length ? valid.reduce((a, b) => (b > a ? b : a), valid[0]) : 0;
+  return valid.length ? valid.reduce((a, b) => (b > a ? b : a), valid[0]) : null;
+}
+
+// avg/safeMin/safeMax now return null for "no data" instead of 0 — round() keeps that
+// null through the toFixed/parseFloat rounding step instead of crashing on it.
+function round(v: number | null): number | null {
+  return v == null ? null : parseFloat(v.toFixed(2));
 }
 
 function getYear(row: any) {
@@ -83,14 +93,17 @@ function processGeral(rows: any[], capitaisRows: any[], regiaoRows: any[], rowsS
   const prevMonth = months[months.length - 2];
   const precoMesAtual = lastMonth !== undefined ? avg(byMonth[lastMonth].map((r) => r["PREÇO MÉDIO REVENDA"])) : precoMedio;
   const precoMesAnterior = prevMonth !== undefined ? avg(byMonth[prevMonth].map((r) => r["PREÇO MÉDIO REVENDA"])) : precoMesAtual;
-  const variacao = precoMesAnterior ? ((precoMesAtual - precoMesAnterior) / precoMesAnterior) * 100 : 0;
+  const variacao =
+    precoMesAnterior != null && precoMesAtual != null && precoMesAnterior !== 0
+      ? ((precoMesAtual - precoMesAnterior) / precoMesAnterior) * 100
+      : null;
 
   const cards = [
-    { title: "Preço médio", value: parseFloat(precoMedio.toFixed(2)) },
-    { title: "Mês anterior", value: parseFloat(precoMesAnterior.toFixed(2)) },
-    { title: "Variação", value: parseFloat(variacao.toFixed(2)) },
-    { title: "Preço mínimo", value: parseFloat(precoMin.toFixed(2)) },
-    { title: "Preço máximo", value: parseFloat(precoMax.toFixed(2)) },
+    { title: "Preço médio", value: round(precoMedio) },
+    { title: "Mês anterior", value: round(precoMesAnterior) },
+    { title: "Variação", value: round(variacao) },
+    { title: "Preço mínimo", value: round(precoMin) },
+    { title: "Preço máximo", value: round(precoMax) },
   ];
 
   // Linha preço médio por mês — ignora o filtro de MÊS (senão a linha vira um ponto só)
@@ -98,13 +111,13 @@ function processGeral(rows: any[], capitaisRows: any[], regiaoRows: any[], rowsS
   const monthsSemMes = Object.keys(byMonthSemMes).map(Number).sort((a, b) => a - b);
   const linhaPrecoMedio = monthsSemMes.map((m) => ({
     mes: MESES[m],
-    preco: parseFloat(avg(byMonthSemMes[m].map((r) => r["PREÇO MÉDIO REVENDA"])).toFixed(2)),
+    preco: round(avg(byMonthSemMes[m].map((r) => r["PREÇO MÉDIO REVENDA"]))),
   }));
 
   // Dispersão: preço médio x postos por produto
   const byProduto = groupBy(rows, (r) => r.PRODUTO);
   const dispersao = Object.entries(byProduto).map(([prod, rs]) => ({
-    precoMedio: parseFloat(avg((rs as any[]).map((r) => r["PREÇO MÉDIO REVENDA"])).toFixed(2)),
+    precoMedio: round(avg((rs as any[]).map((r) => r["PREÇO MÉDIO REVENDA"]))),
     postos: (rs as any[]).reduce((s, r) => s + (r["NÚMERO DE POSTOS PESQUISADOS"] || 0), 0),
     produto: prod,
   }));
@@ -113,7 +126,7 @@ function processGeral(rows: any[], capitaisRows: any[], regiaoRows: any[], rowsS
   const byRegiao = groupBy(regiaoRows, (r) => r["REGIÃO"]);
   const porRegiao = Object.entries(byRegiao).map(([nome, rs]) => ({
     nome,
-    preco: parseFloat(avg((rs as any[]).map((r) => r["PREÇO MÉDIO REVENDA"])).toFixed(2)),
+    preco: round(avg((rs as any[]).map((r) => r["PREÇO MÉDIO REVENDA"]))),
   }));
 
   // Barras capitais (CAPITAL === "S") — sempre todas as capitais, não muda com o filtro de município
@@ -122,18 +135,18 @@ function processGeral(rows: any[], capitaisRows: any[], regiaoRows: any[], rowsS
   const porEstado = Object.entries(byCapital)
     .map(([nome, rs]) => ({
       nome,
-      preco: parseFloat(avg((rs as any[]).map((r) => r["PREÇO MÉDIO REVENDA"])).toFixed(2)),
+      preco: round(avg((rs as any[]).map((r) => r["PREÇO MÉDIO REVENDA"]))),
     }))
-    .sort((a, b) => b.preco - a.preco);
+    .sort((a, b) => (b.preco ?? -Infinity) - (a.preco ?? -Infinity));
 
   // Barras por estado (todos os estados) — sempre todos, não muda com o filtro de município
   const byTodosEstados = groupBy(capitaisRows, (r) => r.UF);
   const porTodosEstados = Object.entries(byTodosEstados)
     .map(([nome, rs]) => ({
       nome,
-      preco: parseFloat(avg((rs as any[]).map((r) => r["PREÇO MÉDIO REVENDA"])).toFixed(2)),
+      preco: round(avg((rs as any[]).map((r) => r["PREÇO MÉDIO REVENDA"]))),
     }))
-    .sort((a, b) => b.preco - a.preco);
+    .sort((a, b) => (b.preco ?? -Infinity) - (a.preco ?? -Infinity));
 
   return { cards, linhaPrecoMedio, dispersao, porRegiao, porEstado, porTodosEstados };
 }
@@ -148,7 +161,7 @@ function processComparativo(rows: any[], barRows: any[], municipio?: string | nu
 
   const linhaRecife = months.map((m) => ({
     mes: MESES[m],
-    preco: parseFloat(avg(byMonth[m].map((r) => r["PREÇO MÉDIO REVENDA"])).toFixed(2)),
+    preco: round(avg(byMonth[m].map((r) => r["PREÇO MÉDIO REVENDA"]))),
   }));
 
   // Gráfico de barra (por produto) é estático: só reage a ano/mês, ignora região/estado/produto/município
@@ -156,15 +169,15 @@ function processComparativo(rows: any[], barRows: any[], municipio?: string | nu
   const byProdutoRecife = groupBy(recifeBars, (r) => r.PRODUTO);
   const produtosRecife = Object.entries(byProdutoRecife).map(([produto, rs]) => ({
     produto,
-    preco: parseFloat(avg((rs as any[]).map((r) => r["PREÇO MÉDIO REVENDA"])).toFixed(2)),
+    preco: round(avg((rs as any[]).map((r) => r["PREÇO MÉDIO REVENDA"]))),
   }));
 
-  const recifePrecoMedio = parseFloat(avg(recife.map((r) => r["PREÇO MÉDIO REVENDA"])).toFixed(2));
+  const recifePrecoMedio = round(avg(recife.map((r) => r["PREÇO MÉDIO REVENDA"])));
   const recifePostos = recife.reduce((s, r) => s + (r["NÚMERO DE POSTOS PESQUISADOS"] || 0), 0);
 
   let linhaComparativo: any[] = [];
   let produtosComparativo: any[] = [];
-  let municipioPrecoMedio: number | undefined;
+  let municipioPrecoMedio: number | null | undefined;
   let municipioPostos: number | undefined;
 
   if (municipio) {
@@ -174,17 +187,17 @@ function processComparativo(rows: any[], barRows: any[], municipio?: string | nu
     const monthsMun = Object.keys(byMonthMun).map(Number).sort((a, b) => a - b);
     linhaComparativo = monthsMun.map((m) => ({
       mes: MESES[m],
-      preco: parseFloat(avg(byMonthMun[m].map((r) => r["PREÇO MÉDIO REVENDA"])).toFixed(2)),
+      preco: round(avg(byMonthMun[m].map((r) => r["PREÇO MÉDIO REVENDA"]))),
     }));
 
     const munBars = barRows.filter((r) => r["MUNICÍPIO"] === municipio);
     const byProdutoMun = groupBy(munBars, (r) => r.PRODUTO);
     produtosComparativo = Object.entries(byProdutoMun).map(([produto, rs]) => ({
       produto,
-      preco: parseFloat(avg((rs as any[]).map((r) => r["PREÇO MÉDIO REVENDA"])).toFixed(2)),
+      preco: round(avg((rs as any[]).map((r) => r["PREÇO MÉDIO REVENDA"]))),
     }));
 
-    municipioPrecoMedio = parseFloat(avg(mun.map((r) => r["PREÇO MÉDIO REVENDA"])).toFixed(2));
+    municipioPrecoMedio = round(avg(mun.map((r) => r["PREÇO MÉDIO REVENDA"])));
     municipioPostos = mun.reduce((s, r) => s + (r["NÚMERO DE POSTOS PESQUISADOS"] || 0), 0);
   }
 
@@ -202,15 +215,15 @@ function processRegional(rows: any[], allRows: any[]) {
   const byRegiao = groupBy(rows, (r) => r["REGIÃO"]);
   const precoMedio = REGIOES.filter((r) => byRegiao[r]).map((r) => ({
     regiao: r,
-    preco: parseFloat(avg(byRegiao[r].map((x: any) => x["PREÇO MÉDIO REVENDA"])).toFixed(2)),
+    preco: round(avg(byRegiao[r].map((x: any) => x["PREÇO MÉDIO REVENDA"]))),
   }));
   const precoMaximo = REGIOES.filter((r) => byRegiao[r]).map((r) => ({
     regiao: r,
-    preco: parseFloat(safeMax(byRegiao[r].map((x: any) => x["PREÇO MÁXIMO REVENDA"])).toFixed(2)),
+    preco: round(safeMax(byRegiao[r].map((x: any) => x["PREÇO MÁXIMO REVENDA"]))),
   }));
   const precoMinimo = REGIOES.filter((r) => byRegiao[r]).map((r) => ({
     regiao: r,
-    preco: parseFloat(safeMin(byRegiao[r].map((x: any) => x["PREÇO MÍNIMO REVENDA"])).toFixed(2)),
+    preco: round(safeMin(byRegiao[r].map((x: any) => x["PREÇO MÍNIMO REVENDA"]))),
   }));
 
   // Evolução por ano
@@ -220,7 +233,7 @@ function processRegional(rows: any[], allRows: any[]) {
     const byR = groupBy(byYear[ano], (r) => r["REGIÃO"]);
     const entry: any = { ano };
     REGIOES.forEach((reg) => {
-      entry[reg] = byR[reg] ? parseFloat(avg(byR[reg].map((r) => r["PREÇO MÉDIO REVENDA"])).toFixed(2)) : null;
+      entry[reg] = byR[reg] ? round(avg(byR[reg].map((r) => r["PREÇO MÉDIO REVENDA"]))) : null;
     });
     return entry;
   });
@@ -234,18 +247,18 @@ function processEstadual(rows: any[], allRows: any[]) {
 
   const precoMedio = estados.map((e) => ({
     estado: e,
-    preco: parseFloat(avg(byEstado[e].map((r: any) => r["PREÇO MÉDIO REVENDA"])).toFixed(2)),
-  })).sort((a, b) => b.preco - a.preco);
+    preco: round(avg(byEstado[e].map((r: any) => r["PREÇO MÉDIO REVENDA"]))),
+  })).sort((a, b) => (b.preco ?? -Infinity) - (a.preco ?? -Infinity));
 
   const precoMaximo = estados.map((e) => ({
     estado: e,
-    preco: parseFloat(safeMax(byEstado[e].map((r: any) => r["PREÇO MÁXIMO REVENDA"])).toFixed(2)),
-  })).sort((a, b) => b.preco - a.preco);
+    preco: round(safeMax(byEstado[e].map((r: any) => r["PREÇO MÁXIMO REVENDA"]))),
+  })).sort((a, b) => (b.preco ?? -Infinity) - (a.preco ?? -Infinity));
 
   const precoMinimo = estados.map((e) => ({
     estado: e,
-    preco: parseFloat(safeMin(byEstado[e].map((r: any) => r["PREÇO MÍNIMO REVENDA"])).toFixed(2)),
-  })).sort((a, b) => b.preco - a.preco);
+    preco: round(safeMin(byEstado[e].map((r: any) => r["PREÇO MÍNIMO REVENDA"]))),
+  })).sort((a, b) => (b.preco ?? -Infinity) - (a.preco ?? -Infinity));
 
   const byYear = groupBy(allRows, getYear);
   const years = Object.keys(byYear).sort();
@@ -253,7 +266,7 @@ function processEstadual(rows: any[], allRows: any[]) {
     const byE = groupBy(byYear[ano], (r) => r.UF);
     const entry: any = { ano };
     estados.forEach((e) => {
-      entry[e] = byE[e] ? parseFloat(avg(byE[e].map((r) => r["PREÇO MÉDIO REVENDA"])).toFixed(2)) : null;
+      entry[e] = byE[e] ? round(avg(byE[e].map((r) => r["PREÇO MÉDIO REVENDA"]))) : null;
     });
     return entry;
   });
@@ -268,18 +281,18 @@ function processMunicipal(rows: any[], allRows: any[], estado?: string) {
 
   const precoMedio = municipios.map((m) => ({
     municipio: m,
-    preco: parseFloat(avg(byMun[m].map((r: any) => r["PREÇO MÉDIO REVENDA"])).toFixed(2)),
-  })).sort((a, b) => b.preco - a.preco);
+    preco: round(avg(byMun[m].map((r: any) => r["PREÇO MÉDIO REVENDA"]))),
+  })).sort((a, b) => (b.preco ?? -Infinity) - (a.preco ?? -Infinity));
 
   const precoMaximo = municipios.map((m) => ({
     municipio: m,
-    preco: parseFloat(safeMax(byMun[m].map((r: any) => r["PREÇO MÁXIMO REVENDA"])).toFixed(2)),
-  })).sort((a, b) => b.preco - a.preco);
+    preco: round(safeMax(byMun[m].map((r: any) => r["PREÇO MÁXIMO REVENDA"]))),
+  })).sort((a, b) => (b.preco ?? -Infinity) - (a.preco ?? -Infinity));
 
   const precoMinimo = municipios.map((m) => ({
     municipio: m,
-    preco: parseFloat(safeMin(byMun[m].map((r: any) => r["PREÇO MÍNIMO REVENDA"])).toFixed(2)),
-  })).sort((a, b) => b.preco - a.preco);
+    preco: round(safeMin(byMun[m].map((r: any) => r["PREÇO MÍNIMO REVENDA"]))),
+  })).sort((a, b) => (b.preco ?? -Infinity) - (a.preco ?? -Infinity));
 
   const top10 = precoMedio.slice(0, 10).map((m) => m.municipio);
   const byYear = groupBy(allRows, getYear);
@@ -288,7 +301,7 @@ function processMunicipal(rows: any[], allRows: any[], estado?: string) {
     const byM = groupBy(byYear[ano], (r) => r["MUNICÍPIO"]);
     const entry: any = { ano };
     top10.forEach((m) => {
-      entry[m] = byM[m] ? parseFloat(avg(byM[m].map((r) => r["PREÇO MÉDIO REVENDA"])).toFixed(2)) : null;
+      entry[m] = byM[m] ? round(avg(byM[m].map((r) => r["PREÇO MÉDIO REVENDA"]))) : null;
     });
     return entry;
   });
