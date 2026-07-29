@@ -97,13 +97,18 @@ const EmpresasPage = () => {
         if (idObjs.includes(data?.id)) {
           // const microCagedData = data?.microCaged || [];
           // mudar isso aqui
-          const empresasDataObj = { ativas: data?.empresas?.ativas?.filteredData || [], inativas: data?.empresas?.inativas?.filteredData || [] };
-          
+          const empresasDataObj = {
+            ativas: data?.empresas?.ativas?.filteredData || [],
+            inativas: data?.empresas?.inativas?.filteredData || [],
+            ativasSemMes: data?.empresas?.ativas?.filteredDataSemMes || [],
+            inativasSemMes: data?.empresas?.inativas?.filteredDataSemMes || [],
+          };
+
           setDataObj(empresasDataObj);
 
           clearInterval(intervalId);
         } else {
-            setDataObj({ ativas: [], inativas: [] });
+            setDataObj({ ativas: [], inativas: [], ativasSemMes: [], inativasSemMes: [] });
           }
 
         if (idObjsRawData.includes(data?.id)) {
@@ -164,14 +169,15 @@ const EmpresasPage = () => {
         />
       case "empresas-inativas":
         return <EmpresasInativas
-        data={dataArr} 
-        year={getYearSelected(filters)} 
-        /> 
+        data={dataArr}
+        dataSemMes={dataArrSemMes}
+        year={getYearSelected(filters)}
+        />
       case "empresas-ativas-inativas":
         return <EmpresasAtivasInativas
-        data={dataObj} 
-        year={getYearSelected(filters)} 
-        />   
+        data={dataObj}
+        year={getYearSelected(filters)}
+        />
       case "empresas-naturezas":
         return <EmpresasNaturezas
         data={dataObjRawData} 

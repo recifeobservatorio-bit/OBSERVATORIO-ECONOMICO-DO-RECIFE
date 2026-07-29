@@ -1,6 +1,19 @@
 import { EmpregosData } from "@/@api/http/to-charts/empregos/EmpregosData";
 import { applyGenericFilters } from "@/utils/filters/@features/applyGenericFilters";
 
+// Soma os campos indicados por ano — usada pela série histórica multianual do toggle Mês/Ano.
+function sumByAno(rows: any[], fields: string[]) {
+  const byAno: Record<string, any> = {};
+  rows.forEach((r) => {
+    const ano = String(r.Ano);
+    if (!byAno[ano]) byAno[ano] = { Ano: ano };
+    fields.forEach((f) => {
+      byAno[ano][f] = (byAno[ano][f] || 0) + (r[f] || 0);
+    });
+  });
+  return Object.values(byAno).sort((a: any, b: any) => String(a.Ano).localeCompare(String(b.Ano)));
+}
+
 export class EmpregosDataService {
   private static instance: EmpregosDataService;
 
@@ -38,8 +51,15 @@ export class EmpregosDataService {
     // tudo menos filtrar por municipio
     const filteredCagedData = applyGenericFilters(fetchData, filters, ['Municipio']);
 
+    // Mesmo recorte de filteredMunicipioData, mas com a série histórica completa (todos os
+    // anos), somada por ano — usada pelo modo "Ano" do toggle Mês/Ano (RelatorioAno/SaldoAno).
+    const allYearsData = await empregosData.fetchAllYearsCaged();
+    const filteredMunicipioPorAno = applyGenericFilters(allYearsData, filters, ['Região', 'UF', 'Mes']);
+    const municipiosPorAno = sumByAno(filteredMunicipioPorAno.filteredData, ["Saldos", "Admissões", "Demissões"]);
+
     return {
         municipios: filteredMunicipioData,
+        municipiosPorAno,
         caged: filteredCagedData,
         id: "empregos-caged"
     };

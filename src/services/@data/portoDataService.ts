@@ -38,6 +38,7 @@ export class PortoDataService {
         mercadoriaDictionary,
         coords,
         coordsPast,
+        atracacaoAllYears,
       ] = await Promise.all([
         portoData.fetchAtracacaoPorAno(),
         portoData.fetchCargaPorAno(),
@@ -46,6 +47,7 @@ export class PortoDataService {
         portoData.fetchMercadoriaDictionary(),
         portoData.fetchCoordinates(),
         new PortoData(pastYear).fetchCoordinates().catch(() => []),
+        portoData.fetchAtracacaoAllYears(),
       ]);
 
       const atracacaoFiltered = applyGenericFilters(atracacao, filters);
@@ -66,11 +68,21 @@ export class PortoDataService {
 
       const portosSelected = filters?.additionalFilters.find((item) => item.label === "Porto Atracação")?.selected ?? [];
 
+      // Mesmo recorte de atracacaoSemMes, mas sem filtro de ano — série histórica completa,
+      // usada pelo modo "Ano" do toggle Mês/Ano (CargasAno/OperacaoCargasAno).
+      const atracacaoPorAnoFiltered = applyGenericFilters(atracacaoAllYears, filters, ["Mes"]);
+      const atracacaoPorAnoIds = new Set(atracacaoPorAnoFiltered.filteredData.map((atracacao) => atracacao.IDAtracacao));
+      const cargaPorAno = carga.filter(
+        (item) => atracacaoPorAnoIds.has(item.IDAtracacao) && item['FlagMCOperacaoCarga']
+      );
+
       return {
         atracacao: atracacaoFiltered,
         carga: cargaFiltered,
         atracacaoSemMes: atracacaoSemMesFiltered.filteredData,
         cargaSemMes: cargaSemMesFiltered,
+        atracacaoPorAno: atracacaoPorAnoFiltered.filteredData,
+        cargaPorAno,
         rawData: { atracacao, carga },
         dictionaries: {
           origem: origemDictionary,
@@ -97,19 +109,23 @@ export class PortoDataService {
 
   private async fetchPortoPassageirosData(filters: Filters) {
     const pastYear = `${+this.currentYear - 1}`;
-    const [passageirosCur, passageirosPast] = await Promise.allSettled([
+    const [passageirosCur, passageirosPast, passageirosAllYears] = await Promise.allSettled([
       new PortoData(this.currentYear).fetchPassageirosPorAno(),
       new PortoData(pastYear).fetchPassageirosPorAno().catch(() => []),
+      new PortoData(this.currentYear).fetchPassageirosAllYears(),
     ]);
 
     const passageirosCurFiltered = applyGenericFilters(passageirosCur.status === 'fulfilled' ? passageirosCur.value : [], filters);
     const passageirosPastFiltered = applyGenericFilters(passageirosPast.status === 'fulfilled' ? passageirosPast.value : [], filters);
+    // Série histórica completa (todos os anos) — usada pelo modo "Ano" do toggle Mês/Ano
+    const passageirosPorAnoFiltered = applyGenericFilters(passageirosAllYears.status === 'fulfilled' ? passageirosAllYears.value : [], filters);
 
     return {
-      passageiros: { 
-        current: passageirosCurFiltered, 
-        past: passageirosPastFiltered 
-      }, 
+      passageiros: {
+        current: passageirosCurFiltered,
+        past: passageirosPastFiltered,
+        porAno: passageirosPorAnoFiltered.filteredData,
+      },
       id: "porto-passageiros"
     } as PortoPassageirosResult;
   }

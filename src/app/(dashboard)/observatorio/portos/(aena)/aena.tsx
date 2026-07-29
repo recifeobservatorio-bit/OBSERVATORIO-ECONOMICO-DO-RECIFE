@@ -16,6 +16,7 @@ const defaultPassageiros: PortoPassageirosOutputData = {
   passageiros: {
     current: [],
     past: [],
+    porAno: [],
   },
 };
 
@@ -35,9 +36,10 @@ const AenaPage = () => {
     const fetchPassageirosData = () => {
       if (data && data.id === "porto-passageiros") {
         const passageirosData = {
-          passageiros: { 
+          passageiros: {
             current: data?.passageiros?.current.filteredData || [],
-            past: data?.passageiros?.past.filteredData || []
+            past: data?.passageiros?.past.filteredData || [],
+            porAno: data?.passageiros?.porAno || [],
           }
         };
         setPassageiros(passageirosData);

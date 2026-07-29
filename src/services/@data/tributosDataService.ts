@@ -57,10 +57,12 @@ function getItbiFilters(filters: Filters) {
   };
 }
 
-function applyItbiFilters(rows: any[], f: ReturnType<typeof getItbiFilters>, yearOverride?: string) {
+function applyItbiFilters(rows: any[], f: ReturnType<typeof getItbiFilters>, yearOverride?: string, allYears = false) {
   const year = yearOverride ?? f.year;
   return rows.filter((r) => {
-    if (String(r.ano) !== String(year)) return false;
+    // allYears: usado pelo modo "Ano" do toggle Mês/Ano — ignora o filtro de ano pra
+    // trazer a série histórica completa.
+    if (!allYears && String(r.ano) !== String(year)) return false;
     if (f.meses.length && !f.meses.includes(String(getItbiMonth(r) + 1).padStart(2, "0"))) return false;
     if (f.bairros.length && !f.bairros.includes(r.bairro)) return false;
     if (f.construcoes.length && !f.construcoes.includes(r.tipo_construcao)) return false;
@@ -70,7 +72,7 @@ function applyItbiFilters(rows: any[], f: ReturnType<typeof getItbiFilters>, yea
   });
 }
 
-function processItbiContribuintes(rows: any[], prevYearRows: any[], year: string, rowsSemMes: any[] = rows) {
+function processItbiContribuintes(rows: any[], prevYearRows: any[], year: string, rowsSemMes: any[] = rows, rowsPorAno: any[] = rowsSemMes) {
   const totalAtual = rows.length;
   const totalAnterior = prevYearRows.length;
   const variacao = totalAnterior ? parseFloat((((totalAtual - totalAnterior) / totalAnterior) * 100).toFixed(2)) : 0;
@@ -87,6 +89,11 @@ function processItbiContribuintes(rows: any[], prevYearRows: any[], year: string
   // Ignora o filtro de MÊS — senão a linha vira um ponto só quando um mês é selecionado.
   const byMonthSemMes = groupBy(rowsSemMes, (r) => String(getItbiMonth(r)));
   const linhaTransmissoes = MESES.map((mes, i) => ({ mes, quantidade: byMonthSemMes[i]?.length ?? 0 }));
+
+  // Mesma linha, mas por ano (toda a série histórica) — usada pelo modo "Ano" do toggle
+  const byAno = groupBy(rowsPorAno, (r) => String(r.ano));
+  const anos = Object.keys(byAno).sort();
+  const linhaTransmissoesPorAno = anos.map((ano) => ({ ano, quantidade: byAno[ano].length }));
 
   const tabelaAnual = MESES.map((mes, i) => {
     const total = byMonth[i]?.length ?? 0;
@@ -105,10 +112,10 @@ function processItbiContribuintes(rows: any[], prevYearRows: any[], year: string
 
   const porUso = Object.entries(groupBy(rows, (r) => r.tipo_ocupacao)).map(([uso, rs]) => ({ uso, quantidade: rs.length }));
 
-  return { cards, linhaTransmissoes, tabelaAnual, porBairro, porConstrucao, porUso };
+  return { cards, linhaTransmissoes, linhaTransmissoesPorAno, tabelaAnual, porBairro, porConstrucao, porUso };
 }
 
-function processItbiAvaliacoes(rows: any[], rowsSemMes: any[] = rows) {
+function processItbiAvaliacoes(rows: any[], rowsSemMes: any[] = rows, rowsPorAno: any[] = rowsSemMes) {
   const valores = rows.map((r) => parseDecimal(r.valor_avaliacao)).filter((v) => !isNaN(v));
   const maior = valores.length ? Math.max(...valores) : 0;
   const menor = valores.length ? Math.min(...valores) : 0;
@@ -125,6 +132,14 @@ function processItbiAvaliacoes(rows: any[], rowsSemMes: any[] = rows) {
   const medianaAvaliacoes = MESES.map((mes, i) => ({
     mes,
     mediana: parseFloat(median((byMonthSemMes[i] ?? []).map((r: any) => parseDecimal(r.valor_avaliacao))).toFixed(2)),
+  }));
+
+  // Mesma linha, mas por ano (toda a série histórica) — usada pelo modo "Ano" do toggle
+  const byAno = groupBy(rowsPorAno, (r) => String(r.ano));
+  const anos = Object.keys(byAno).sort();
+  const medianaAvaliacoesPorAno = anos.map((ano) => ({
+    ano,
+    mediana: parseFloat(median(byAno[ano].map((r: any) => parseDecimal(r.valor_avaliacao))).toFixed(2)),
   }));
 
   // Amostra das transações mais recentes (a tabela renderiza tudo no cliente, então não manda o dataset inteiro)
@@ -146,7 +161,7 @@ function processItbiAvaliacoes(rows: any[], rowsSemMes: any[] = rows) {
     }))
     .sort((a, b) => b.mediana - a.mediana);
 
-  return { cards, medianaAvaliacoes, tabelaTransacoes, medianaPorBairro };
+  return { cards, medianaAvaliacoes, medianaAvaliacoesPorAno, tabelaTransacoes, medianaPorBairro };
 }
 
 function processItbiPesquisa(rows: any[]) {
@@ -323,6 +338,9 @@ export class TributosDataService {
       // Mesmo recorte, ignorando o filtro de MÊS — usado só pelas linhas (linhaTransmissoes/
       // medianaAvaliacoes), pra não colapsar num ponto só quando um mês é selecionado.
       const rowsSemMes = applyItbiFilters(allRows, { ...f, meses: [] });
+      // Mesmo recorte, mas ignorando também o ano — série histórica completa, usada pelo
+      // modo "Ano" do toggle Mês/Ano.
+      const rowsPorAno = applyItbiFilters(allRows, { ...f, meses: [] }, undefined, true);
 
       const additionalFiltersOptions = [
         { label: "MÊS", options: ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"] },
@@ -334,7 +352,7 @@ export class TributosDataService {
 
       switch (tab) {
         case "itbi-avaliacoes":
-          processed = { id: "tributos", itbiAvaliacoes: { ...processItbiAvaliacoes(rows, rowsSemMes), additionalFiltersOptions } };
+          processed = { id: "tributos", itbiAvaliacoes: { ...processItbiAvaliacoes(rows, rowsSemMes, rowsPorAno), additionalFiltersOptions } };
           break;
         case "itbi-pesquisa":
           processed = { id: "tributos", itbiPesquisa: { ...processItbiPesquisa(rows), additionalFiltersOptions } };
@@ -343,7 +361,7 @@ export class TributosDataService {
           const prevYearRows = applyItbiFilters(allRows, f, String(Number(this.currentYear) - 1));
           processed = {
             id: "tributos",
-            itbiContribuintes: { ...processItbiContribuintes(rows, prevYearRows, this.currentYear, rowsSemMes), additionalFiltersOptions },
+            itbiContribuintes: { ...processItbiContribuintes(rows, prevYearRows, this.currentYear, rowsSemMes, rowsPorAno), additionalFiltersOptions },
           };
         }
       }

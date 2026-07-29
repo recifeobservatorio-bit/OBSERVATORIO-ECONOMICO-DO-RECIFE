@@ -9,6 +9,10 @@ export interface PortoGeralData {
    * gráficos de linha (CargasAno/OperacaoCargasAno) pra não colapsar num ponto só. */
   atracacaoSemMes?: PortoAtracacaoHeaders[];
   cargaSemMes?: PortoCargaHeaders[];
+  /** Mesmo recorte de atracacaoSemMes/cargaSemMes, mas sem filtro de ano — série
+   * histórica completa, usada pelo modo "Ano" do toggle Mês/Ano. */
+  atracacaoPorAno?: PortoAtracacaoHeaders[];
+  cargaPorAno?: PortoCargaHeaders[];
   months?: PortoMeses;
   coords: [PortoCoordHeaders[], number[]];
   dictionaries: {
@@ -22,6 +26,10 @@ export interface PortoGeralData {
 export interface RawDataPortos {
     atracacao: PortoAtracacaoHeaders[];
     carga: PortoCargaHeaders[];
+    /** Mesmo recorte de atracacao/carga, mas com a série histórica completa (todos os
+     * anos) — usada pelo modo "Ano" do toggle Mês/Ano. */
+    atracacaoPorAno?: PortoAtracacaoHeaders[];
+    cargaPorAno?: PortoCargaHeaders[];
 }
 
 export interface PortoOperacaoData {
@@ -35,6 +43,8 @@ export interface PassageirosPortoAno extends DataWithFilters<PortoPassageirosHea
 export interface PortoPassageirosData {
     current: PassageirosPortoAno;
     past: PassageirosPortoAno;
+    /** Série histórica completa (todos os anos) — usada pelo modo "Ano" do toggle Mês/Ano. */
+    porAno?: PortoPassageirosHeaders[];
 }
   
 export interface PortoPassageirosResult {
@@ -52,6 +62,8 @@ export interface PortoPassageirosOutputData extends PortoPassageirosCardData {
   passageiros: {
     current: PortoPassageirosHeaders[];
     past: PortoPassageirosHeaders[];
+    /** Série histórica completa (todos os anos) — usada pelo modo "Ano" do toggle Mês/Ano. */
+    porAno?: PortoPassageirosHeaders[];
   }
 }
 

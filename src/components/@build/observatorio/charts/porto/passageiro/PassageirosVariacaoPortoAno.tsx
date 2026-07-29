@@ -1,12 +1,14 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 
 import { PortoPassageirosOutputData } from "@/@types/observatorio/@data/portoData";
 import { ChartBuild } from "@/@types/observatorio/shared";
 import LineChart from "@/components/@global/charts/LineChart";
 import ChartGrabber from "@/components/@global/features/ChartGrabber";
+import MesAnoToggle from "@/components/@global/features/MesAnoToggle";
 import { processPassageirosAnoPorto } from "@/functions/process_data/observatorio/porto/passageiro/charts/passageirosAnoPorto";
+import { processPassageirosPorAnoPorto } from "@/functions/process_data/observatorio/porto/passageiro/charts/passageirosPorAnoPorto";
 import { updatedMonthChartData } from "@/utils/filters/@global/updateMonthChartData";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
@@ -16,13 +18,18 @@ const PassageirosVariacaoPortoAno = ({
   title = "Variação de Passageiros no Ano",
   months
 }: ChartBuild<PortoPassageirosOutputData>) => {
-const yearCur = data.passageiros?.current[0]?.['Data'].split('-')[0] || 'Dado não encontrado'
-const yearPast = data.passageiros?.past[0]?.['Data'].split('-')[0] || 'Dado não encontrado'
+  const [mode, setMode] = useState<"ano" | "mes">("mes");
 
-const chartData = processPassageirosAnoPorto(data.passageiros.current || [], data.passageiros.past || [])
+  const yearCur = data.passageiros?.current[0]?.['Data'].split('-')[0] || 'Dado não encontrado'
+  const yearPast = data.passageiros?.past[0]?.['Data'].split('-')[0] || 'Dado não encontrado'
 
- const updatedData = updatedMonthChartData(chartData, months);
+  const mesChartData = processPassageirosAnoPorto(data.passageiros.current || [], data.passageiros.past || [])
+  const updatedMesData = updatedMonthChartData(mesChartData, months);
 
+  const anoChartData = processPassageirosPorAnoPorto(data.passageiros.porAno ?? []);
+
+  const updatedData = mode === "ano" ? anoChartData : updatedMesData;
+  const xKey = mode === "ano" ? "ano" : "mes";
 
   return (
     <div className="chart-wrapper col-span-full">
@@ -30,10 +37,11 @@ const chartData = processPassageirosAnoPorto(data.passageiros.current || [], dat
         <LineChart
           data={updatedData}
           title={title}
+          underTitle={<MesAnoToggle mode={mode} onChange={setMode} />}
           colors={colors}
-          xKey="mes"
+          xKey={xKey}
           lines={[
-            { dataKey: "variation", name: `${yearCur} - ${yearPast}`, strokeWidth: 2 },
+            { dataKey: "variation", name: mode === "ano" ? "Variação anual (%)" : `${yearCur} - ${yearPast}`, strokeWidth: 2 },
           ]}
         />
       </ChartGrabber>

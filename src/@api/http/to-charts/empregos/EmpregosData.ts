@@ -50,6 +50,11 @@ export class EmpregosData {
     return filterByYear(await cagedFetcher.fetchAll(), this.year);
   }
 
+  // Sem filtro de ano — usada pela série histórica multianual ("Ano" no toggle Mês/Ano).
+  async fetchAllYearsCaged(): Promise<any[]> {
+    return cagedFetcher.fetchAll();
+  }
+
   async fetchProcessedDataCagedDesemprego(): Promise<any[]> {
     return filterByYear(await desempregoFetcher.fetchAll(), this.year);
   }

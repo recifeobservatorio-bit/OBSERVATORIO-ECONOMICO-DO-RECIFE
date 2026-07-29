@@ -19,6 +19,7 @@ const IpcaPage = () => {
   const { isLoading, data, filters } = useDashboard();
   const [ipca, setIpca] = useState<IpcaGeralHeaders[]>([]);
   const [ipcaRawData, setIpcaRawData] = useState<IpcaGeralHeaders[]>([]);
+  const [ipcaPorAno, setIpcaPorAno] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState("geral");
   const router = useRouter();
 
@@ -34,9 +35,10 @@ const IpcaPage = () => {
 
   useEffect(() => {
     if (data?.id === "ipca") {
-      const ipcaData = data?.geral;
+      const ipcaData = data?.geral as any;
       setIpca(ipcaData?.filteredData || []);
       setIpcaRawData(ipcaData?.rawData || []);
+      setIpcaPorAno(ipcaData?.porAno || []);
     }
 
   }, [data]);
@@ -53,6 +55,7 @@ const IpcaPage = () => {
         return <Geral
             data={ipca || {}}
             rawData={ipcaRawData || {}}
+            porAno={ipcaPorAno}
             months={getMonths(filters)}
           />
       case "grupos":
@@ -66,6 +69,7 @@ const IpcaPage = () => {
         return <Geral
           data={ipca}
           rawData={ipcaRawData || {}}
+          porAno={ipcaPorAno}
           months={getMonths(filters)}
         />
     }

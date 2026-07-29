@@ -11,8 +11,9 @@ import charts from "./@imports/charts";
 const Geral = ({
   data,
   rawData,
+  porAno,
   months,
-}: ChartBuild<IpcaGeralHeaders[]>) => {
+}: ChartBuild<IpcaGeralHeaders[]> & { porAno?: any[] }) => {
   const [chartOrder, setChartOrder] = useState(charts.map((_, index) => index));
   const sortableContainerRef = useRef<HTMLDivElement>(null);
 
@@ -25,7 +26,7 @@ const Geral = ({
             <div key={index} className={`chart-content-wrapper`}>
               <React.Suspense fallback={<GraphSkeleton />}>
                 <ErrorBoundary>
-                  <Component data={data} rawData={rawData} months={months} />
+                  <Component data={data} rawData={rawData} porAno={porAno} months={months} />
                 </ErrorBoundary>
               </React.Suspense>
             </div>

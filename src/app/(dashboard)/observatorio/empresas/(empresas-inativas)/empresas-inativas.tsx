@@ -17,9 +17,11 @@ import cards from "./@imports/cards";
 
 const EmpresasInativas = ({
   data,
+  dataSemMes,
   year,
 }: {
   data: any;
+  dataSemMes?: any;
   year: string;
 }) => {
   const [chartOrder, setChartOrder] = useState(charts.map((_, index) => index));
@@ -29,8 +31,15 @@ const EmpresasInativas = ({
   const params = ['nome_bairro', 'Grupo', 'desc_atividade', 'mes']
 
   const chartData = useMemo(() => {
-    return geralAccFunction(data, params)
-  }, [data, params])  
+    const acc = geralAccFunction(data, params)
+    // 'mesFiltrado' preserva a série respeitando o filtro de mês, para o toggle
+    // Mês/Ano de EmpresasMes escolher entre ela e a variante sem filtro abaixo.
+    acc.mesFiltrado = acc.mes
+    // 'mes' alimenta o modo "Ano" do gráfico de linha (EmpresasMes) — usa a série sem o
+    // filtro de mês aplicado, senão a linha vira um ponto só quando um mês é selecionado.
+    if (dataSemMes) acc.mes = geralAccFunction(dataSemMes, ['mes']).mes
+    return acc
+  }, [data, dataSemMes, params])
   
   const { Component }: any = maps[0]
 

@@ -41,18 +41,24 @@ const ComparativoClasses = ({
   const params = ['Natureza Jurídica', 'mes', 'Porte', 'Município']
 
   useEffect(() => {
+    const empresasAtivas = dataFormat(data['empresas']['ativas'], toCompare, params, 'Quantidade de Empresas', geralAccFieldFunction)
+    const empresasInativas = dataFormat(data['empresas']['inativas'], toCompare, params, 'Quantidade de Empresas', geralAccFieldFunction)
+    const rawDataAtivas = dataFormat(data['rawData']['ativas'], toCompare, params, 'Quantidade de Empresas', geralAccFieldFunction)
+    const rawDataInativas = dataFormat(data['rawData']['inativas'], toCompare, params, 'Quantidade de Empresas', geralAccFieldFunction)
+
+    // 'mes' em rawData ignora os filtros (série completa do ano) — alimenta o modo "Ano" do
+    // toggle Mês/Ano em EmpresasMesAtivasInativas. 'mesFiltrado' respeita os filtros ativos
+    // (vem de 'empresas', que já passou por applyGenericFilters) — alimenta o modo "Mês".
+    toCompare.forEach((muni: string) => {
+      if (rawDataAtivas[muni]) rawDataAtivas[muni].mesFiltrado = empresasAtivas[muni]?.mes
+      if (rawDataInativas[muni]) rawDataInativas[muni].mesFiltrado = empresasInativas[muni]?.mes
+    })
+
     const dataMuni = {
-      empresas: {
-        ativas: dataFormat(data['empresas']['ativas'], toCompare, params, 'Quantidade de Empresas', geralAccFieldFunction),
-        inativas: dataFormat(data['empresas']['inativas'], toCompare, params, 'Quantidade de Empresas', geralAccFieldFunction)
-      },
-      rawData: {
-        ativas: dataFormat(data['rawData']['ativas'], toCompare, params, 'Quantidade de Empresas', geralAccFieldFunction),
-        inativas: dataFormat(data['rawData']['inativas'], toCompare, params, 'Quantidade de Empresas', geralAccFieldFunction)
-      }
+      empresas: { ativas: empresasAtivas, inativas: empresasInativas },
+      rawData: { ativas: rawDataAtivas, inativas: rawDataInativas }
     }
 
-    console.log('DATaMUNI', dataMuni)
     setChartData(dataMuni)
   }, [data])
 

@@ -57,10 +57,11 @@ function getFiltersFromState(filters: Filters) {
   };
 }
 
-function applyFilters(rows: any[], f: ReturnType<typeof getFiltersFromState>, yearOverride?: string) {
-  const year = yearOverride ?? f.year;
+function applyFilters(rows: any[], f: ReturnType<typeof getFiltersFromState>, opts: { allYears?: boolean } = {}) {
   return rows.filter((r) => {
-    if (getYear(r) !== year) return false;
+    // allYears: usado pelo modo "Ano" dos gráficos que por padrão só mostram o ano
+    // selecionado — ignora o filtro de ano pra trazer a série histórica completa.
+    if (!opts.allYears && getYear(r) !== f.year) return false;
     if (f.meses.length && !f.meses.includes(String(getMonth(r) + 1).padStart(2, "0"))) return false;
     if (f.regioes.length && !f.regioes.includes(r["REGIÃO"])) return false;
     if (f.estados.length && !f.estados.includes(r.ESTADO) && !f.estados.includes(r.UF)) return false;
@@ -79,7 +80,7 @@ function groupBy<T>(arr: T[], key: (r: T) => string): Record<string, T[]> {
   }, {});
 }
 
-function processGeral(rows: any[], capitaisRows: any[], regiaoRows: any[], rowsSemMes: any[] = rows, mesesFiltro: string[] = []) {
+function processGeral(rows: any[], capitaisRows: any[], regiaoRows: any[], rowsSemMes: any[] = rows, mesesFiltro: string[] = [], rowsPorAno: any[] = rowsSemMes) {
   const precoMedio = avg(rows.map((r) => r["PREÇO MÉDIO REVENDA"]));
   const precoMin = safeMin(rows.map((r) => r["PREÇO MÍNIMO REVENDA"]));
   const precoMax = safeMax(rows.map((r) => r["PREÇO MÁXIMO REVENDA"]));
@@ -125,6 +126,14 @@ function processGeral(rows: any[], capitaisRows: any[], regiaoRows: any[], rowsS
     preco: round(avg(byMonthSemMes[m].map((r) => r["PREÇO MÉDIO REVENDA"]))),
   }));
 
+  // Mesma linha, mas por ano (toda a série histórica) — usada pelo modo "Ano" do toggle
+  const byYearGeral = groupBy(rowsPorAno, getYear);
+  const anosGeral = Object.keys(byYearGeral).sort();
+  const linhaPrecoMedioPorAno = anosGeral.map((ano) => ({
+    ano,
+    preco: round(avg(byYearGeral[ano].map((r) => r["PREÇO MÉDIO REVENDA"]))),
+  }));
+
   // Dispersão: preço médio x postos por produto
   const byProduto = groupBy(rows, (r) => r.PRODUTO);
   const dispersao = Object.entries(byProduto).map(([prod, rs]) => ({
@@ -159,10 +168,10 @@ function processGeral(rows: any[], capitaisRows: any[], regiaoRows: any[], rowsS
     }))
     .sort((a, b) => (b.preco ?? -Infinity) - (a.preco ?? -Infinity));
 
-  return { cards, linhaPrecoMedio, dispersao, porRegiao, porEstado, porTodosEstados };
+  return { cards, linhaPrecoMedio, linhaPrecoMedioPorAno, dispersao, porRegiao, porEstado, porTodosEstados };
 }
 
-function processComparativo(rows: any[], barRows: any[], municipio?: string | null, rowsSemMes: any[] = rows) {
+function processComparativo(rows: any[], barRows: any[], municipio?: string | null, rowsSemMes: any[] = rows, rowsPorAno: any[] = rowsSemMes) {
   const recife = rows.filter((r) => r["MUNICÍPIO"]?.includes("Recife") && r.UF === "PE");
 
   // Linhas (Recife e comparativo) ignoram o filtro de MÊS — senão viram um ponto só
@@ -173,6 +182,15 @@ function processComparativo(rows: any[], barRows: any[], municipio?: string | nu
   const linhaRecife = months.map((m) => ({
     mes: MESES[m],
     preco: round(avg(byMonth[m].map((r) => r["PREÇO MÉDIO REVENDA"]))),
+  }));
+
+  // Mesma linha, mas por ano (toda a série histórica) — usada pelo modo "Ano" do toggle
+  const recifePorAno = rowsPorAno.filter((r) => r["MUNICÍPIO"]?.includes("Recife") && r.UF === "PE");
+  const byYearRecife = groupBy(recifePorAno, getYear);
+  const anosRecife = Object.keys(byYearRecife).sort();
+  const linhaRecifePorAno = anosRecife.map((ano) => ({
+    ano,
+    preco: round(avg(byYearRecife[ano].map((r) => r["PREÇO MÉDIO REVENDA"]))),
   }));
 
   // Gráfico de barra (por produto) é estático: só reage a ano/mês, ignora região/estado/produto/município
@@ -187,6 +205,7 @@ function processComparativo(rows: any[], barRows: any[], municipio?: string | nu
   const recifePostos = recife.reduce((s, r) => s + (r["NÚMERO DE POSTOS PESQUISADOS"] || 0), 0);
 
   let linhaComparativo: any[] = [];
+  let linhaComparativoPorAno: any[] = [];
   let produtosComparativo: any[] = [];
   let municipioPrecoMedio: number | null | undefined;
   let municipioPostos: number | undefined;
@@ -199,6 +218,14 @@ function processComparativo(rows: any[], barRows: any[], municipio?: string | nu
     linhaComparativo = monthsMun.map((m) => ({
       mes: MESES[m],
       preco: round(avg(byMonthMun[m].map((r) => r["PREÇO MÉDIO REVENDA"]))),
+    }));
+
+    const munPorAno = rowsPorAno.filter((r) => r["MUNICÍPIO"] === municipio);
+    const byYearMun = groupBy(munPorAno, getYear);
+    const anosMun = Object.keys(byYearMun).sort();
+    linhaComparativoPorAno = anosMun.map((ano) => ({
+      ano,
+      preco: round(avg(byYearMun[ano].map((r) => r["PREÇO MÉDIO REVENDA"]))),
     }));
 
     const munBars = barRows.filter((r) => r["MUNICÍPIO"] === municipio);
@@ -216,13 +243,15 @@ function processComparativo(rows: any[], barRows: any[], municipio?: string | nu
     recife: { precoMedio: recifePrecoMedio, postos: recifePostos },
     municipio: { precoMedio: municipioPrecoMedio, postos: municipioPostos },
     linhaRecife,
+    linhaRecifePorAno,
     produtosRecife,
     linhaComparativo,
+    linhaComparativoPorAno,
     produtosComparativo,
   };
 }
 
-function processRegional(rows: any[], allRows: any[]) {
+function processRegional(rows: any[], allRows: any[], rowsSemMes: any[] = rows) {
   const byRegiao = groupBy(rows, (r) => r["REGIÃO"]);
   const precoMedio = REGIOES.filter((r) => byRegiao[r]).map((r) => ({
     regiao: r,
@@ -249,10 +278,23 @@ function processRegional(rows: any[], allRows: any[]) {
     return entry;
   });
 
-  return { precoMedio, precoMaximo, precoMinimo, evolucao };
+  // Preço médio por mês (ano selecionado) — usada pelo modo "Mês" do toggle. Ignora o
+  // filtro de MÊS (senão a linha vira um ponto só quando um mês é selecionado).
+  const byMonthRegiao = groupBy(rowsSemMes, (r) => getMonth(r).toString());
+  const monthsRegiao = Object.keys(byMonthRegiao).map(Number).sort((a, b) => a - b);
+  const porMes = monthsRegiao.map((m) => {
+    const byR = groupBy(byMonthRegiao[m], (r) => r["REGIÃO"]);
+    const entry: any = { mes: MESES[m] };
+    REGIOES.forEach((reg) => {
+      entry[reg] = byR[reg] ? round(avg(byR[reg].map((r) => r["PREÇO MÉDIO REVENDA"]))) : null;
+    });
+    return entry;
+  });
+
+  return { precoMedio, precoMaximo, precoMinimo, evolucao, porMes };
 }
 
-function processEstadual(rows: any[], allRows: any[]) {
+function processEstadual(rows: any[], allRows: any[], rowsSemMes: any[] = rows) {
   const byEstado = groupBy(rows, (r) => r.UF);
   const estados = Object.keys(byEstado).sort();
 
@@ -282,10 +324,23 @@ function processEstadual(rows: any[], allRows: any[]) {
     return entry;
   });
 
-  return { precoMedio, precoMaximo, precoMinimo, evolucao };
+  // Preço médio por mês (ano selecionado) — usada pelo modo "Mês" do toggle
+  const byMonthEstado = groupBy(rowsSemMes, (r) => getMonth(r).toString());
+  const monthsEstado = Object.keys(byMonthEstado).map(Number).sort((a, b) => a - b);
+  const estadosSemMes = Array.from(new Set(rowsSemMes.map((r) => r.UF))).sort();
+  const porMes = monthsEstado.map((m) => {
+    const byE = groupBy(byMonthEstado[m], (r) => r.UF);
+    const entry: any = { mes: MESES[m] };
+    estadosSemMes.forEach((e) => {
+      entry[e] = byE[e] ? round(avg(byE[e].map((r) => r["PREÇO MÉDIO REVENDA"]))) : null;
+    });
+    return entry;
+  });
+
+  return { precoMedio, precoMaximo, precoMinimo, evolucao, porMes };
 }
 
-function processMunicipal(rows: any[], allRows: any[], estado?: string) {
+function processMunicipal(rows: any[], allRows: any[], estado?: string, rowsSemMes: any[] = rows) {
   const filtered = estado ? rows.filter((r) => r.UF === estado || r.ESTADO === estado) : rows;
   const byMun = groupBy(filtered, (r) => r["MUNICÍPIO"]);
   const municipios = Object.keys(byMun).sort();
@@ -317,7 +372,20 @@ function processMunicipal(rows: any[], allRows: any[], estado?: string) {
     return entry;
   });
 
-  return { precoMedio, precoMaximo, precoMinimo, evolucao };
+  // Preço médio por mês (ano selecionado), mesmos top10 municípios — usada pelo modo "Mês" do toggle
+  const filteredSemMes = estado ? rowsSemMes.filter((r) => r.UF === estado || r.ESTADO === estado) : rowsSemMes;
+  const byMonthMun = groupBy(filteredSemMes, (r) => getMonth(r).toString());
+  const monthsMun = Object.keys(byMonthMun).map(Number).sort((a, b) => a - b);
+  const porMes = monthsMun.map((m) => {
+    const byM = groupBy(byMonthMun[m], (r) => r["MUNICÍPIO"]);
+    const entry: any = { mes: MESES[m] };
+    top10.forEach((mun) => {
+      entry[mun] = byM[mun] ? round(avg(byM[mun].map((r) => r["PREÇO MÉDIO REVENDA"]))) : null;
+    });
+    return entry;
+  });
+
+  return { precoMedio, precoMaximo, precoMinimo, evolucao, porMes };
 }
 
 export class CombustiveisDataService {
@@ -390,20 +458,27 @@ export class CombustiveisDataService {
         // Mesmo recorte, mas ignorando também o filtro de MÊS — usado só pelas linhas
         // (linhaRecife/linhaComparativo), pra não colapsar num ponto só quando um mês é selecionado
         const comparativoRowsSemMes = applyFilters(allRows, { ...f, municipios: [], meses: [] });
+        // Mesmo recorte, mas ignorando ano e mês — série histórica completa, usada pelo modo "Ano" do toggle
+        const comparativoRowsPorAno = applyFilters(allRows, { ...f, municipios: [], meses: [] }, { allYears: true });
         // Gráfico de barra (preço médio por produto) é estático: só muda com ano/mês
         const barRows = applyFilters(allRows, { ...f, regioes: [], estados: [], municipios: [], produtos: [] });
-        processed = { id: "combustiveis", comparativo: { ...processComparativo(comparativoRows, barRows, f.municipio, comparativoRowsSemMes), additionalFiltersOptions } };
+        processed = { id: "combustiveis", comparativo: { ...processComparativo(comparativoRows, barRows, f.municipio, comparativoRowsSemMes, comparativoRowsPorAno), additionalFiltersOptions } };
         break;
       }
-      case "regional":
-        processed = { id: "combustiveis", regional: { ...processRegional(filtered, allRows), additionalFiltersOptions } };
+      case "regional": {
+        const filteredSemMes = applyFilters(allRows, { ...f, meses: [] });
+        processed = { id: "combustiveis", regional: { ...processRegional(filtered, allRows, filteredSemMes), additionalFiltersOptions } };
         break;
-      case "estadual":
-        processed = { id: "combustiveis", estadual: { ...processEstadual(filtered, allRows), additionalFiltersOptions } };
+      }
+      case "estadual": {
+        const filteredSemMes = applyFilters(allRows, { ...f, meses: [] });
+        processed = { id: "combustiveis", estadual: { ...processEstadual(filtered, allRows, filteredSemMes), additionalFiltersOptions } };
         break;
+      }
       case "municipal": {
         const estadoFilter = filters.additionalFilters?.find((f) => f.label === "ESTADO")?.selected?.[0];
-        processed = { id: "combustiveis", municipal: { ...processMunicipal(filtered, allRows, estadoFilter), additionalFiltersOptions } };
+        const filteredSemMes = applyFilters(allRows, { ...f, meses: [] });
+        processed = { id: "combustiveis", municipal: { ...processMunicipal(filtered, allRows, estadoFilter, filteredSemMes), additionalFiltersOptions } };
         break;
       }
       default: {
@@ -419,13 +494,19 @@ export class CombustiveisDataService {
           ? filteredSemMes
           : filteredSemMes.filter((r) => r["MUNICÍPIO"]?.includes("Recife"));
 
+        // Mesmo recorte, mas ignorando ano e mês — série histórica completa, usada pelo modo "Ano" do toggle
+        const filteredPorAno = applyFilters(allRows, { ...f, meses: [] }, { allYears: true });
+        const geralRowsPorAno = f.municipios.length
+          ? filteredPorAno
+          : filteredPorAno.filter((r) => r["MUNICÍPIO"]?.includes("Recife"));
+
         // O gráfico de capitais e o de todos os estados sempre mostram tudo, ignorando o filtro de município
         const capitaisRows = applyFilters(allRows, { ...f, municipios: [] });
 
         // O treemap por região sempre mostra todas as regiões, ignorando os filtros de município e de estado
         const regiaoRows = applyFilters(allRows, { ...f, municipios: [], estados: [] });
 
-        processed = { id: "combustiveis", geral: { ...processGeral(geralRows, capitaisRows, regiaoRows, geralRowsSemMes, f.meses), additionalFiltersOptions } };
+        processed = { id: "combustiveis", geral: { ...processGeral(geralRows, capitaisRows, regiaoRows, geralRowsSemMes, f.meses, geralRowsPorAno), additionalFiltersOptions } };
       }
     }
 

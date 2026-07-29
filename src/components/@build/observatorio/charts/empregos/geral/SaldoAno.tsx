@@ -1,12 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 
-import { AnacGeralHeaders } from "@/@types/observatorio/@fetch/aeroporto";
-import { ChartBuild } from "@/@types/observatorio/shared";
 import LineChart from "@/components/@global/charts/LineChart";
 import ChartGrabber from "@/components/@global/features/ChartGrabber";
-import { processCargaAno } from "@/functions/process_data/observatorio/aeroporto/geral/charts/cargaAno";
+import MesAnoToggle from "@/components/@global/features/MesAnoToggle";
 import { updatedMonthChartData } from "@/utils/filters/@global/updateMonthChartData";
 import { monthShortName } from "@/utils/formatters/@global/monthShortName";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
@@ -18,10 +16,15 @@ const SaldoAno = ({
   title = "Saldo ao Longo do Ano",
   months,
 }: any) => {
-  
-  const chartData = data['municipios'].sort((a: any, b: any) => a["Mes"] - b["Mes"]).map((data: any) => ({ ...data, "Mês": monthShortName(data['Mes'])}));
+  const [mode, setMode] = useState<"ano" | "mes">("mes");
 
-  const updatedData = updatedMonthChartData(chartData, months ?? 1);
+  const mesChartData = (data['municipios'] ?? []).sort((a: any, b: any) => a["Mes"] - b["Mes"]).map((data: any) => ({ ...data, "Mês": monthShortName(data['Mes'])}));
+  const updatedMesData = updatedMonthChartData(mesChartData, months ?? 1);
+
+  const anoChartData = data['municipiosPorAno'] ?? [];
+
+  const updatedData = mode === "ano" ? anoChartData : updatedMesData;
+  const xKey = mode === "ano" ? "Ano" : nameKey;
 
   return (
     <div className="chart-wrapper">
@@ -29,8 +32,9 @@ const SaldoAno = ({
         <LineChart
           data={updatedData}
           title={title}
+          underTitle={<MesAnoToggle mode={mode} onChange={setMode} />}
           colors={colors}
-          xKey={nameKey}
+          xKey={xKey}
           lines={[{ dataKey: "Saldos", name: "Saldo", strokeWidth: 2 }]}
         />
       </ChartGrabber>

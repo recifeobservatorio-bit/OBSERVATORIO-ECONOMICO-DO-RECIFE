@@ -1,7 +1,10 @@
 "use client";
 
+import { useState } from "react";
+
 import LineChart from "@/components/@global/charts/LineChart";
 import ChartGrabber from "@/components/@global/features/ChartGrabber";
+import MesAnoToggle from "@/components/@global/features/MesAnoToggle";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
 const LinhaTransmissoes = ({
@@ -9,7 +12,12 @@ const LinhaTransmissoes = ({
   title = "Quantidade de Transmissões Imobiliárias",
   colors = ColorPalette.default,
 }: any) => {
-  const chartData: any[] = data?.linhaTransmissoes ?? [];
+  const [mode, setMode] = useState<"ano" | "mes">("mes");
+
+  const mesChartData: any[] = data?.linhaTransmissoes ?? [];
+  const anoChartData: any[] = data?.linhaTransmissoesPorAno ?? [];
+  const chartData = mode === "ano" ? anoChartData : mesChartData;
+  const xKey = mode === "ano" ? "ano" : "mes";
 
   return (
     <div className="chart-wrapper">
@@ -17,8 +25,9 @@ const LinhaTransmissoes = ({
         <LineChart
           data={chartData}
           title={title}
+          underTitle={<MesAnoToggle mode={mode} onChange={setMode} />}
           colors={colors}
-          xKey="mes"
+          xKey={xKey}
           tooltipEntry=""
           lines={[{ dataKey: "quantidade", name: "Transmissões", strokeWidth: 2 }]}
         />

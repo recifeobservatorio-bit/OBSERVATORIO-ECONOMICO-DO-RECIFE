@@ -49,9 +49,11 @@ const ComparativoClasses = ({
       if (!dataMuni[muni]) dataMuni[muni] = {}
 
       const municipioAcc = geralAccFieldFunction(dataFiltred, params, 'Estabelecimentos')
-      // 'mes' alimenta o gráfico de linha (EmpresasAtivasClassesMes) — usa a série sem o
-      // filtro de mês aplicado, senão a linha vira um ponto só quando um mês é selecionado.
+      // 'mes' alimenta o modo "Ano" do toggle Mês/Ano em EmpresasAtivasClassesMes — usa a
+      // série sem o filtro de mês aplicado, senão a linha vira um ponto só quando um mês é
+      // selecionado. 'mesFiltrado' alimenta o modo "Mês", que respeita o filtro selecionado.
       municipioAcc.mes = geralAccFieldFunction(dataFiltredSemMes, ['mes'], 'Estabelecimentos').mes
+      municipioAcc.mesFiltrado = geralAccFieldFunction(dataFiltred, ['mes'], 'Estabelecimentos').mes
 
       dataMuni[muni] = {
         municipio: municipioAcc,

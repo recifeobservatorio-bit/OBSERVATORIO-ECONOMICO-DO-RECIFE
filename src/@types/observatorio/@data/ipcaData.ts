@@ -1,7 +1,10 @@
 import { IpcaGeralHeaders, IpcaGrupoHeaders, IpcaTabelaHeaders } from "../@fetch/ipca";
 import { DataWithFilters } from "../shared";
 
-export interface IpcaGeralData extends DataWithFilters<IpcaGeralHeaders> {}
+export interface IpcaGeralData extends DataWithFilters<IpcaGeralHeaders> {
+  /** IPCA anual por capital (série histórica completa) — usada pelo modo "Ano" do toggle Mês/Ano. */
+  porAno?: any[];
+}
 
 export interface IpcaGrupoData extends DataWithFilters<IpcaGrupoHeaders> {}
 

@@ -65,6 +65,12 @@ export class PortoData {
     return filterByYear(all, this.year).map((r) => ({ ...r, Mes: mesFromDataAtracacao(r["Data Atracação"]) }));
   }
 
+  // Sem filtro de ano — usada pela série histórica multianual ("Ano" no toggle Mês/Ano).
+  async fetchAtracacaoAllYears(): Promise<PortoAtracacaoHeaders[]> {
+    const all = await atracacaoFetcher.fetchAll();
+    return all.map((r) => ({ ...r, Mes: mesFromDataAtracacao(r["Data Atracação"]) }));
+  }
+
   // O escopo por ano já é aplicado via interseção com os IDs de atracação do ano
   // (feito em portoDataService.ts) — aqui basta devolver a base de cargas de PE inteira.
   async fetchCargaPorAno(): Promise<PortoCargaHeaders[]> {
@@ -73,6 +79,11 @@ export class PortoData {
 
   async fetchPassageirosPorAno(): Promise<PortoPassageirosHeaders[]> {
     return filterByYear(await passageirosFetcher.fetchAll(), this.year);
+  }
+
+  // Sem filtro de ano — usada pela série histórica multianual ("Ano" no toggle Mês/Ano).
+  async fetchPassageirosAllYears(): Promise<PortoPassageirosHeaders[]> {
+    return passageirosFetcher.fetchAll();
   }
 
   // Não existe arquivo de dicionário (origem/destino/mercadoria) nos dados enviados —

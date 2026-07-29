@@ -26,11 +26,17 @@ const EmpresasAtivasInativas = ({
   const params = ['nome_bairro', 'Grupo', 'desc_atividade', 'mes']
 
   const chartData = useMemo(() => {
-    return {
-        ativas: geralAccFunction(data['ativas'], params),
-        inativas: geralAccFunction(data['inativas'], params) 
-      }
-  }, [data, params])  
+    const ativas = geralAccFunction(data['ativas'], params)
+    const inativas = geralAccFunction(data['inativas'], params)
+
+    // Mesmo esquema de mesFiltrado/mes do toggle Mês/Ano em empresas-ativas.tsx
+    ativas.mesFiltrado = ativas.mes
+    inativas.mesFiltrado = inativas.mes
+    if (data['ativasSemMes']) ativas.mes = geralAccFunction(data['ativasSemMes'], ['mes']).mes
+    if (data['inativasSemMes']) inativas.mes = geralAccFunction(data['inativasSemMes'], ['mes']).mes
+
+    return { ativas, inativas }
+  }, [data, params])
 
   return (
     <div>

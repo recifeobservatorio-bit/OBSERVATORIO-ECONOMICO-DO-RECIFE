@@ -1,7 +1,10 @@
 "use client";
 
+import { useState } from "react";
+
 import LineChart from "@/components/@global/charts/LineChart";
 import ChartGrabber from "@/components/@global/features/ChartGrabber";
+import MesAnoToggle from "@/components/@global/features/MesAnoToggle";
 import { monthShortName } from "@/utils/formatters/@global/monthShortName";
 import { getDateKeys } from "@/utils/formatters/getDataKeys";
 import { getObjToArr } from "@/utils/formatters/getObjToArr";
@@ -13,11 +16,12 @@ const EmpresasAtivasClassesMes = ({
   color = ColorPalette.default,
   title = "Quantidade de Empresas Classes no Recife",
   }: any) => {
-    console.log('CHARTDADTA ->', data)
+    const [mode, setMode] = useState<"ano" | "mes">("ano");
 
     const dataRawData = data
+    const monthKey = mode === "mes" ? "mesFiltrado" : "mes";
 
-    const dataArr = toCompare.map((compare: string) => getObjToArr(dataRawData?.[compare]?.['municipio']?.['mes']).map((obj) => ({ ...obj, name: compare }))).flat()
+    const dataArr = toCompare.map((compare: string) => getObjToArr(dataRawData?.[compare]?.['municipio']?.[monthKey]).map((obj) => ({ ...obj, name: compare }))).flat()
 
 
     const dataCorrect: any = []
@@ -42,6 +46,7 @@ const EmpresasAtivasClassesMes = ({
           <LineChart
             data={chartData}
             title={title}
+            underTitle={<MesAnoToggle mode={mode} onChange={setMode} />}
             colors={color}
             xKey="label"
             lines={[...getDateKeys(toCompare ?? [])]}

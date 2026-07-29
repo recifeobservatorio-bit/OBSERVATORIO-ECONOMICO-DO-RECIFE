@@ -38,18 +38,31 @@ const Comparativo = ({
     cargas: PortoCargaHeaders[];
   }[]>([]);
 
+  // Mesmo recorte por porto, mas com a série histórica completa (todos os anos) —
+  // usada pelo modo "Ano" do toggle Mês/Ano em OperacaoCargasAno.
+  const [portosDataFilteredPorAno, setPortosDataFilteredPorAno] = useState<{
+    porto: string;
+    atracacao: PortoAtracacaoHeaders[];
+    cargas: PortoCargaHeaders[];
+  }[]>([]);
+
   const sortableContainerTableRef = useRef<HTMLDivElement>(null);
 
 const attTempFiltred = ['Recife', ...tempFiltred]
 
 useEffect(() => {
   const portosDataFiltered = getFilteredData(data.rawData as RawDataPortos, attTempFiltred);
+  const portosDataFilteredPorAno = getFilteredData(
+    { atracacao: data.atracacaoPorAno ?? [], carga: data.cargaPorAno ?? [] } as RawDataPortos,
+    attTempFiltred
+  );
 
     const getNewTables = tempFiltred.map((val) => {
       return [...charts];
     });
 
     setPortosDataFiltered(portosDataFiltered)
+    setPortosDataFilteredPorAno(portosDataFilteredPorAno)
     setTablesRender([[...charts], ...getNewTables]);
   }, [tempFiltred, data]);
 
@@ -108,9 +121,11 @@ useEffect(() => {
                 <Component
                   porto={["Recife", ...tempFiltred][index]}
                   color={ColorPalette.default[index]}
-                  data={{ ...data, 
-                    atracacao: portosDataFiltered.find((obj) => obj.porto == ["Recife", ...tempFiltred][index])?.['atracacao'] || [], 
-                    carga: portosDataFiltered.find((obj) => obj.porto == ["Recife", ...tempFiltred][index])?.['cargas'] || [], 
+                  data={{ ...data,
+                    atracacao: portosDataFiltered.find((obj) => obj.porto == ["Recife", ...tempFiltred][index])?.['atracacao'] || [],
+                    carga: portosDataFiltered.find((obj) => obj.porto == ["Recife", ...tempFiltred][index])?.['cargas'] || [],
+                    atracacaoPorAno: portosDataFilteredPorAno.find((obj) => obj.porto == ["Recife", ...tempFiltred][index])?.['atracacao'] || [],
+                    cargaPorAno: portosDataFilteredPorAno.find((obj) => obj.porto == ["Recife", ...tempFiltred][index])?.['cargas'] || [],
                   }}
                   year={year}
                   months={months}

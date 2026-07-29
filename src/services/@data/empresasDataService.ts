@@ -61,13 +61,16 @@ export class EmpresasDataService {
     };
   }
 
-  // tab3   
+  // tab3
   private async fetchEmpresasInativas(filters: any) {
     const empresasData = new EmpresasData(this.currentYear);
 
-    const fetchData = await empresasData.fetchProcessedEmpresasInativas() 
+    const fetchData = await empresasData.fetchProcessedEmpresasInativas()
 
-    const filteredData = applyGenericFilters(fetchData, filters);
+    const filteredData = {
+      ...applyGenericFilters(fetchData, filters),
+      filteredDataSemMes: applyGenericFilters(fetchData, filters, ["mes"]).filteredData,
+    };
 
     return {
       empresas: filteredData,
@@ -75,15 +78,21 @@ export class EmpresasDataService {
     };
   }
 
-  // tab4   
+  // tab4
   private async fetchEmpresasAtivasInativas(filters: any) {
     const empresasData = new EmpresasData(this.currentYear);
 
-    const fetchDataAtivas = await empresasData.fetchProcessedEmpresasAtivas() 
-    const fetchDataInativas = await empresasData.fetchProcessedEmpresasInativas() 
+    const fetchDataAtivas = await empresasData.fetchProcessedEmpresasAtivas()
+    const fetchDataInativas = await empresasData.fetchProcessedEmpresasInativas()
 
-    const filteredDataAtivas = applyGenericFilters(fetchDataAtivas, filters);
-    const filteredDataInativas = applyGenericFilters(fetchDataInativas, filters);
+    const filteredDataAtivas = {
+      ...applyGenericFilters(fetchDataAtivas, filters),
+      filteredDataSemMes: applyGenericFilters(fetchDataAtivas, filters, ["mes"]).filteredData,
+    };
+    const filteredDataInativas = {
+      ...applyGenericFilters(fetchDataInativas, filters),
+      filteredDataSemMes: applyGenericFilters(fetchDataInativas, filters, ["mes"]).filteredData,
+    };
 
     return {
       empresas: {

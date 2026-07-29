@@ -1,10 +1,36 @@
 import { IpcaData } from "@/@api/http/to-charts/ipca/IPCAData";
 import { IpcaDataResult, IpcaGeralData, IpcaGrupoData } from "@/@types/observatorio/@data/ipcaData";
-import { IpcaTabelaHeaders } from "@/@types/observatorio/@fetch/ipca";
+import { IpcaGeralHeaders, IpcaTabelaHeaders } from "@/@types/observatorio/@fetch/ipca";
 import { DataWithFilters, Filters } from "@/@types/observatorio/shared";
 import { getRawData } from "@/utils/filters/@data/getRawData";
 import { applyGenericFilters } from "@/utils/filters/@features/applyGenericFilters";
 import { filterByYear } from "@/utils/filters/@features/filterByYear";
+
+// IPCA anual por capital: pega, em cada (Ano, Capital), o valor de "Variação acumulado
+// no ano" no último mês disponível daquele ano — é a forma padrão de reportar a inflação
+// anual do IPCA (soma os "Variação mensal" mês a mês, como o modo "Mês" faz, distorceria
+// o resultado por não compor as taxas corretamente). Usada pelo modo "Ano" do toggle Mês/Ano.
+function buildIpcaPorAno(rows: IpcaGeralHeaders[]) {
+  const byAnoCapital: Record<string, Record<string, { mes: number; valor: number }>> = {};
+
+  rows.forEach((r) => {
+    const ano = String(r.Ano);
+    const capital = r.Capital;
+    if (!byAnoCapital[ano]) byAnoCapital[ano] = {};
+    const atual = byAnoCapital[ano][capital];
+    if (!atual || r["MÊS"] > atual.mes) {
+      byAnoCapital[ano][capital] = { mes: r["MÊS"], valor: r["IPCA - Variação acumulado no ano"] };
+    }
+  });
+
+  return Object.keys(byAnoCapital).sort().map((ano) => {
+    const entry: any = { ano };
+    Object.entries(byAnoCapital[ano]).forEach(([capital, v]) => {
+      entry[capital] = v.valor;
+    });
+    return entry;
+  });
+}
 
 export class IpcaDataService {
   private static instance: IpcaDataService;
@@ -38,7 +64,12 @@ export class IpcaDataService {
     const rawData = applyGenericFilters(geral, filters, ['Capital'])
     const geralFiltered = {...applyGenericFilters(geral, filters, ['MÊS']), rawData: rawData.filteredData};
 
-    return { geral: geralFiltered, id: "ipca" };
+    // Mesmo recorte de geralFiltered, mas com a série histórica completa (todos os anos) —
+    // usada pelo modo "Ano" do toggle Mês/Ano (IpcaPorMeses/IpcaBrasilPorMeses).
+    const geralPorAnoFiltered = applyGenericFilters(geralAllYears, filters, ['MÊS']);
+    const porAno = buildIpcaPorAno(geralPorAnoFiltered.filteredData);
+
+    return { geral: { ...geralFiltered, porAno }, id: "ipca" };
   }
 
   private async fetchIpcaGruposData(filters: Filters): Promise<{ id: "ipca-grupos"; grupos: IpcaGrupoData }> {
