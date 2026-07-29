@@ -79,18 +79,29 @@ function groupBy<T>(arr: T[], key: (r: T) => string): Record<string, T[]> {
   }, {});
 }
 
-function processGeral(rows: any[], capitaisRows: any[], regiaoRows: any[], rowsSemMes: any[] = rows) {
+function processGeral(rows: any[], capitaisRows: any[], regiaoRows: any[], rowsSemMes: any[] = rows, mesesFiltro: string[] = []) {
   const precoMedio = avg(rows.map((r) => r["PREÇO MÉDIO REVENDA"]));
   const precoMin = safeMin(rows.map((r) => r["PREÇO MÍNIMO REVENDA"]));
   const precoMax = safeMax(rows.map((r) => r["PREÇO MÁXIMO REVENDA"]));
 
-  // Mês anterior: pegar o mês mais recente e o anterior. Usa rowsSemMes (ignora o filtro
-  // de MÊS) — senão, com um mês específico selecionado, sobra só um mês na lista e
-  // "Mês anterior" acaba repetindo o valor do mês atual.
+  // Mês anterior: usa rowsSemMes (ignora o filtro de MÊS nos agrupamentos) — senão, com um
+  // mês específico selecionado, sobra só um mês na lista e "Mês anterior" acaba repetindo
+  // o valor do mês atual. Quando um mês está selecionado no filtro, ele vira o "atual" e
+  // buscamos o mês civil imediatamente anterior disponível; sem filtro, cai para os dois
+  // últimos meses do próprio dataset.
   const byMonth = groupBy(rowsSemMes, (r) => getMonth(r).toString());
   const months = Object.keys(byMonth).map(Number).sort((a, b) => a - b);
-  const lastMonth = months[months.length - 1];
-  const prevMonth = months[months.length - 2];
+  let lastMonth: number | undefined;
+  let prevMonth: number | undefined;
+  if (mesesFiltro.length) {
+    const selecionado = Number(mesesFiltro[mesesFiltro.length - 1]) - 1;
+    lastMonth = months.includes(selecionado) ? selecionado : undefined;
+    const anteriores = months.filter((m) => m < selecionado);
+    prevMonth = anteriores.length ? anteriores[anteriores.length - 1] : undefined;
+  } else {
+    lastMonth = months[months.length - 1];
+    prevMonth = months[months.length - 2];
+  }
   const precoMesAtual = lastMonth !== undefined ? avg(byMonth[lastMonth].map((r) => r["PREÇO MÉDIO REVENDA"])) : precoMedio;
   const precoMesAnterior = prevMonth !== undefined ? avg(byMonth[prevMonth].map((r) => r["PREÇO MÉDIO REVENDA"])) : precoMesAtual;
   const variacao =
@@ -414,7 +425,7 @@ export class CombustiveisDataService {
         // O treemap por região sempre mostra todas as regiões, ignorando os filtros de município e de estado
         const regiaoRows = applyFilters(allRows, { ...f, municipios: [], estados: [] });
 
-        processed = { id: "combustiveis", geral: { ...processGeral(geralRows, capitaisRows, regiaoRows, geralRowsSemMes), additionalFiltersOptions } };
+        processed = { id: "combustiveis", geral: { ...processGeral(geralRows, capitaisRows, regiaoRows, geralRowsSemMes, f.meses), additionalFiltersOptions } };
       }
     }
 
