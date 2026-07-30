@@ -10,18 +10,22 @@ const VariacaoTrimesteAnterior = ({
 }: any) => {
  
   const dataMunicipio = data['trimestre']?.['municipiosTrimestre'] || []
-  
+  const dataMunicipioPast = data['trimestre']?.['municipiosTrimestrePast'] || []
+
   const dataQuarter = dataMunicipio.reduce((acc: number, obj: any) => {
     const data = +obj['Trimestre'].split('º')[0]
     acc = acc <= data ? data : acc
 
     return acc
-  }, 0) 
+  }, 0)
 
-  const quarterPast = dataQuarter - 1 
-  const quarterCur = dataQuarter  
+  // Trimestre 1 não tem "trimestre anterior" no ano corrente: busca o 4º Trimestre do ano anterior.
+  const isPreviousYear = dataQuarter <= 1
+  const quarterPast = isPreviousYear ? 4 : dataQuarter - 1
+  const quarterCur = dataQuarter
+  const pastSourceData = isPreviousYear ? dataMunicipioPast : dataMunicipio
 
-  const dataPastFiltred = dataMunicipio.filter((obj: any) => +obj['Trimestre'].split('º')[0] == quarterPast)
+  const dataPastFiltred = pastSourceData.filter((obj: any) => +obj['Trimestre'].split('º')[0] == quarterPast)
   const dataCurFiltred = dataMunicipio.filter((obj: any) => +obj['Trimestre'].split('º')[0] == quarterCur)
 
   const taxaPastData = dataPastFiltred.reduce((acc: number, obj: any) => acc += obj['Taxa'] , 0) || 0

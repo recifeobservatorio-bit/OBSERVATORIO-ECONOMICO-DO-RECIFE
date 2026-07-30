@@ -10,19 +10,21 @@ const EmpresasVariacaoInativasRecente = ({
   color,
 }: any) => {
 
-  const monthsData = Object.keys(data['mes'])
+  // 'mesFiltrado' respeita o filtro de mês selecionado — 'mes' é a série sem esse filtro,
+  // usada só pelo gráfico de linha no modo "Ano".
+  const monthsData = Object.keys(data['mesFiltrado'])
 
   const curMonthData = monthsData.sort(
     (a: any, b: any) => +b - +a,
   ) ?.[0]
-  
+
   const pastMonthData = monthsData.sort(
     (a: any, b: any) => +b - +a,
   )?.[1]
 
   const curMonthName = monthLongName(+curMonthData)
 
-  const chartData = (((data['mes'][curMonthData] - data['mes'][pastMonthData]) / data['mes'][pastMonthData]) * 100).toFixed(2)
+  const chartData = (((data['mesFiltrado'][curMonthData] - data['mesFiltrado'][pastMonthData]) / data['mesFiltrado'][pastMonthData]) * 100).toFixed(2)
 
   return (
     <>

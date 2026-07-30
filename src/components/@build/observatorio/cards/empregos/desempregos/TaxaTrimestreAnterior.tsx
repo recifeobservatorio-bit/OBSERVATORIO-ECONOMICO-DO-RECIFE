@@ -10,28 +10,33 @@ const TaxaTrimestreAnterior = ({
 }: any) => {
  
   const dataMunicipio = data['trimestre']?.['municipiosTrimestre'] || []
-  
+  const dataMunicipioPast = data['trimestre']?.['municipiosTrimestrePast'] || []
+
   const dataQuarter = dataMunicipio.reduce((acc: number, obj: any) => {
     const data = +obj['Trimestre'].split('º')[0]
     acc = acc <= data ? data : acc
 
     return acc
-  }, 0) 
+  }, 0)
 
-  const quarter = dataQuarter - 1 
+  // Trimestre 1 não tem "trimestre anterior" no ano corrente: busca o 4º Trimestre do ano anterior.
+  const isPreviousYear = dataQuarter <= 1
+  const quarter = isPreviousYear ? 4 : dataQuarter - 1
+  const sourceData = isPreviousYear ? dataMunicipioPast : dataMunicipio
+  const displayYear = isPreviousYear ? `${+year - 1}` : year
 
-  const dataFiltred = dataMunicipio.filter((obj: any) => +obj['Trimestre'].split('º')[0] == quarter)
+  const dataFiltred = sourceData.filter((obj: any) => +obj['Trimestre'].split('º')[0] == quarter)
 
   const chartData = dataFiltred.reduce((acc: number, obj: any) => acc += obj['Taxa'] , 0) || 0
-  
-  title =  title + ` - (${quarter > 0 ? dataFiltred?.[0]?.['Trimestre'] : 'Não possui dados'} )`
+
+  title =  title + ` - (${dataFiltred?.[0]?.['Trimestre'] || 'Não possui dados'})`
 
   return (
     <Card
       local={local}
       title={`${title}`}
       data={chartData}
-      year={year}
+      year={displayYear}
       color={color}
     />
   );

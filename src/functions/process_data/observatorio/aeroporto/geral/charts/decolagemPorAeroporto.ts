@@ -4,8 +4,10 @@ export const processDecolagensPorAeroporto = (data: AnacGeralHeaders[]) => {
 
   const processedData: Record<string, { aeroporto: string; totalDecolagens: number }> = data
   .reduce((acc: { [aeroporto: string]: {aeroporto: string, totalDecolagens: number} }, item: AnacGeralHeaders) => {
+    if (item["GRUPO DE VOO"] === "IMPRODUTIVO") return acc;
+
     const aeroporto = item["AEROPORTO NOME"] || "Indefinido";
-    
+
     const decolagens = item["DECOLAGENS"] || 0;
 
     if (!acc[aeroporto]) {

@@ -6,6 +6,11 @@ import L from "leaflet";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 import { colorGroupHash, GroupType } from "@/utils/hashs/colorGroupHash";
 
+const LIMITES_BRASIL: L.LatLngBoundsExpression = [
+  [-35, -75], // sudoeste
+  [7, -32], // nordeste
+];
+
 type GeoJSONFeature = {
   type: "Feature";
   geometry: {
@@ -67,7 +72,11 @@ export default function EmpresasFechadas({ data }: CapitaisLocalizacaoProps) {
       return;
     }
 
-    const map = L.map(mapRef.current).setView([-8.0631617, -34.875949], 15); // Coordenadas iniciais e zoom
+    const map = L.map(mapRef.current, {
+      minZoom: 4,
+      maxBounds: LIMITES_BRASIL,
+      maxBoundsViscosity: 1.0,
+    }).setView([-8.0631617, -34.875949], 15); // Coordenadas iniciais e zoom
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 18,

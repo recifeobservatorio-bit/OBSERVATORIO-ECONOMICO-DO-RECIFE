@@ -9,7 +9,9 @@ const EmpresasInativasMesRecente = ({
   year,
   color,
 }: any) => {
-  const monthsData = Object.keys(data['mes'])
+  // 'mesFiltrado' respeita o filtro de mês selecionado — 'mes' é a série sem esse filtro,
+  // usada só pelo gráfico de linha no modo "Ano".
+  const monthsData = Object.keys(data['mesFiltrado'])
 
   const curMonthData = monthsData.sort(
     (a: any, b: any) => +b - +a,
@@ -17,7 +19,7 @@ const EmpresasInativasMesRecente = ({
 
   const curMonthName = monthLongName(+curMonthData)
 
-  const chartData = data['mes'][curMonthData] || 0
+  const chartData = data['mesFiltrado'][curMonthData] || 0
 
   return (
     <Card

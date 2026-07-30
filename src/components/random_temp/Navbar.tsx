@@ -137,9 +137,11 @@ const Navbar = () => {
           <div className="p-4 bg-white dark:bg-[#0C1B2B] shadow-md rounded-lg text-sm text-gray-700">
             <span className="font-medium text-lg text-gray-800 dark:text-gray-100">Filtros selecionados:</span>
             <ul className="flex flex-wrap gap-4 mt-2 dark:text-gray-300">
-              <li>
-                Ano: <strong>{filters.year || (filters.years && filters.years[filters.years.length - 1])}</strong>
-              </li>
+              {!filters.hideYearFilter && (
+                <li>
+                  Ano: <strong>{filters.year || (filters.years && filters.years[filters.years.length - 1])}</strong>
+                </li>
+              )}
               {filters.additionalFilters?.map((f: AdditionalFilter) => {
                 if (f.selected?.length > 0) {
                   const visible = isMonthFilterLabel(f.label)
@@ -175,22 +177,24 @@ const Navbar = () => {
                 <h2 className="mb-4 text-base font-semibold text-gray-800 dark:text-gray-200">Filtros</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   {/* Seletor de Ano */}
-                  <div className="flex flex-col">
-                    <label className="text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">ANO</label>
-                    <select
-                      value={tempFilters.year || filters.years && filters.years[filters.years.length - 1]}
-                      onChange={(e) => {
-                        setTempFilters((prev) => ({ ...prev, year: e.target.value }));
-                      }}
-                      className="px-3 py-2 border text-sm rounded-md dark:bg-[#182e46] dark:border-gray-600 dark:text-gray-300"
-                    >
-                      {filters.years?.map((yr: string) => (
-                        <option key={yr} value={yr}>
-                          {yr}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  {!tempFilters.hideYearFilter && (
+                    <div className="flex flex-col">
+                      <label className="text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">ANO</label>
+                      <select
+                        value={tempFilters.year || filters.years && filters.years[filters.years.length - 1]}
+                        onChange={(e) => {
+                          setTempFilters((prev) => ({ ...prev, year: e.target.value }));
+                        }}
+                        className="px-3 py-2 border text-sm rounded-md dark:bg-[#182e46] dark:border-gray-600 dark:text-gray-300"
+                      >
+                        {filters.years?.map((yr: string) => (
+                          <option key={yr} value={yr}>
+                            {yr}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
 
                   {/* Additional filters */}
                   {tempFilters.additionalFilters?.map((f: AdditionalFilter) => (

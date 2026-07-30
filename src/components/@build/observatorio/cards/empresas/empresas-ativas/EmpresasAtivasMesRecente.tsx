@@ -4,20 +4,25 @@ import { monthLongName } from '@/utils/formatters/@global/monthLongName'
 const EmpresasAtivasMesRecente = ({
   data,
   date,
-  title = `Empresas Ativas (mês)`,
+  title = `Empresas Abertas (mês)`,
   local = '',
   year,
   color,
 }: any) => {
-  const monthsData = Object.keys(data['mes'])
+  // 'mesFiltrado' respeita o filtro de mês selecionado. Se um único mês está selecionado,
+  // mostra só aquele mês; sem filtro de mês (todos os meses presentes), soma o ano todo.
+  const monthsData = Object.keys(data['mesFiltrado'])
+  const mesEspecifico = monthsData.length === 1
 
   const curMonthData = monthsData.sort(
     (a: any, b: any) => +b - +a,
   )?.[0]
 
-  const curMonthName = monthLongName(+curMonthData)
+  const curMonthName = mesEspecifico ? monthLongName(+curMonthData) : 'Ano'
 
-  const chartData = data['mes'][curMonthData] || 0
+  const chartData = mesEspecifico
+    ? data['mesFiltrado'][curMonthData] || 0
+    : Object.values(data['mesFiltrado']).reduce((acc: number, v: any) => acc + v, 0)
 
   return (
     <Card

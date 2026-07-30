@@ -16,6 +16,8 @@ export const processDecolagensAnoComparativo = (
   });
 
   data.forEach((item: AnacGeralHeaders) => {
+    if (item["GRUPO DE VOO"] === "IMPRODUTIVO") return;
+
     const decolagens = parseFloat(
       (item["DECOLAGENS"] || "0").toString()
     );

@@ -20,7 +20,10 @@ export const processPassageirosMes = (
     const month = months[0];
 
     passageirosMes = data.reduce((total: number, item: AnacGeralHeaders) => {
-      if ( (!airportName || item["AEROPORTO NOME"] === airportName) && item["MÊS"] === month ) {
+      if (
+        (!airportName || item["AEROPORTO NOME"] === airportName) &&
+        item["MÊS"] === month
+      ) {
         const passageiros = item["PASSAGEIRO"] || 0;
         return total + passageiros;
       }

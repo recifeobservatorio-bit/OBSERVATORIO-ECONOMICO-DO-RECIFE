@@ -7,6 +7,7 @@ import { processEmpresasMonthInfo } from "@/functions/process_data/observatorio/
 
 const EmpresasAtivasMes = ({
   data = [],
+  dataSemMes,
   color = "#000000",
 
 }: any) => {
@@ -17,7 +18,9 @@ const [ordenation, setOrdenation] = useState([{ index: 0, name: 'mes', ordenatio
 
 const order = ordenation.find((item) => item.ordenation != 0)
 
-const chartData = processEmpresasMonthInfo(data)
+// Usa dataSemMes (ignora o filtro de MÊS) — a tabela precisa enxergar todos os meses pra
+// calcular a variação de cada linha contra o mês anterior corretamente.
+const chartData = processEmpresasMonthInfo(dataSemMes ?? data)
 
 const aggregatedData = chartData
 

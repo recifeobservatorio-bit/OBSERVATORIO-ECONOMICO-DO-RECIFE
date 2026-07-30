@@ -25,7 +25,9 @@ const AeroportoInfo = ({
       }
       acc[mes].PASSAGEIRO += Number(item["PASSAGEIRO"]) || 0;
       acc[mes].CARGA += Number(item["CARGA"]) || 0;
-      acc[mes].DECOLAGENS += Number(item["DECOLAGENS"]) || 0;
+      if (item["GRUPO DE VOO"] !== "IMPRODUTIVO") {
+        acc[mes].DECOLAGENS += Number(item["DECOLAGENS"]) || 0;
+      }
       return acc;
     }, {});
 

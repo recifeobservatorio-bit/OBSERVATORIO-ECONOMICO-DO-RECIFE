@@ -12,6 +12,7 @@ import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
 const VariacaoEmpresasAtivasRecife = ({
   data = [],
+  dataSemMes,
   colors = ColorPalette.default,
   title = "Variação de Empresas Ativas no Recife",
   }: any) => {
@@ -37,9 +38,14 @@ const VariacaoEmpresasAtivasRecife = ({
       );
     }
 
-    const mesChartData = data.sort((a: any, b: any) => a['mes'] - b['mes']).map((dataMap: any, i: number) => {
-        if (dataMap['mes'] !== 1) {
-           return { mes: dataMap['Mês'], empresas: (((dataMap['Empresas Ativas'] - data[i - 1]['Empresas Ativas']) / data[i - 1]['Empresas Ativas']) * 100).toFixed(2) }
+    // Usa dataSemMes (ignora o filtro de MÊS) — precisa enxergar todos os meses pra achar
+    // o mês anterior de cada linha, mesmo que o usuário tenha filtrado por um único mês.
+    const baseData = dataSemMes ?? data
+    const sortedMesData = [...baseData].sort((a: any, b: any) => a['mes'] - b['mes'])
+    const mesChartData = sortedMesData.map((dataMap: any) => {
+        const mesAnterior = sortedMesData.find((item: any) => item['mes'] === dataMap['mes'] - 1)
+        if (mesAnterior) {
+           return { mes: dataMap['Mês'], empresas: (((dataMap['Empresas Ativas'] - mesAnterior['Empresas Ativas']) / mesAnterior['Empresas Ativas']) * 100).toFixed(2) }
         }
     }).filter((data: any) => !!data);
     const chartData = mode === "ano" ? anoData : mesChartData;

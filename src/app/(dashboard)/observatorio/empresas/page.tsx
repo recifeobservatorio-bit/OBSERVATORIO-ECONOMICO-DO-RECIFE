@@ -25,6 +25,7 @@ const EmpresasPage = () => {
   const { isLoading, data, filters } = useDashboard() as any;
   const [dataArr, setDataArr] = useState<any>([]);
   const [dataArrSemMes, setDataArrSemMes] = useState<any>([]);
+  const [dataArrSemMesPast, setDataArrSemMesPast] = useState<any>([]);
   const [dataObjRawData, setDataObjRawData] = useState<any>({});
   const [dataObj, setDataObj] = useState<any>({});
   const [dataTest, setDataTest] = useState<any>({});
@@ -60,11 +61,13 @@ const EmpresasPage = () => {
 
           setDataArr(empresasDataObj.filteredData);
           setDataArrSemMes(empresasDataObj.filteredDataSemMes || []);
+          setDataArrSemMesPast(empresasDataObj.filteredDataSemMesPast || []);
 
           clearInterval(intervalId);
         } else {
             setDataArr([]);
             setDataArrSemMes([]);
+            setDataArrSemMesPast([]);
           }
         
         if (idTest.includes(data?.id)) {
@@ -159,12 +162,14 @@ const EmpresasPage = () => {
         return <EmpresasAtivasRecife
         data={dataArr}
         dataSemMes={dataArrSemMes}
+        dataSemMesPast={dataArrSemMesPast}
         year={getYearSelected(filters)}
         />
       case "empresas-ativas":
         return <EmpresasAtivas
         data={dataArr}
         dataSemMes={dataArrSemMes}
+        dataSemMesPast={dataArrSemMesPast}
         year={getYearSelected(filters)}
         />
       case "empresas-inativas":
@@ -225,6 +230,7 @@ const EmpresasPage = () => {
         return <EmpresasAtivasRecife
         data={dataArr}
         dataSemMes={dataArrSemMes}
+        dataSemMesPast={dataArrSemMesPast}
         year={getYearSelected(filters)}
         />
     }

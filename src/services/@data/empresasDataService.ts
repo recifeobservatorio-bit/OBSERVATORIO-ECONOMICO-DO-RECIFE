@@ -30,12 +30,18 @@ export class EmpresasDataService {
   // tab1
   private async fetchGeral(filters: any) {
     const empresasData = new EmpresasData(this.currentYear);
+    const pastYear = `${+this.currentYear - 1}`;
 
-    const fetchData = await empresasData.fetchProcessedEmpresasAtivasRecife()
+    const [fetchData, fetchDataPast] = await Promise.all([
+      empresasData.fetchProcessedEmpresasAtivasRecife(),
+      new EmpresasData(pastYear).fetchProcessedEmpresasAtivasRecife().catch(() => []),
+    ]);
 
     const filteredData = {
       ...applyGenericFilters(fetchData, filters),
       filteredDataSemMes: applyGenericFilters(fetchData, filters, ["mes"]).filteredData,
+      // Ano anterior inteiro (sem filtro de mês) — usado para Janeiro "puxar" Dezembro do ano passado.
+      filteredDataSemMesPast: applyGenericFilters(fetchDataPast, filters, ["mes"]).filteredData,
     };
 
     return {
@@ -47,12 +53,19 @@ export class EmpresasDataService {
   // tab2
   private async fetchEmpresasAtivas(filters: any) {
     const empresasData = new EmpresasData(this.currentYear);
+    const pastYear = `${+this.currentYear - 1}`;
 
-    const fetchData = await empresasData.fetchProcessedEmpresasAtivas()
+    const [fetchData, fetchDataPast] = await Promise.all([
+      empresasData.fetchProcessedEmpresasAtivasPorAno(),
+      new EmpresasData(pastYear).fetchProcessedEmpresasAtivasPorAno().catch(() => []),
+    ]);
 
     const filteredData = {
       ...applyGenericFilters(fetchData, filters),
       filteredDataSemMes: applyGenericFilters(fetchData, filters, ["mes"]).filteredData,
+      // Ano anterior inteiro (sem filtro de mês) — usado pra comparar o mês atual com o
+      // mesmo mês do ano passado ("Variação" e "Empresas Abertas anteriormente").
+      filteredDataSemMesPast: applyGenericFilters(fetchDataPast, filters, ["mes"]).filteredData,
     };
 
     return {
@@ -65,7 +78,7 @@ export class EmpresasDataService {
   private async fetchEmpresasInativas(filters: any) {
     const empresasData = new EmpresasData(this.currentYear);
 
-    const fetchData = await empresasData.fetchProcessedEmpresasInativas()
+    const fetchData = await empresasData.fetchProcessedEmpresasInativasPorAno()
 
     const filteredData = {
       ...applyGenericFilters(fetchData, filters),
@@ -82,8 +95,8 @@ export class EmpresasDataService {
   private async fetchEmpresasAtivasInativas(filters: any) {
     const empresasData = new EmpresasData(this.currentYear);
 
-    const fetchDataAtivas = await empresasData.fetchProcessedEmpresasAtivas()
-    const fetchDataInativas = await empresasData.fetchProcessedEmpresasInativas()
+    const fetchDataAtivas = await empresasData.fetchProcessedEmpresasAtivasPorAno()
+    const fetchDataInativas = await empresasData.fetchProcessedEmpresasInativasPorAno()
 
     const filteredDataAtivas = {
       ...applyGenericFilters(fetchDataAtivas, filters),

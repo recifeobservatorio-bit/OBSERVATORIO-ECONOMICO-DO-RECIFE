@@ -2,6 +2,7 @@ import Card from "@/components/@global/cards/Card";
 
 const EmpresasAtivasMesRecente = ({
   data,
+  dataSemMes,
   date,
   title = `Empresas Ativas (mês)`,
   local = '',
@@ -9,7 +10,7 @@ const EmpresasAtivasMesRecente = ({
   color,
 }: any) => {
 
-  const curMonthData = data.sort((a: any, b: any) => b['mes'] - a['mes'])?.[0] 
+  const curMonthData = [...data].sort((a: any, b: any) => b['mes'] - a['mes'])?.[0]
   
   const curMonthName = curMonthData?.['Mês']
 

@@ -7,6 +7,11 @@ import { processDesempregoTaxaCapital } from "@/functions/process_data/observato
 import { capitaisCoordsDicts } from "@/utils/dicts/empregos/desemprego/capitaisCoordsDicts";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
+const LIMITES_BRASIL: L.LatLngBoundsExpression = [
+  [-35, -75], // sudoeste
+  [7, -32], // nordeste
+];
+
 type DesempregoData = {
   Ano: number
   Capital: string
@@ -102,7 +107,11 @@ export default function CapitaisLocalizacao({ data }: CapitaisLocalizacaoProps) 
     }
 
 
-    const map = L.map(mapRef.current).setView([-14.673, -51.260], 4); // Coordenadas iniciais e zoom
+    const map = L.map(mapRef.current, {
+      minZoom: 4,
+      maxBounds: LIMITES_BRASIL,
+      maxBoundsViscosity: 1.0,
+    }).setView([-14.673, -51.260], 4); // Coordenadas iniciais e zoom
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 18,

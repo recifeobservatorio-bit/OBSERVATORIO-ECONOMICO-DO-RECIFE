@@ -4,29 +4,41 @@ import { monthLongName } from "@/utils/formatters/@global/monthLongName";
 const EmpresasVariacaoAtivasRecente = ({
   data,
   date,
-  title = `Variação Mês anterior de Empresas Ativas (mês)`,
+  title = `Variação Empresas Abertas (mês) - Ano Anterior`,
   local = '',
   year,
   color,
 }: any) => {
 
-  const monthsData = Object.keys(data['mes'])
+  // 'mesFiltrado' respeita o filtro de mês selecionado — 'mesPast' é o ano anterior inteiro,
+  // por mês. Com um mês específico selecionado, compara com o MESMO mês do ano anterior;
+  // sem filtro de mês, compara o ano todo (atual) com o ano anterior inteiro.
+  const monthsData = Object.keys(data['mesFiltrado'])
+  const mesEspecifico = monthsData.length === 1
 
   const curMonthData = monthsData.sort(
     (a: any, b: any) => +b - +a,
   ) ?.[0]
-  
-  const pastMonthData = monthsData.sort(
-    (a: any, b: any) => +b - +a,
-  )?.[1]
 
-  const curMonthName = monthLongName(+curMonthData)
+  const mesPast = data['mesPast'] || {}
 
-  const chartData = (((data['mes'][curMonthData] - data['mes'][pastMonthData]) / data['mes'][pastMonthData]) * 100).toFixed(2)
+  const curMonthValor = mesEspecifico
+    ? data['mesFiltrado'][curMonthData] || 0
+    : Object.values(data['mesFiltrado']).reduce((acc: number, v: any) => acc + v, 0)
+
+  const pastMonthValor = mesEspecifico
+    ? mesPast[curMonthData]
+    : Object.values(mesPast).reduce((acc: number, v: any) => acc + v, 0)
+
+  const curMonthName = mesEspecifico ? monthLongName(+curMonthData) : 'Ano'
+
+  const chartData = pastMonthValor
+    ? (((curMonthValor - pastMonthValor) / pastMonthValor) * 100).toFixed(2)
+    : 0
 
   return (
     <>
-      {pastMonthData && <Card
+      {!!pastMonthValor && <Card
         local={local}
         title={`${title.replace('mês', curMonthName)}`}
         data={chartData}

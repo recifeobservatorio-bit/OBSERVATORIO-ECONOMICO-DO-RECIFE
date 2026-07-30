@@ -4,12 +4,14 @@ import { monthLongName } from '@/utils/formatters/@global/monthLongName'
 const EmpresasAtivasMesRecente = ({
   data,
   date,
-  title = `Empresas Ativas (mês)`,
+  title = `Empresas Abertas (mês)`,
   local = '',
   year,
   color,
 }: any) => {
-  const monthsData = Object.keys(data['ativas']['mes'])
+  // 'mesFiltrado' respeita o filtro de mês selecionado — 'mes' é a série sem esse filtro,
+  // usada só pelo gráfico de linha no modo "Ano".
+  const monthsData = Object.keys(data['ativas']['mesFiltrado'])
 
   const curMonthData = monthsData.sort(
     (a: any, b: any) => +b - +a,
@@ -17,7 +19,7 @@ const EmpresasAtivasMesRecente = ({
 
   const curMonthName = monthLongName(+curMonthData)
 
-  const chartData = data['ativas']['mes'][curMonthData] || 0
+  const chartData = data['ativas']['mesFiltrado'][curMonthData] || 0
 
   return (
     <Card

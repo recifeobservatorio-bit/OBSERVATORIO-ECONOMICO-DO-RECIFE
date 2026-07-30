@@ -28,7 +28,7 @@ const AeroportoMovimentacao = ({ year }: { year: string }) => {
         .filter((r: any) => r.Aeroporto === "Recife")
         .reduce((acc: number, r: any) => acc + (Number(r.Quantidade) || 0), 0);
       const totalVoos = anac
-        .filter((r: any) => r["AEROPORTO NOME"] === "Recife")
+        .filter((r: any) => r["AEROPORTO NOME"] === "Recife" && r["GRUPO DE VOO"] !== "IMPRODUTIVO")
         .reduce((acc: number, r: any) => acc + (Number(r.DECOLAGENS) || 0), 0);
 
       setChartData([{ label: "Recife", passageiros: totalPassageiros, cargas: totalCargas }]);

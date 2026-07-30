@@ -3,6 +3,8 @@ export interface Filters<T = unknown> {
     years?: string[];
     additionalFilters: AdditionalFilter[];
     extra?: T;
+    /** Esconde o seletor de ANO no Navbar — para abas cuja fonte de dados não tem coluna de ano. */
+    hideYearFilter?: boolean;
   }
   
 export interface AdditionalFilter {

@@ -2,14 +2,20 @@ import Card from "@/components/@global/cards/Card";
 
 const EmpresasAtivasMediaAno = ({
   data,
+  dataSemMes,
   date,
-  title = `Empresas Abertas - (mes)`,
+  title = `Média Empresas Ativas Mensal`,
   local = '',
   year,
   color,
 }: any) => {
 
-  const chartData = (data.reduce((acc: number, data: any) => acc += data['Empresas Ativas'], 0) / data.length).toFixed(0) || 0
+  // Média acumulada do ano até o mês filtrado (ex: filtrando Junho, tira a média de Jan-Jun,
+  // não só o valor de Junho isoladamente).
+  const curMonth = Math.max(...data.map((item: any) => item['mes']))
+  const dataAteMes = (dataSemMes ?? data).filter((item: any) => item['mes'] <= curMonth)
+
+  const chartData = (dataAteMes.reduce((acc: number, item: any) => acc += item['Empresas Ativas'], 0) / dataAteMes.length).toFixed(0) || 0
 
   return (
     <Card

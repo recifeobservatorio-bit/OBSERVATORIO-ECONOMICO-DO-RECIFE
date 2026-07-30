@@ -54,6 +54,19 @@ function filterByYear(rows: any[], year: string, field: string): any[] {
   return rows.filter((r) => String(r[field]) === String(year));
 }
 
+// empresas_ativas.parquet não tem coluna "Ano" pronta, mas tem a data completa de abertura
+// (data_abertura_empresa) — o Power BI já deriva o ano dessa coluna automaticamente, então
+// fazemos o mesmo aqui pra permitir filtrar por ano de abertura.
+function withAnoAbertura(rows: any[]): any[] {
+  return rows.map((row) => ({
+    ...row,
+    // getUTCFullYear, não getFullYear — a data vem em UTC meia-noite; em horário local
+    // (UTC-3) isso desloca a virada de mês/ano 3h pra trás e empurra empresas abertas no
+    // dia 1 pro mês/ano anterior (mesma classe de bug de timezone já visto em Combustíveis).
+    Ano: row.data_abertura_empresa ? new Date(row.data_abertura_empresa).getUTCFullYear() : null,
+  }));
+}
+
 export class EmpresasData {
   constructor(private year: string) {}
 
@@ -70,8 +83,21 @@ export class EmpresasData {
     return ativasRegistroFetcher.fetchAll();
   }
 
+  // Igual a fetchProcessedEmpresasAtivas, mas com "Ano" derivado de data_abertura_empresa e
+  // já filtrado pelo ano selecionado — usado pela aba "Empresas Ativas", que tem filtro de ANO.
+  async fetchProcessedEmpresasAtivasPorAno(): Promise<any[]> {
+    return filterByYear(withAnoAbertura(await ativasRegistroFetcher.fetchAll()), this.year, "Ano");
+  }
+
   async fetchProcessedEmpresasInativas(): Promise<any[]> {
     return inativasFetcher.fetchAll();
+  }
+
+  // Igual a fetchProcessedEmpresasInativas, mas com "Ano" derivado de data_abertura_empresa
+  // (ano em que a empresa foi aberta, não em que fechou — data_encerramento só existe em
+  // ~17% dos registros) e já filtrado pelo ano selecionado.
+  async fetchProcessedEmpresasInativasPorAno(): Promise<any[]> {
+    return filterByYear(withAnoAbertura(await inativasFetcher.fetchAll()), this.year, "Ano");
   }
 
   async fetchProcessedNaturezas(): Promise<any[]> {

@@ -21,6 +21,7 @@ export const processDecolagensMes = (
       decolagensMes = data.reduce((total: number, item: AnacGeralHeaders) => {
         if (
           (!aeroportoNome || item["AEROPORTO NOME"] === aeroportoNome) &&
+          item["GRUPO DE VOO"] !== "IMPRODUTIVO" &&
           item["MÊS"] === month
         ) {
           const decolagens = item["DECOLAGENS"] || 0;
@@ -39,6 +40,7 @@ export const processDecolagensMes = (
         const mesAtual = item["MÊS"];
         if (
           (!aeroportoNome || item["AEROPORTO NOME"] === aeroportoNome) &&
+          item["GRUPO DE VOO"] !== "IMPRODUTIVO" &&
           mesAtual >= startMonth &&
           mesAtual <= endMonth
         ) {
@@ -58,13 +60,16 @@ export const processDecolagensMes = (
       };
     } else {
       decolagensMes = data.reduce((total: number, item: AnacGeralHeaders) => {
-        if (!aeroportoNome || item["AEROPORTO NOME"] === aeroportoNome) {
+        if (
+          (!aeroportoNome || item["AEROPORTO NOME"] === aeroportoNome) &&
+          item["GRUPO DE VOO"] !== "IMPRODUTIVO"
+        ) {
           const decolagens = item["DECOLAGENS"] || 0;
           return total + decolagens;
         }
         return total;
       }, 0);
-  
+
       return {
         ano: year,
         decolagens: decolagensMes,

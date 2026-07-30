@@ -24,6 +24,7 @@ export function processDesembarqueNaturezaTipo(
 
     if (
       item.TIPO === "Desembarque" &&
+      (tipoDado !== "decolagens" || item["GRUPO DE VOO"] !== "IMPRODUTIVO") &&
       item.NATUREZA === natureza &&
       aeroportosNomes.includes(item["AEROPORTO NOME"]) &&
       (mes === undefined || itemMes === mes) // Filtrar pelo mês se fornecido

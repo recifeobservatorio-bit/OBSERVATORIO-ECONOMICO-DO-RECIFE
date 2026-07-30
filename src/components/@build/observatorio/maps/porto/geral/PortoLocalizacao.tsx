@@ -6,6 +6,11 @@ import L from "leaflet";
 import { PortoCoordHeaders } from "@/@types/observatorio/@fetch/porto";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
+const LIMITES_BRASIL: L.LatLngBoundsExpression = [
+  [-35, -75], // sudoeste
+  [7, -32], // nordeste
+];
+
 type GeoJSONFeature = {
   type: "Feature";
   geometry: {
@@ -109,7 +114,11 @@ export default function PortoLocalizacao({ data }: PortoLocalizacaoProps) {
     const portoData = data[0];
     const selectedMonths = data[1];
 
-    const map = L.map(mapRef.current).setView([-14.673, -51.260], 4); // Coordenadas iniciais e zoom
+    const map = L.map(mapRef.current, {
+      minZoom: 4,
+      maxBounds: LIMITES_BRASIL,
+      maxBoundsViscosity: 1.0,
+    }).setView([-14.673, -51.260], 4); // Coordenadas iniciais e zoom
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 18,

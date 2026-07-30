@@ -4,12 +4,14 @@ import { monthLongName } from '@/utils/formatters/@global/monthLongName'
 const EmpresasAtivasInativasMesRecente = ({
   data,
   date,
-  title = `Empresas Variação Ativas e Inativas (mês)`,
+  title = `Variação Empresas Abertas e Inativas (mês)`,
   local = '',
   year,
   color,
 }: any) => {
-  const monthsData = Object.keys(data['ativas']['mes'])
+  // 'mesFiltrado' respeita o filtro de mês selecionado — 'mes' é a série sem esse filtro,
+  // usada só pelo gráfico de linha no modo "Ano".
+  const monthsData = Object.keys(data['ativas']['mesFiltrado'])
 
   const curMonthData = monthsData.sort(
     (a: any, b: any) => +b - +a,
@@ -17,17 +19,22 @@ const EmpresasAtivasInativasMesRecente = ({
 
   const curMonthName = monthLongName(+curMonthData)
 
-  const chartData = (((data['ativas']['mes'][curMonthData] - data['inativas']['mes'][curMonthData]) / data['inativas']['mes'][curMonthData]) * 100).toFixed(0)
+  const ativasValor = data['ativas']['mesFiltrado'][curMonthData]
+  const inativasValor = data['inativas']['mesFiltrado'][curMonthData]
+
+  const chartData = inativasValor ? (((ativasValor - inativasValor) / inativasValor) * 100).toFixed(0) : 0
 
   return (
-    <Card
-      local={local}
-      title={`${title.replace('mês', curMonthName)}`}
-      data={chartData}
-      year={year}
-      color={color}
-      percent
-    />
+    <>
+      {!!inativasValor && <Card
+        local={local}
+        title={`${title.replace('mês', curMonthName)}`}
+        data={chartData}
+        year={year}
+        color={color}
+        percent
+      />}
+    </>
   )
 }
 

@@ -11,13 +11,11 @@ import { processPassageirosPorNatureza } from "@/functions/process_data/observat
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
 const PassageirosPorNatureza = ({
-  rawData = [],
-  title = "Cargas por Natureza do Voo",
-  
+  data = [],
+  title = "Passageiros por Natureza do Voo",
 }: ChartBuild<AnacGeralHeaders[]>) => {
   const [showPercentage, setShowPercentage] = useState(true);
-  const chartData = processPassageirosPorNatureza(rawData);
-
+  const chartData = processPassageirosPorNatureza(data);
 
   return (
     <div className="chart-wrapper">

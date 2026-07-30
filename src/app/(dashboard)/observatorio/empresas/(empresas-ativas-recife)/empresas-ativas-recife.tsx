@@ -16,10 +16,12 @@ import tables from "./@imports/tables";
 const EmpresasAtivasRecife = ({
   data,
   dataSemMes,
+  dataSemMesPast,
   year,
 }: {
   data: any;
   dataSemMes?: any;
+  dataSemMesPast?: any;
   year: string;
 }) => {
   const [chartOrder, setChartOrder] = useState(charts.map((_, index) => index));
@@ -36,6 +38,8 @@ const EmpresasAtivasRecife = ({
             <ErrorBoundary>
               <Component
                 data={data}
+                dataSemMes={dataSemMes}
+                dataSemMesPast={dataSemMesPast}
                 year={year}
                 color={ColorPalette.default[index]}
               />
@@ -75,6 +79,7 @@ const EmpresasAtivasRecife = ({
                     <Component
                       color={ColorPalette.default[index]}
                       data={data}
+                      dataSemMes={dataSemMes}
                       year={year}
                     />
                 </div> 

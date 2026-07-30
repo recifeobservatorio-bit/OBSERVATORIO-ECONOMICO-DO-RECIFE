@@ -1,5 +1,5 @@
 export const empresasInativasFilters = {
-    years: ["2023", "2024", "2025", "2026"], // Filtra por ano
+    years: ["2021", "2022", "2023", "2024", "2025", "2026"], // Filtra pelo ano de abertura da empresa (derivado de data_abertura_empresa)
     additionalFilters: [
     //   {
     //     label: "Mês",  

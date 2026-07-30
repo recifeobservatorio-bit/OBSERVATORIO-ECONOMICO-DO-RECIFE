@@ -39,6 +39,7 @@ export function processEmbarqueDomesticoInternacional(
       (aeroportosNomes.length === 0 ||
         aeroportosNomes.includes(item["AEROPORTO NOME"])) &&
       item.TIPO === operacao &&
+      (tipoDado !== "decolagens" || item["GRUPO DE VOO"] !== "IMPRODUTIVO") &&
       item.NATUREZA &&
       (mes === undefined || item.MÊS === mes)
     );
