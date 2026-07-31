@@ -1,7 +1,7 @@
 import { monthHash } from "@/utils/hashs/monthHash";
 
 export const empresasComparativoClasses = {
-    years: ["2023", "2024", "2025", "2026"], // Filtra por ano
+    years: ["2025", "2026"], // Filtra por ano — empresas_classes.parquet só tem dados de 2025/2026
     additionalFilters: [
       {
         label: "mes",  

@@ -38,6 +38,7 @@ import { empresasNaturezasFilters } from "@/utils/filters/empresas/empresasNatur
 import { empresasClassesFilters } from "@/utils/filters/empresas/empresasClassesFilters";
 import { empresasComparativoClasses } from "@/utils/filters/empresas/empresasComparativoClasses";
 import { empresasAbertasFechadasFilters } from "@/utils/filters/empresas/empresasAbertasFechadasFilters";
+import { empresasTempoAberturaFilters } from "@/utils/filters/empresas/empresasTempoAberturaFilters";
 import { combustiveisGeralFilters } from "@/utils/filters/combustiveis/combustiveisGeralFilters";
 import { combustiveisComparativoFilters } from "@/utils/filters/combustiveis/combustiveisComparativoFilters";
 import { combustiveisRegionalFilters } from "@/utils/filters/combustiveis/combustiveisRegionalFilters";
@@ -136,7 +137,7 @@ export const routeFiltersMap: Record<string, TabFiltersMap> = {
     "empresas-classes": empresasClassesFilters,
     "comparativo-empresas-classes": empresasComparativoClasses,
     "empresas-abertas-fechadas": empresasAbertasFechadasFilters,
-    "empresas-tempo-abertura": empresasAbertasFechadasFilters
+    "empresas-tempo-abertura": empresasTempoAberturaFilters
     // saldo: empresasGeralFilters,
     // media: empresasGeralFilters,
     // "comparativo-mov": empresasGeralFilters,

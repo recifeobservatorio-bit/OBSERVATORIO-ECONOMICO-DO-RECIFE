@@ -115,14 +115,14 @@ const EmpresasPage = () => {
           }
 
         if (idObjsRawData.includes(data?.id)) {
-          const empresasDataObj = { empresas: data?.empresas?.empresas?.filteredData || [], rawData: { mes: data?.empresas?.rawData?.mes?.filteredData || [], municipio: data?.empresas?.rawData?.municipio?.filteredData || [], municipioSemMes: data?.empresas?.rawData?.municipioSemMes?.filteredData || [] } };
-          
+          const empresasDataObj = { empresas: data?.empresas?.empresas?.filteredData || [], rawData: { mes: data?.empresas?.rawData?.mes?.filteredData || [], municipio: data?.empresas?.rawData?.municipio?.filteredData || [], municipioSemMes: data?.empresas?.rawData?.municipioSemMes?.filteredData || [] }, past: data?.empresas?.past?.filteredData || [] };
+
           setDataObjRawData(empresasDataObj);
 
           clearInterval(intervalId);
         } else {
-            setDataObjRawData({ empresas: [], rawData: {mes: [], municipio: []} });
-          }          
+            setDataObjRawData({ empresas: [], rawData: {mes: [], municipio: []}, past: [] });
+          }
       }, 50);
   
       return () => clearInterval(intervalId);
@@ -176,6 +176,7 @@ const EmpresasPage = () => {
         return <EmpresasInativas
         data={dataArr}
         dataSemMes={dataArrSemMes}
+        dataSemMesPast={dataArrSemMesPast}
         year={getYearSelected(filters)}
         />
       case "empresas-ativas-inativas":

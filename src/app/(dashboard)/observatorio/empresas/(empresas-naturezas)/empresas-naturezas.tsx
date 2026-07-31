@@ -25,14 +25,19 @@ const EmpresasNaturezas = ({
   const params = ['Municipio', 'mes', 'Natureza Jurídica']
  
   const chartData = useMemo(() => {
-    return { 
-      empresas: geralAccFieldFunction(data['empresas'], params, 'Estabelecimentos'),
+    const empresas = geralAccFieldFunction(data['empresas'], params, 'Estabelecimentos')
+    // 'mesPast' é o ano anterior inteiro, por mês (sem filtro de mês) — usado pelos cards
+    // pra comparar o período atual com o mesmo período do ano passado.
+    empresas.mesPast = data['past'] ? geralAccFieldFunction(data['past'], ['mes'], 'Estabelecimentos').mes : {}
+
+    return {
+      empresas,
       rawData: {
         municipio: geralAccFieldFunction(data['rawData']['municipio'], params, 'Estabelecimentos'),
         mes: geralAccFieldFunction(data['rawData']['mes'], params, 'Estabelecimentos')
       }
     }
-  }, [data, params])  
+  }, [data, params])
   
   return (
     <div>

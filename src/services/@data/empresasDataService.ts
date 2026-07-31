@@ -77,12 +77,19 @@ export class EmpresasDataService {
   // tab3
   private async fetchEmpresasInativas(filters: any) {
     const empresasData = new EmpresasData(this.currentYear);
+    const pastYear = `${+this.currentYear - 1}`;
 
-    const fetchData = await empresasData.fetchProcessedEmpresasInativasPorAno()
+    const [fetchData, fetchDataPast] = await Promise.all([
+      empresasData.fetchProcessedEmpresasInativasPorAno(),
+      new EmpresasData(pastYear).fetchProcessedEmpresasInativasPorAno().catch(() => []),
+    ]);
 
     const filteredData = {
       ...applyGenericFilters(fetchData, filters),
       filteredDataSemMes: applyGenericFilters(fetchData, filters, ["mes"]).filteredData,
+      // Ano anterior inteiro (sem filtro de mês) — usado pra comparar o período atual com o
+      // mesmo período do ano passado ("Ano Anterior" e "Variação").
+      filteredDataSemMesPast: applyGenericFilters(fetchDataPast, filters, ["mes"]).filteredData,
     };
 
     return {
@@ -119,21 +126,30 @@ export class EmpresasDataService {
   // tab5
     private async fetchEmpresasNaturezas(filters: any) {
       const empresasData = new EmpresasData(this.currentYear);
+      const pastYear = `${+this.currentYear - 1}`;
 
-      const fetchData = await empresasData.fetchProcessedNaturezas() 
+      const [fetchData, fetchDataPast] = await Promise.all([
+        empresasData.fetchProcessedNaturezas(),
+        new EmpresasData(pastYear).fetchProcessedNaturezas().catch(() => []),
+      ]);
 
       const filteredData = applyGenericFilters(fetchData, filters);
       const filteredDataRawDataMunicipio = applyGenericFilters(fetchData, filters, ['Municipio']);
       const filteredDataRawDataMes = applyGenericFilters(fetchData, filters, ['mes']);
+      // Ano anterior inteiro (sem filtro de mês) — usado pelos cards pra comparar o período
+      // atual com o mesmo período do ano passado, em vez do "mês anterior" dentro do mesmo
+      // ano filtrado (que sumia quando só um mês ficava nos dados filtrados).
+      const filteredDataPastSemMes = applyGenericFilters(fetchDataPast, filters, ['mes']);
 
       return {
         empresas: {
           empresas: filteredData,
           rawData: {
-            mes: filteredDataRawDataMes, 
+            mes: filteredDataRawDataMes,
             municipio: filteredDataRawDataMunicipio
-          },   
-        },      
+          },
+          past: filteredDataPastSemMes,
+        },
         id: "empresas-empresas-naturezas",
       };
   }
@@ -141,8 +157,12 @@ export class EmpresasDataService {
   // tab6 e tab7
   private async fetchEmpresasClasses(filters: any) {
    const empresasData = new EmpresasData(this.currentYear);
+   const pastYear = `${+this.currentYear - 1}`;
 
-      const fetchData = await empresasData.fetchProcessedClasses() 
+      const [fetchData, fetchDataPast] = await Promise.all([
+        empresasData.fetchProcessedClasses(),
+        new EmpresasData(pastYear).fetchProcessedClasses().catch(() => []),
+      ]);
 
       const filteredData = applyGenericFilters(fetchData, filters);
       const filteredDataRawDataMunicipio = applyGenericFilters(fetchData, filters, ['Municipio']);
@@ -151,6 +171,9 @@ export class EmpresasDataService {
       // all municípios, not just the selected one) — but that skip list doesn't include 'mes',
       // so its line chart collapses to one point when a month is selected. This variant skips both.
       const filteredDataRawDataMunicipioSemMes = applyGenericFilters(fetchData, filters, ['Municipio', 'mes']);
+      // Ano anterior inteiro (sem filtro de mês) — usado pelos cards da aba "empresas-classes"
+      // pra comparar o período atual com o mesmo período do ano passado.
+      const filteredDataPastSemMes = applyGenericFilters(fetchDataPast, filters, ['mes']);
 
       return {
         empresas: {
@@ -160,6 +183,7 @@ export class EmpresasDataService {
             municipio: filteredDataRawDataMunicipio,
             municipioSemMes: filteredDataRawDataMunicipioSemMes,
           },
+          past: filteredDataPastSemMes,
         },
         id: "empresas-empresas-classes",
       };

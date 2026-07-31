@@ -70,11 +70,14 @@ function montarMunicipioData(
     ? anoNumeroPreferido
     : anosDisponiveis[anosDisponiveis.length - 1];
 
+  // 'valor' vem null na fonte pra boa parte de 2023-2025 (o Tesouro Nacional publica a nota/
+  // classificação antes do indicador numérico detalhado) — mantemos null em vez de forçar 0,
+  // senão vira um "zero" falso nas tabelas/gráficos em vez de "sem dado".
   const historico: CapagHistoricoAno[] = anosDisponiveis.map((ano) => {
-    const entry: CapagHistoricoAno = { ano: String(ano), endividamento: 0, liquidez: 0, poupancaCorrente: 0 };
+    const entry: CapagHistoricoAno = { ano: String(ano), endividamento: null, liquidez: null, poupancaCorrente: null };
     for (const row of porAno.get(ano)!) {
       const campo = CAMPO_POR_INDICADOR[row.indicador];
-      if (campo) entry[campo] = Number.isFinite(row.valor) ? row.valor : 0;
+      if (campo) entry[campo] = Number.isFinite(row.valor) ? row.valor : null;
     }
     return entry;
   });
@@ -83,7 +86,7 @@ function montarMunicipioData(
   const indicadorAtual = (nomeIndicador: string): CapagIndicador => {
     const row = linhasAnoAtual.find((r) => r.indicador === nomeIndicador);
     return {
-      valor: row && Number.isFinite(row.valor) ? row.valor : 0,
+      valor: row && Number.isFinite(row.valor) ? row.valor : null,
       nota: row?.nota ?? "n.d.",
     };
   };

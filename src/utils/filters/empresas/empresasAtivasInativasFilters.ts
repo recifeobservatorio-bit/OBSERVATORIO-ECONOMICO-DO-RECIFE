@@ -1,9 +1,22 @@
+import { monthHash } from "@/utils/hashs/monthHash";
+
 export const empresasAtivasInativasFilters = {
     years: ["2020", "2021", "2022", "2023", "2024", "2025", "2026"], // Filtra pelo ano de abertura da empresa (derivado de data_abertura_empresa)
     additionalFilters: [
+      {
+        label: "Grupo",
+        options: [],
+        selected: [],
+      },
+      {
+        label: "mes",
+        options: [],
+        selected: [],
+        hash: monthHash
+      },
     //   {
-    //     label: "Mês",  
-    //     options: [],  
+    //     label: "Mês",
+    //     options: [],
     //     selected: [],
     //   },
     //   {

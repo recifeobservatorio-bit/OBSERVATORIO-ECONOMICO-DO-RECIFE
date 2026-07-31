@@ -25,7 +25,7 @@ const normalize = (value: string) =>
 
 export const isMonthFilterLabel = (label: string) => {
   const normalized = normalize(label);
-  return normalized === "mes" || normalized === "meses";
+  return normalized === "mes" || normalized === "meses" || normalized === "mes deferimento";
 };
 
 // Aceita valor numerico ("1", "01") ou por extenso ("Março", "mar") e retorna a posicao 1-12.

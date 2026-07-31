@@ -56,7 +56,8 @@ function filterByYear(rows: any[], year: string, field: string): any[] {
 
 // empresas_ativas.parquet não tem coluna "Ano" pronta, mas tem a data completa de abertura
 // (data_abertura_empresa) — o Power BI já deriva o ano dessa coluna automaticamente, então
-// fazemos o mesmo aqui pra permitir filtrar por ano de abertura.
+// fazemos o mesmo aqui pra permitir filtrar por ano de abertura. A coluna 'mes' crua já vem
+// baseada na mesma data (abertura), então não precisa de ajuste aqui.
 function withAnoAbertura(rows: any[]): any[] {
   return rows.map((row) => ({
     ...row,
@@ -64,6 +65,18 @@ function withAnoAbertura(rows: any[]): any[] {
     // (UTC-3) isso desloca a virada de mês/ano 3h pra trás e empurra empresas abertas no
     // dia 1 pro mês/ano anterior (mesma classe de bug de timezone já visto em Combustíveis).
     Ano: row.data_abertura_empresa ? new Date(row.data_abertura_empresa).getUTCFullYear() : null,
+  }));
+}
+
+// empresas_inativas.parquet não tem coluna "Ano" pronta. A coluna 'mes' crua já vem do
+// ENCERRAMENTO (mês em que a empresa fechou, presente em só ~16,5% dos registros — os
+// demais não têm data_encerramento preenchida e por isso não entram em nenhum filtro de
+// ano/mês específico). Pra bater com valores de referência conferidos (ex.: Junho/2026 = 37,
+// Junho/2025 = 113), o "Ano" precisa vir da MESMA data (encerramento), não da abertura.
+function withAnoEncerramento(rows: any[]): any[] {
+  return rows.map((row) => ({
+    ...row,
+    Ano: row.data_encerramento ? new Date(row.data_encerramento).getUTCFullYear() : null,
   }));
 }
 
@@ -93,23 +106,38 @@ export class EmpresasData {
     return inativasFetcher.fetchAll();
   }
 
-  // Igual a fetchProcessedEmpresasInativas, mas com "Ano" derivado de data_abertura_empresa
-  // (ano em que a empresa foi aberta, não em que fechou — data_encerramento só existe em
-  // ~17% dos registros) e já filtrado pelo ano selecionado.
+  // Igual a fetchProcessedEmpresasInativas, mas com "Ano" derivado de data_encerramento (ano
+  // em que a empresa fechou, consistente com a coluna 'mes' crua) e já filtrado pelo ano
+  // selecionado.
   async fetchProcessedEmpresasInativasPorAno(): Promise<any[]> {
-    return filterByYear(withAnoAbertura(await inativasFetcher.fetchAll()), this.year, "Ano");
+    return filterByYear(withAnoEncerramento(await inativasFetcher.fetchAll()), this.year, "Ano");
   }
 
   async fetchProcessedNaturezas(): Promise<any[]> {
     return filterByYear(await naturezasFetcher.fetchAll(), this.year, "Ano");
   }
 
+  // Sem filtro de ano — usada pela série histórica multianual ("Ano" no toggle Mês/Ano).
+  async fetchAllYearsNaturezas(): Promise<any[]> {
+    return naturezasFetcher.fetchAll();
+  }
+
   async fetchProcessedClasses(): Promise<any[]> {
     return filterByYear(await classesFetcher.fetchAll(), this.year, "Ano");
   }
 
+  // Sem filtro de ano — usada pela série histórica multianual ("Ano" no toggle Mês/Ano).
+  async fetchAllYearsClasses(): Promise<any[]> {
+    return classesFetcher.fetchAll();
+  }
+
   async fetchProcessedEmpresasAbertas(): Promise<any[]> {
     return filterByYear(await abertasFetcher.fetchAll(), this.year, "Ano");
+  }
+
+  // Sem filtro de ano — usada pela série histórica multianual ("Ano" no toggle Mês/Ano).
+  async fetchAllYearsAbertas(): Promise<any[]> {
+    return abertasFetcher.fetchAll();
   }
 
   async fetchProcessedAbertasPorSecao(): Promise<any[]> {
@@ -118,6 +146,11 @@ export class EmpresasData {
 
   async fetchProcessedEmpresasFechadas(): Promise<any[]> {
     return filterByYear(await fechadasFetcher.fetchAll(), this.year, "Ano de Baixa");
+  }
+
+  // Sem filtro de ano — usada pela série histórica multianual ("Ano" no toggle Mês/Ano).
+  async fetchAllYearsFechadas(): Promise<any[]> {
+    return fechadasFetcher.fetchAll();
   }
 
   async fetchProcessedTempoMedio(): Promise<any[]> {

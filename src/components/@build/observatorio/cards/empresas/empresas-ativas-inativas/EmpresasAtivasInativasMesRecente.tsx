@@ -4,37 +4,41 @@ import { monthLongName } from '@/utils/formatters/@global/monthLongName'
 const EmpresasAtivasInativasMesRecente = ({
   data,
   date,
-  title = `Variação Empresas Abertas e Inativas (mês)`,
+  title = `Saldo Empresas Abertas e Inativas (mês)`,
   local = '',
   year,
   color,
 }: any) => {
-  // 'mesFiltrado' respeita o filtro de mês selecionado — 'mes' é a série sem esse filtro,
-  // usada só pelo gráfico de linha no modo "Ano".
+  // 'mesFiltrado' respeita o filtro de mês selecionado. Se um único mês está selecionado,
+  // mostra só aquele mês; sem filtro de mês (todos os meses presentes), soma o ano todo.
   const monthsData = Object.keys(data['ativas']['mesFiltrado'])
+  const mesEspecifico = monthsData.length === 1
 
   const curMonthData = monthsData.sort(
     (a: any, b: any) => +b - +a,
   )?.[0]
 
-  const curMonthName = monthLongName(+curMonthData)
+  const curMonthName = mesEspecifico ? monthLongName(+curMonthData) : 'Ano'
 
-  const ativasValor = data['ativas']['mesFiltrado'][curMonthData]
-  const inativasValor = data['inativas']['mesFiltrado'][curMonthData]
+  const ativasValor = mesEspecifico
+    ? data['ativas']['mesFiltrado'][curMonthData] || 0
+    : Object.values(data['ativas']['mesFiltrado']).reduce((acc: number, v: any) => acc + v, 0)
 
-  const chartData = inativasValor ? (((ativasValor - inativasValor) / inativasValor) * 100).toFixed(0) : 0
+  const inativasValor = mesEspecifico
+    ? data['inativas']['mesFiltrado'][curMonthData] || 0
+    : Object.values(data['inativas']['mesFiltrado']).reduce((acc: number, v: any) => acc + v, 0)
+
+  // Saldo: quantas empresas a mais abriram do que fecharam no período (pode ser negativo).
+  const chartData = ativasValor - inativasValor
 
   return (
-    <>
-      {!!inativasValor && <Card
-        local={local}
-        title={`${title.replace('mês', curMonthName)}`}
-        data={chartData}
-        year={year}
-        color={color}
-        percent
-      />}
-    </>
+    <Card
+      local={local}
+      title={`${title.replace('mês', curMonthName)}`}
+      data={chartData}
+      year={year}
+      color={color}
+    />
   )
 }
 

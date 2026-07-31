@@ -1,7 +1,8 @@
 import TableGeneric from "@/components/@global/tables/TableGeneric";
 import { CapagMunicipioData } from "@/@types/observatorio/@data/capagData";
 
-const formatValor = (v: number) => v.toLocaleString("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+const formatValor = (v: number | null) =>
+  v === null ? "n.d." : v.toLocaleString("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
 
 const CapagClassificacaoTable = ({
   data,

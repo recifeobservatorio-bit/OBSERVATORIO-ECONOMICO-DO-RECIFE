@@ -18,10 +18,12 @@ import cards from "./@imports/cards";
 const EmpresasInativas = ({
   data,
   dataSemMes,
+  dataSemMesPast,
   year,
 }: {
   data: any;
   dataSemMes?: any;
+  dataSemMesPast?: any;
   year: string;
 }) => {
   const [chartOrder, setChartOrder] = useState(charts.map((_, index) => index));
@@ -38,8 +40,11 @@ const EmpresasInativas = ({
     // 'mes' alimenta o modo "Ano" do gráfico de linha (EmpresasMes) — usa a série sem o
     // filtro de mês aplicado, senão a linha vira um ponto só quando um mês é selecionado.
     if (dataSemMes) acc.mes = geralAccFunction(dataSemMes, ['mes']).mes
+    // 'mesPast' é o ano anterior inteiro, por mês — usado pra comparar o período atual com o
+    // mesmo período do ano passado.
+    acc.mesPast = dataSemMesPast ? geralAccFunction(dataSemMesPast, ['mes']).mes : {}
     return acc
-  }, [data, dataSemMes, params])
+  }, [data, dataSemMes, dataSemMesPast, params])
   
   const { Component }: any = maps[0]
 

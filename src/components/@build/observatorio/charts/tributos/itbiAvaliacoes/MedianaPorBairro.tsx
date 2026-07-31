@@ -16,7 +16,7 @@ const MedianaPorBairro = ({ data, title = "Mediana do Valor de Transmissão por 
           colors={[colors[1]]}
           xKey="bairro"
           bars={[{ dataKey: "mediana", name: "Mediana (R$)" }]}
-          widthMultiply={130}
+          widthMultiply={190}
           heightToPass={285}
           tooltipEntry="R$"
         />

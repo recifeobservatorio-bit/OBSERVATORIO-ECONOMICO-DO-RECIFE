@@ -1,13 +1,13 @@
 export interface CapagIndicador {
-  valor: number;
+  valor: number | null;
   nota: string;
 }
 
 export interface CapagHistoricoAno {
   ano: string;
-  endividamento: number;
-  liquidez: number;
-  poupancaCorrente: number;
+  endividamento: number | null;
+  liquidez: number | null;
+  poupancaCorrente: number | null;
 }
 
 export interface CapagMunicipioData {
