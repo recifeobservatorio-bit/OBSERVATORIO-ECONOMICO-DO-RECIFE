@@ -16,39 +16,41 @@ interface TeamMember {
   name: string;
   role: string;
   image: string;
+  imagePosition?: string;
 }
 
 const highlightedMembers: HighlightMemberProps[] = [
   {
-    name: "João Campos",
+    name: "Victor Marques",
     role: "Prefeito da Cidade do Recife",
-    image: "/images/team/prefeito.avif",
+    image: "/images/team/prefeito.jpg",
     description:
-      "Engenheiro civil formado pela UFPE, João Campos é o prefeito mais jovem da história do Recife. Eleito em 2020 e reeleito em 2024, sua gestão prioriza o desenvolvimento sustentável e a inovação, promovendo políticas públicas que fortalecem a economia local, atraem investimentos e impulsionam novos negócios, consolidando o Recife como um polo econômico estratégico.",
+      "Natural do Recife, Victor Marques é engenheiro civil formado pela Universidade de Pernambuco (UPE). Foi eleito vice-prefeito do Recife nas Eleições de 2024, ao lado do prefeito João Campos, em primeiro turno, com 78,11% dos votos válidos — a maior votação da história da capital pernambucana. À frente da Secretaria de Infraestrutura do Recife desde 2025, esteve responsável pela coordenação de obras públicas e intervenções urbanas em áreas como mobilidade, drenagem, contenção de encostas, urbanização e requalificação de espaços públicos, conduzindo projetos estruturadores na cidade. Entre 2021 e 2024, atuou como chefe de gabinete da Prefeitura do Recife, participando da coordenação de ações de governo e do acompanhamento de projetos estratégicos. Anteriormente, exerceu a mesma função na Câmara dos Deputados, no período de 2019 a 2020. Victor Marques tem 31 anos e é casado com a médica Eduarda Neiva.",
   },
   {
-    name: "Carlos Andrade Lima",
+    name: "Felipe Matos",
     role: "Secretário de Desenvolvimento Econômico",
-    image: "/images/team/secretario.avif",
+    image: "/images/team/secretario.jpg",
     description:
-      "Como Secretário de Desenvolvimento Econômico do Recife, Carlos Andrade Lima lidera iniciativas para impulsionar o crescimento sustentável da cidade, com foco na geração de negócios, atração de investimentos e fortalecimento de empreendimentos. Advogado, combina visão estratégica com ações para consolidar o Recife como um polo inovador e atrativo.",
+      "Graduado e Mestre em Economia pela Universidade Federal de Pernambuco (UFPE) e MBA Executivo pelo IESE (Espanha), Felipe trabalhou por 9 anos em empresa de engenharia até se tornar Diretor Financeiro na instituição, no ano de 2018. No ano de 2021, entrou para a Administração Pública como Secretário de Planejamento, Gestão e Transformação Digital da Prefeitura do Recife, com o fito de monitorar todas as ações estratégicas do governo. Além disso, como Secretário, Felipe assumiu a liderança sobre a área de Concessões Públicas e Parcerias Público-Privadas, bem como nas áreas de Transformação Digital, Orçamento, Gestão de Pessoas e Licitações. Essa experiência transversal permitiu que o mesmo apoiasse as secretarias finalísticas da Prefeitura do Recife no desenho e viabilização de diversas políticas públicas bem-sucedidas, logrando êxito em ampliar a atuação da Secretaria para além de suas atribuições básicas.",
     reverse: true,
     imagePosition: "object-top",
   },
   {
     name: "Gelisa Bosi",
     role: "Secretária Executiva de Desenvolvimento e Inovação",
-    image: "/images/team/sec-exc-gelisa.avif",
+    image: "/images/team/sec-exc-gelisa.jpg",
     description:
-      "Responsável por promover o crescimento econômico sustentável do Recife, Gelisa Bosi atua na atração de investimentos, no fortalecimento de negócios e na melhoria do ambiente de negócios, consolidando a cidade como um polo atrativo para empresas e pessoas.",
+      "Responsável por atrair investimentos, fortalecer o ambiente de negócios e liderar projetos estratégicos no Recife. Atua na expansão de empreendimentos, na desburocratização de processos e na promoção da inovação, inclusão produtiva e transformação digital, impulsionando o desenvolvimento econômico sustentável da cidade.",
   },
 ];
 
 const teamMembers: TeamMember[] = [
   {
-    name: "Pedro Lacerda",
+    name: "Ronnie Lorena",
     role: "Gerente Geral do Investe Recife",
-    image: "/images/team/ger-pedro.avif",
+    image: "/images/team/ger-ronnie.jpeg",
+    imagePosition: "object-top",
   },
   {
     name: "Ben-Hur Beltrão",
@@ -58,7 +60,8 @@ const teamMembers: TeamMember[] = [
   {
     name: "Hugo Borba",
     role: "Gerente de Estudos Econômicos",
-    image: "/images/team/hugo-borba.avif",
+    image: "/images/team/hugo-borba.jpeg",
+    imagePosition: "object-top",
   },
 ];
 

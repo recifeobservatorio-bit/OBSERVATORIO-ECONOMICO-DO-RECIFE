@@ -4,6 +4,7 @@ export interface TeamMember {
   name: string;
   role: string;
   image: string;
+  imagePosition?: string; // Classe adicional para controlar a posição da imagem
 }
 
 export const TeamGrid: React.FC<{ members: TeamMember[] }> = ({ members }) => {
@@ -25,12 +26,13 @@ export const TeamGrid: React.FC<{ members: TeamMember[] }> = ({ members }) => {
             <img
               src={member.image}
               alt={member.name}
-              className="
+              className={`
                 w-full h-full object-cover
                 transition-transform
                 duration-500
                 group-hover:scale-110
-              "
+                ${member.imagePosition ?? ""}
+              `}
             />
             <div className="absolute inset-0 from-black via-transparent to-transparent opacity-50" />
           </div>

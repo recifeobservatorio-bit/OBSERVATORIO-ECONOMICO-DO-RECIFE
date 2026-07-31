@@ -26,14 +26,14 @@ export const HighlightSection: React.FC<HighlightMemberProps> = ({
       {/* Imagem */}
       <div
         className="
-          group w-full md:w-[60%] lg:w-1/2
+          group w-full max-w-xs md:w-[40%] lg:w-1/3
           bg-white dark:bg-gray-800
           rounded-3xl shadow-2xl
           overflow-hidden transform transition
           hover:-translate-y-3 hover:shadow-2xl
         "
       >
-        <div className="relative w-full h-72 overflow-hidden">
+        <div className="relative w-full aspect-[2972/3872] overflow-hidden">
           <img
             src={image}
             alt={name}
