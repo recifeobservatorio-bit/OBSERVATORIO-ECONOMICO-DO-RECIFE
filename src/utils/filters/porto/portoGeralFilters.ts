@@ -21,9 +21,9 @@ export const portoGeralFilters = {
       },
       {
         label: "Porto Atracação",
-        options: [], // Deixe vazio para preencher com base nos dados
-        selected: ['Recife'],
-        allowMultiple: false
+        options: [], // Deixe vazio para preencher com base nos dados — agora inclui portos do Brasil inteiro
+        selected: ['Recife', 'Suape'], // pré-seleção padrão: só os portos de Pernambuco
+        allowMultiple: true
       },
       // { 
       //   label: "CDTUP",

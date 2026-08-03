@@ -40,6 +40,9 @@ function makeFlatFetcher(fileName: string) {
 const atracacaoFetcher = makeFlatFetcher("porto_atracacao.parquet");
 const cargaFetcher = makeFlatFetcher("porto_cargas.parquet");
 const passageirosFetcher = makeFlatFetcher("porto_passageiros.parquet");
+const mercadoriaFetcher = makeFlatFetcher("porto_mercadoria.parquet");
+const origemFetcher = makeFlatFetcher("porto_instalacao_origem.parquet");
+const destinoFetcher = makeFlatFetcher("porto_instalacao_destino.parquet");
 
 // "Data Atracação" chega como "14/02/2023 10:35:00" — extrai o mês (não veio pronto do backend).
 function mesFromDataAtracacao(str: string): number | null {
@@ -86,18 +89,16 @@ export class PortoData {
     return passageirosFetcher.fetchAll();
   }
 
-  // Não existe arquivo de dicionário (origem/destino/mercadoria) nos dados enviados —
-  // os códigos ficam sem rótulo amigável até essa tabela aparecer.
   async fetchOrigemDictionary(): Promise<PortoOrigemDestinoHeaders[]> {
-    return [];
+    return origemFetcher.fetchAll();
   }
 
   async fetchDestinoDictionary(): Promise<PortoDestinoHeaders[]> {
-    return [];
+    return destinoFetcher.fetchAll();
   }
 
   async fetchMercadoriaDictionary(): Promise<PortoMercadoHeaders[]> {
-    return [];
+    return mercadoriaFetcher.fetchAll();
   }
 
   // Não existe endpoint/arquivo de coordenadas pronto — construído aqui juntando
@@ -125,5 +126,8 @@ export class PortoData {
     atracacaoFetcher.clearCache();
     cargaFetcher.clearCache();
     passageirosFetcher.clearCache();
+    mercadoriaFetcher.clearCache();
+    origemFetcher.clearCache();
+    destinoFetcher.clearCache();
   }
 }
