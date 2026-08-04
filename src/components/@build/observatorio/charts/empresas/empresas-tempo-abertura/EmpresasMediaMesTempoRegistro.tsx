@@ -1,14 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+import { EmpresasData } from "@/@api/http/to-charts/empresas/EmpresasData";
 import LineChart from "@/components/@global/charts/LineChart";
 import ChartGrabber from "@/components/@global/features/ChartGrabber";
 import MesAnoToggle from "@/components/@global/features/MesAnoToggle";
-import { processEmpresasDataLineGraph } from "@/functions/process_data/observatorio/empresas/empresas-tempo-abertura/empresasDataLineGraph";
+import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
+import { processEmpresasDataLineGraph, processEmpresasDataLineGraphPorAno } from "@/functions/process_data/observatorio/empresas/empresas-tempo-abertura/empresasDataLineGraph";
 import { monthShortName } from "@/utils/formatters/@global/monthShortName";
 import { getDateKeys } from "@/utils/formatters/getDataKeys";
+import { getGroupValues } from "@/utils/filters/@global/getUniqueValues";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
+
+const COLUNA = "Tempo Médio de Registro";
 
 const EmpresasMediaMesTempoRegistro = ({
   data,
@@ -17,12 +22,32 @@ const EmpresasMediaMesTempoRegistro = ({
   title = "Tempo Médio de Registro de Empresas (Horas)",
   }: any) => {
     const [mode, setMode] = useState<"ano" | "mes">("ano");
+    const [anoRows, setAnoRows] = useState<any[] | null>(null);
 
-    // "Ano" ignora os filtros ativos (data.rawData é o ano inteiro sem filtro);
-    // "Mês" respeita os filtros selecionados (data.empresas já vem filtrado).
-    const dataCur = (mode === "mes" ? data['empresas'] : data['rawData']) || {}
+    useEffect(() => {
+      let cancelled = false;
+      new EmpresasData("").fetchAllYearsTempoMedio().then((rows) => {
+        if (cancelled) return;
+        setAnoRows(rows);
+      });
+      return () => {
+        cancelled = true;
+      };
+    }, []);
 
-    const chartData = processEmpresasDataLineGraph(dataCur, toCompare, 'Tempo Médio de Registro').map((obj) => ({ ...obj, label: monthShortName(+obj.label) }))
+    if (mode === "ano" && !anoRows) {
+      return (
+        <div className="chart-wrapper">
+          <GraphSkeleton />
+        </div>
+      );
+    }
+
+    // "Ano" busca a série histórica multianual (2021-2025), com a média das linhas de cada ano
+    // por município; "Mês" respeita os filtros selecionados (data.empresas já vem filtrado).
+    const chartData = mode === "ano"
+      ? processEmpresasDataLineGraphPorAno(getGroupValues(anoRows ?? [], "Municipio"), toCompare ?? [], COLUNA)
+      : processEmpresasDataLineGraph(data['empresas'], toCompare, COLUNA).map((obj) => ({ ...obj, label: monthShortName(+obj.label) }))
 
     return (
       <div className="chart-wrapper">

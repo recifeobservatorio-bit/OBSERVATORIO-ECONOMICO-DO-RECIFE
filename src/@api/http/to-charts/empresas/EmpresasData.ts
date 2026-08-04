@@ -102,6 +102,11 @@ export class EmpresasData {
     return filterByYear(withAnoAbertura(await ativasRegistroFetcher.fetchAll()), this.year, "Ano");
   }
 
+  // Sem filtro de ano — usada pela série histórica multianual ("Ano" no toggle Mês/Ano).
+  async fetchAllYearsEmpresasAtivas(): Promise<any[]> {
+    return withAnoAbertura(await ativasRegistroFetcher.fetchAll());
+  }
+
   async fetchProcessedEmpresasInativas(): Promise<any[]> {
     return inativasFetcher.fetchAll();
   }
@@ -111,6 +116,11 @@ export class EmpresasData {
   // selecionado.
   async fetchProcessedEmpresasInativasPorAno(): Promise<any[]> {
     return filterByYear(withAnoEncerramento(await inativasFetcher.fetchAll()), this.year, "Ano");
+  }
+
+  // Sem filtro de ano — usada pela série histórica multianual ("Ano" no toggle Mês/Ano).
+  async fetchAllYearsEmpresasInativas(): Promise<any[]> {
+    return withAnoEncerramento(await inativasFetcher.fetchAll());
   }
 
   async fetchProcessedNaturezas(): Promise<any[]> {
@@ -155,6 +165,11 @@ export class EmpresasData {
 
   async fetchProcessedTempoMedio(): Promise<any[]> {
     return filterByYear(await tempoMedioFetcher.fetchAll(), this.year, "Ano");
+  }
+
+  // Sem filtro de ano — usada pela série histórica multianual ("Ano" no toggle Mês/Ano).
+  async fetchAllYearsTempoMedio(): Promise<any[]> {
+    return tempoMedioFetcher.fetchAll();
   }
 
   clearCache(): void {
