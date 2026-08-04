@@ -23,7 +23,7 @@ const EmpresasAtivasInativas = ({
 
   const sortableContainerRef = useRef<HTMLDivElement>(null);
 
-  const params = ['nome_bairro', 'Grupo', 'desc_atividade', 'mes']
+  const params = ['nome_bairro', 'Grupo', 'desc_atividade', 'mes', 'rpa', 'zona']
 
   const chartData = useMemo(() => {
     const ativas = geralAccFunction(data['ativas'], params)

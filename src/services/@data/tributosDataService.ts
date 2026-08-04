@@ -245,12 +245,20 @@ function processIptuContribuintes(rows: any[], prevYearRows: any[], allRows: any
     .map(([bairro, rs]) => ({ bairro, quantidade: rs.reduce((s, r) => s + r.quantidade, 0) }))
     .sort((a, b) => b.quantidade - a.quantidade);
 
+  const porRPA = Object.entries(groupBy(rows, (r) => r.rpa))
+    .map(([rpa, rs]) => ({ rpa, quantidade: rs.reduce((s, r) => s + r.quantidade, 0) }))
+    .sort((a, b) => b.quantidade - a.quantidade);
+
+  const porZona = Object.entries(groupBy(rows, (r) => r.zona))
+    .map(([zona, rs]) => ({ zona, quantidade: rs.reduce((s, r) => s + r.quantidade, 0) }))
+    .sort((a, b) => b.quantidade - a.quantidade);
+
   const porUso = Object.entries(groupBy(rows, (r) => r.uso)).map(([uso, rs]) => ({
     uso,
     quantidade: rs.reduce((s, r) => s + r.quantidade, 0),
   }));
 
-  return { cards, linhaContribuintes, tabelaVariacao, porBairro, porUso };
+  return { cards, linhaContribuintes, tabelaVariacao, porBairro, porRPA, porZona, porUso };
 }
 
 function processIptuValores(rows: any[], prevYearRows: any[], allRows: any[]) {
@@ -287,7 +295,15 @@ function processIptuValores(rows: any[], prevYearRows: any[], allRows: any[]) {
     .map(([bairro, rs]) => ({ bairro, valor: parseFloat(somaValor(rs).toFixed(2)) }))
     .sort((a, b) => b.valor - a.valor);
 
-  return { cards, tabelaEvolucao, linhaValorTotal, porUso, porBairro };
+  const porRPA = Object.entries(groupBy(rows, (r) => r.rpa))
+    .map(([rpa, rs]) => ({ rpa, valor: parseFloat(somaValor(rs).toFixed(2)) }))
+    .sort((a, b) => b.valor - a.valor);
+
+  const porZona = Object.entries(groupBy(rows, (r) => r.zona))
+    .map(([zona, rs]) => ({ zona, valor: parseFloat(somaValor(rs).toFixed(2)) }))
+    .sort((a, b) => b.valor - a.valor);
+
+  return { cards, tabelaEvolucao, linhaValorTotal, porUso, porBairro, porRPA, porZona };
 }
 
 function processIptuPesquisa(rows: any[]) {

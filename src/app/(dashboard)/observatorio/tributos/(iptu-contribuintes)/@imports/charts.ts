@@ -5,6 +5,8 @@ const charts = [
   { Component: React.lazy(() => import("@/components/@build/observatorio/charts/tributos/iptuContribuintes/TabelaVariacao")), title: "Variação da Quantidade de Contribuintes" },
   { Component: React.lazy(() => import("@/components/@build/observatorio/charts/tributos/iptuContribuintes/PorUso")), title: "Quantidade de Contribuintes do IPTU pelo Uso do Imóvel" },
   { Component: React.lazy(() => import("@/components/@build/observatorio/charts/tributos/iptuContribuintes/PorBairro")), title: "Total de Contribuintes do IPTU por Bairro" },
+  { Component: React.lazy(() => import("@/components/@build/observatorio/charts/tributos/iptuContribuintes/PorRPA")), title: "Total de Contribuintes do IPTU por RPA" },
+  { Component: React.lazy(() => import("@/components/@build/observatorio/charts/tributos/iptuContribuintes/PorZona")), title: "Total de Contribuintes do IPTU por Zona" },
 ];
 
 export default charts;

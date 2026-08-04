@@ -11,10 +11,24 @@ const charts = [
   {
     Component: React.lazy(() =>
       import(
+        "@/components/@build/observatorio/charts/empresas/empresas-ativas/EmpresasRPA"
+      )
+    ),
+  },
+  {
+    Component: React.lazy(() =>
+      import(
+        "@/components/@build/observatorio/charts/empresas/empresas-ativas/EmpresasZona"
+      )
+    ),
+  },
+  {
+    Component: React.lazy(() =>
+      import(
         "@/components/@build/observatorio/charts/empresas/empresas-ativas/EmpresaGrupo"
       )
     ),
-  },  
+  },
   {
     Component: React.lazy(() =>
       import(

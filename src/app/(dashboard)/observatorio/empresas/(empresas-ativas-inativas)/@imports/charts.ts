@@ -18,6 +18,20 @@ const charts = [
   {
     Component: React.lazy(() =>
       import(
+        "@/components/@build/observatorio/charts/empresas/empresas-ativas-inativas/EmpresasRPAAtivasInativas"
+      )
+    ),
+  },
+  {
+    Component: React.lazy(() =>
+      import(
+        "@/components/@build/observatorio/charts/empresas/empresas-ativas-inativas/EmpresasZonaAtivasInativas"
+      )
+    ),
+  },
+  {
+    Component: React.lazy(() =>
+      import(
         "@/components/@build/observatorio/charts/empresas/empresas-ativas-inativas/EmpresasDescricaoAtivasInativas"
       )
     ),
