@@ -15,18 +15,21 @@ function normalizeBigInt(rows: any[]) {
 // de um único flat parquet — RAIS é dado bruto por vínculo, não dá pra pré-agregar como outros
 // módulos (raisDataService.ts precisa das linhas individuais pra filtrar/agrupar sob demanda),
 // e todos os anos combinados (~4,6M linhas) seriam grandes demais pra buscar de uma vez.
-const cache: Record<string, any[]> = {};
-const fetching: Record<string, Promise<any[]>> = {};
+const cache: Record<string, any[] | undefined> = {};
+const fetching: Record<string, Promise<any[]> | undefined> = {};
 
 export class RaisData {
   constructor(private year: string) {}
 
   async fetchProcessedDataRais(): Promise<any[]> {
     const year = this.year;
-    if (cache[year]) return cache[year];
-    if (fetching[year]) return fetching[year];
+    const cached = cache[year];
+    if (cached) return cached;
 
-    fetching[year] = (async () => {
+    const inFlight = fetching[year];
+    if (inFlight) return inFlight;
+
+    const promise = (async () => {
       const url = `${process.env.NEXT_PUBLIC_API_BASE_LOGIN}/data/rais_${year}.parquet`;
       const res = await fetch(url);
       if (!res.ok) throw new Error(`Erro ao buscar parquet: ${res.status}`);
@@ -34,8 +37,9 @@ export class RaisData {
       cache[year] = rows;
       return rows;
     })();
+    fetching[year] = promise;
 
-    return fetching[year];
+    return promise;
   }
 
   clearCache(): void {
