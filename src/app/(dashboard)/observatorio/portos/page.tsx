@@ -102,6 +102,9 @@ const PortosPage = () => {
       <h1 className="text-4xl font-bold text-gray-800 text-center mb-8 tracking-wide dark:text-gray-200">
         Movimentação dos Portos
       </h1>
+      <div className="max-w-3xl mx-auto mb-8 px-4 py-3 rounded-lg border border-amber-400 bg-amber-50 text-amber-800 dark:border-amber-500 dark:bg-amber-950 dark:text-amber-200 text-center text-sm font-medium">
+        Site da Antaq em manutenção. Último mês divulgado foi fevereiro/2026.
+      </div>
       <div className="flex justify-center gap-6 mb-8 flex-wrap">
         {/* Botões de navegação */}
         <button
