@@ -1,7 +1,10 @@
-import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { useId } from "react";
+import { BarChart as RechartsBarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
+import { useChartSelection } from "@/context/ChartSelectionContext";
 import { tooltipFormatter, yAxisFormatter } from "@/utils/formatters/@global/graphFormatter";
 
+import { resolveCrossFilterFill } from "./crossFilterFill";
 import CustomLegend from "../features/CustomLegend";
 import CustomTooltip from "../features/CustomTooltip";
 
@@ -17,7 +20,9 @@ const HorizontalScrollableBarChart = ({
   yDomain,
   xAxisOrientation = "top",
 }: any) => {
-  
+  const chartId = useId();
+  const { selection, select } = useChartSelection();
+
   const customTooltipFormatter = (value: any) => {
       return tooltipFormatter(value, tooltipEntry || "");
     };
@@ -61,7 +66,22 @@ const HorizontalScrollableBarChart = ({
                   iconSize={20}
                 />
                 {bars.map((bar: any, index: any) => (
-                  <Bar key={index} dataKey={bar.dataKey} fill={colors[index]} name={bar.name} radius={[6, 6, 0, 0]} maxBarSize={64} />
+                  <Bar key={index} dataKey={bar.dataKey} fill={colors[index]} name={bar.name} radius={[6, 6, 0, 0]} maxBarSize={64}>
+                    {data.map((entry: any, dataIndex: number) => (
+                      <Cell
+                        key={`cell-${dataIndex}`}
+                        cursor="pointer"
+                        onClick={() => select(chartId, String(entry[xKey]))}
+                        fill={resolveCrossFilterFill({
+                          myId: chartId,
+                          selection,
+                          categoryValue: entry[xKey],
+                          defaultFill: colors[index],
+                          isStaticHighlighted: false,
+                        })}
+                      />
+                    ))}
+                  </Bar>
                 ))}
               </RechartsBarChart>
             </ResponsiveContainer>

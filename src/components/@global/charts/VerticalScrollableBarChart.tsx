@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import {
   BarChart as RechartsBarChart,
   Bar,
@@ -11,8 +11,10 @@ import {
   ResponsiveContainer
 } from "recharts";
 
+import { useChartSelection } from "@/context/ChartSelectionContext";
 import { tooltipFormatter, yAxisFormatter } from "@/utils/formatters/@global/graphFormatter";
 
+import { resolveCrossFilterFill } from "./crossFilterFill";
 import CustomLegend from "../features/CustomLegend";
 import CustomTooltip from "../features/CustomTooltip";
 import { resizeDiv } from "../features/resizeDiv";
@@ -69,6 +71,8 @@ const VerticalScrollableBarChart = ({
   highlightValues = ["Recife"],
   highlightColor,
 }: any) => {
+  const chartId = useId();
+  const { selection, select } = useChartSelection();
   const scrollRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -218,9 +222,16 @@ const VerticalScrollableBarChart = ({
                   {dataRead.map((entry: any, dataIndex: number) => (
                     <Cell
                       key={`cell-${dataIndex}`}
-                      fill={highlightValues.some((v: string) => entry[xKey]?.includes(v))
-                        ? (highlightColor ?? colors[(index % colors.length) + 1])
-                        : colors[index % colors.length]}
+                      cursor="pointer"
+                      onClick={() => select(chartId, String(entry[xKey]))}
+                      fill={resolveCrossFilterFill({
+                        myId: chartId,
+                        selection,
+                        categoryValue: entry[xKey],
+                        defaultFill: colors[index % colors.length],
+                        isStaticHighlighted: highlightValues.some((v: string) => entry[xKey]?.includes(v)),
+                        staticHighlightFill: highlightColor ?? colors[(index % colors.length) + 1],
+                      })}
                     />
                   ))}
                 </Bar>

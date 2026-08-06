@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useId } from "react";
 import {
   BarChart as RechartsBarChart,
   Bar,
@@ -12,8 +12,10 @@ import {
   LabelList,
 } from "recharts";
 
+import { useChartSelection } from "@/context/ChartSelectionContext";
 import { tooltipFormatter, yAxisFormatter } from "@/utils/formatters/@global/graphFormatter";
 
+import { resolveCrossFilterFill } from "./crossFilterFill";
 import CustomLegend from "../features/CustomLegend";
 import CustomTooltip from "../features/CustomTooltip";
 
@@ -34,6 +36,8 @@ const StackerBarChartVertical = ({
   showPercentage = true,
   minPercentageLabelWidth = 37, // mínimo % visual da barra para exibir label <- ajeitar isso aqui
 }: any) => {
+  const chartId = useId();
+  const { selection, select } = useChartSelection();
   const [isSmallScreen, setIsSmallScreen] = useState(false);
 
   useEffect(() => {
@@ -112,13 +116,21 @@ const StackerBarChartVertical = ({
                 stackId="stack"
                 fill={colors[barIndex % colors.length]}
               >
-                {data.map((entry: any, dataIndex: number) => {
-                  const color =
-                    entry[xKey] === "Recife"
-                      ? colors[(barIndex % colors.length) + 1]
-                      : colors[barIndex % colors.length];
-                  return <Cell key={`cell-${dataIndex}`} fill={color} />;
-                })}
+                {data.map((entry: any, dataIndex: number) => (
+                  <Cell
+                    key={`cell-${dataIndex}`}
+                    cursor="pointer"
+                    onClick={() => select(chartId, String(entry[xKey]))}
+                    fill={resolveCrossFilterFill({
+                      myId: chartId,
+                      selection,
+                      categoryValue: entry[xKey],
+                      defaultFill: colors[barIndex % colors.length],
+                      isStaticHighlighted: entry[xKey] === "Recife",
+                      staticHighlightFill: colors[(barIndex % colors.length) + 1],
+                    })}
+                  />
+                ))}
 
                 {bar.showPercentage && showPercentage && (
                   <LabelList

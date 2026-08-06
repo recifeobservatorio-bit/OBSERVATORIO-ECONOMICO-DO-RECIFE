@@ -1,17 +1,31 @@
 "use client";
 import { usePathname } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 
 import { DrawingStoreProvider } from "@/components/@global/excalidraw/context/drawingStoreContext";
 import { ExcalidrawProvider } from "@/components/@global/excalidraw/context/useContext";
 import FloatingExcalidrawButton from "@/components/@global/excalidraw/floatButton";
+import ChartSelectionIndicator from "@/components/@global/features/ChartSelectionIndicator";
 import HiddenChartsPanel from "@/components/@global/features/HiddenChartsPanel";
 import ToggleDarkMode from "@/components/@global/features/ToggleDarkMode";
 import { LoadingScreen } from "@/components/home/LoadingScreen";
 import Navbar from "@/components/random_temp/Navbar";
 import { Sidebar } from "@/components/random_temp/Sidebar";
+import { ChartSelectionProvider, useChartSelection } from "@/context/ChartSelectionContext";
 import { DashboardProvider } from "@/context/DashboardContext";
 import "@excalidraw/excalidraw/index.css";
+
+function ChartSelectionResetOnNavigate() {
+  const pathname = usePathname();
+  const { clear } = useChartSelection();
+
+  useEffect(() => {
+    clear();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
+
+  return null;
+}
 
 export default function DashboardLayout({
   children,
@@ -46,22 +60,26 @@ const getBackgroundForRoute = () => {
   return (
     <Suspense fallback={< LoadingScreen />}>
       <DashboardProvider>
-        <div className="h-screen flex overflow-hidden">
-          <Sidebar />
-          <div
-            className={`flex-1 ${getBackgroundForRoute()} bg-cover overflow-scroll flex flex-col pb-[1em]`}
-          >
-            <Navbar />
-            <ToggleDarkMode />
-            <HiddenChartsPanel />
-            <DrawingStoreProvider>
-              <ExcalidrawProvider>
-                {children}
-                <FloatingExcalidrawButton />
-              </ExcalidrawProvider>
-            </DrawingStoreProvider>
+        <ChartSelectionProvider>
+          <ChartSelectionResetOnNavigate />
+          <div className="h-screen flex overflow-hidden">
+            <Sidebar />
+            <div
+              className={`flex-1 ${getBackgroundForRoute()} bg-cover overflow-scroll flex flex-col pb-[1em]`}
+            >
+              <Navbar />
+              <ToggleDarkMode />
+              <HiddenChartsPanel />
+              <ChartSelectionIndicator />
+              <DrawingStoreProvider>
+                <ExcalidrawProvider>
+                  {children}
+                  <FloatingExcalidrawButton />
+                </ExcalidrawProvider>
+              </DrawingStoreProvider>
+            </div>
           </div>
-        </div>
+        </ChartSelectionProvider>
       </DashboardProvider>
     </Suspense>
   );

@@ -1,7 +1,10 @@
+import { useId } from "react";
 import { BarChart as RechartsBarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
+import { useChartSelection } from "@/context/ChartSelectionContext";
 import { tooltipFormatter, yAxisFormatter } from "@/utils/formatters/@global/graphFormatter";
 
+import { resolveCrossFilterFill } from "./crossFilterFill";
 import CustomLegend from "../features/CustomLegend";
 import CustomTooltip from "../features/CustomTooltip";
 
@@ -15,6 +18,8 @@ const BarChart = ({
   highlightValues = [],
   highlightColor,
 }: any) => {
+  const chartId = useId();
+  const { selection, select } = useChartSelection();
 
   const customTooltipFormatter = (value: any) => {
       return tooltipFormatter(value, tooltipEntry || "");
@@ -47,10 +52,19 @@ const BarChart = ({
             />
             {bars.map((bar: any, index: any) => (
               <Bar key={index} dataKey={bar.dataKey} fill={colors[index]} name={bar.name} radius={[6, 6, 0, 0]} maxBarSize={64}>
-                {highlightColor && data.map((entry: any, dataIndex: number) => (
+                {data.map((entry: any, dataIndex: number) => (
                   <Cell
                     key={`cell-${dataIndex}`}
-                    fill={highlightValues.some((v: string) => entry[xKey]?.includes(v)) ? highlightColor : colors[index]}
+                    cursor="pointer"
+                    onClick={() => select(chartId, String(entry[xKey]))}
+                    fill={resolveCrossFilterFill({
+                      myId: chartId,
+                      selection,
+                      categoryValue: entry[xKey],
+                      defaultFill: colors[index],
+                      isStaticHighlighted: highlightValues.some((v: string) => entry[xKey]?.includes(v)),
+                      staticHighlightFill: highlightColor,
+                    })}
                   />
                 ))}
               </Bar>

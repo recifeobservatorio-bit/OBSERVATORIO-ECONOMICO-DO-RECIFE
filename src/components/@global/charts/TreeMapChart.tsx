@@ -1,12 +1,14 @@
-import React, { PureComponent, useState } from 'react';
+import React, { PureComponent, useId, useState } from 'react';
 import { Treemap, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 
+import { useChartSelection } from '@/context/ChartSelectionContext';
 import { tooltipFormatter } from '@/utils/formatters/@global/graphFormatter';
 
+import { resolveCrossFilterFill } from './crossFilterFill';
 import CustomLegend from '../features/CustomLegend';
 import CustomTooltip from '../features/CustomTooltip';
 
-const CustomizedContent = ({ root, depth, x, y, width, height, index, payload, colors, rank, label, highlightValues = [], highlightColor }: any) => {
+const CustomizedContent = ({ root, depth, x, y, width, height, index, label, colors, highlightValues = [], highlightColor, chartId, selection, onSelect }: any) => {
     const MIN_SIZE = 70;
 
     const adjustedWidth = Math.max(width, MIN_SIZE);
@@ -14,9 +16,16 @@ const CustomizedContent = ({ root, depth, x, y, width, height, index, payload, c
 
     const shouldDisplayText = adjustedWidth > MIN_SIZE && adjustedHeight > MIN_SIZE;
 
-    const isHighlighted = highlightColor && highlightValues.some((v: string) => payload?.label?.includes(v));
+    const defaultFill = colors[Math.floor((index / (root?.children?.length || 1)) * 6)];
     const fill = depth < 2
-        ? (isHighlighted ? highlightColor : colors[Math.floor((index / (root?.children?.length || 1)) * 6)])
+        ? resolveCrossFilterFill({
+            myId: chartId,
+            selection,
+            categoryValue: label,
+            defaultFill,
+            isStaticHighlighted: highlightValues.some((v: string) => label?.includes(v)),
+            staticHighlightFill: highlightColor,
+          })
         : '#ffffff00';
 
     return (
@@ -26,6 +35,8 @@ const CustomizedContent = ({ root, depth, x, y, width, height, index, payload, c
                 y={y}
                 width={adjustedWidth}
                 height={adjustedHeight}
+                cursor={depth < 2 ? "pointer" : undefined}
+                onClick={depth < 2 ? () => onSelect(chartId, String(label)) : undefined}
                 style={{
                     fill,
                     strokeOpacity: 0,
@@ -40,10 +51,10 @@ const CustomizedContent = ({ root, depth, x, y, width, height, index, payload, c
     );
 };
 
-const TreeMapChart = ({ 
-    data, 
-    title, 
-    colors, 
+const TreeMapChart = ({
+    data,
+    title,
+    colors,
     xKey,
     dataKey,
     bars,
@@ -52,6 +63,8 @@ const TreeMapChart = ({
     highlightValues = [],
     highlightColor,
 }: any) => {
+    const chartId = useId();
+    const { selection, select } = useChartSelection();
     const [percent, setPercent] = useState(false)
 
     // const totalValue = data.reduce((acc: number, entry: any) => acc + entry.value, 0);
@@ -92,12 +105,21 @@ const TreeMapChart = ({
                 <div className={`flex flex-wrap gap-2 justify-center space-x-4 border -mt-2 mb-4 rounded-md pt-6 pb-3 px-2  `}>
                     {data?.map((entry: any, index: number) => {
                         const percentage = calculatePercentage(entry.value);
-                        const legendColor = (highlightColor && highlightValues.some((v: string) => entry.label?.includes(v)))
-                            ? highlightColor
-                            : colors[index];
+                        const legendColor = resolveCrossFilterFill({
+                            myId: chartId,
+                            selection,
+                            categoryValue: entry.label,
+                            defaultFill: colors[index],
+                            isStaticHighlighted: highlightValues.some((v: string) => entry.label?.includes(v)),
+                            staticHighlightFill: highlightColor,
+                        });
 
                         return (
-                            <div key={index} className="flex items-center justify-center gap-1 text-xs">
+                            <div
+                                key={index}
+                                className="flex items-center justify-center gap-1 text-xs cursor-pointer"
+                                onClick={() => select(chartId, String(entry.label))}
+                            >
                                 <span className="h-3 w-3 rounded-full" style={{ backgroundColor: legendColor }}></span>
                                 <span
                                     className="text-xs font-semibold"
@@ -113,17 +135,26 @@ const TreeMapChart = ({
                 </div>
             </div>
 
-            
+
             <div className='rounded-md overflow-hidden w-full'>
                 <ResponsiveContainer width="100%" height={400}>
-                    <Treemap 
+                    <Treemap
                         // dataKey={'displayValue'}
                         dataKey={dataKey}
-                        nameKey={xKey} 
-                        content={<CustomizedContent colors={colors} />} 
-                        width={400} 
-                        height={200} 
-                        data={dataProcessed}  
+                        nameKey={xKey}
+                        content={
+                            <CustomizedContent
+                                colors={colors}
+                                highlightValues={highlightValues}
+                                highlightColor={highlightColor}
+                                chartId={chartId}
+                                selection={selection}
+                                onSelect={select}
+                            />
+                        }
+                        width={400}
+                        height={200}
+                        data={dataProcessed}
                         aspectRatio={4 / 3} 
                         stroke="#fff" 
                         fill="#8884d8"
