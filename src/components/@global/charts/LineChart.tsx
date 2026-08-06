@@ -1,3 +1,4 @@
+import { useId } from "react";
 import {
   LineChart as RechartsLineChart,
   Line,
@@ -11,6 +12,7 @@ import {
 
 import { tooltipFormatter, yAxisFormatter } from "@/utils/formatters/@global/graphFormatter";
 
+import { useChartCrossFilter } from "./crossFilterFill";
 import CustomLegend from "../features/CustomLegend";
 import CustomTooltip from "../features/CustomTooltip";
 
@@ -26,6 +28,8 @@ const LineChart = ({
   height = 340,
 
 }: any) => {
+  const chartId = useId();
+  const { visibleData } = useChartCrossFilter(chartId, data, (entry: any) => entry[xKey]);
 
   const customTooltipFormatter = (value: any) => {
     return tooltipFormatter(value, tooltipEntry || "");
@@ -41,7 +45,7 @@ const LineChart = ({
       </div>
       <ResponsiveContainer width="100%" height={height}>
         <RechartsLineChart
-          data={data}
+          data={visibleData}
           margin={{ top: 20, right: 30, left: 23, bottom: 10 }}
         >
           <CartesianGrid strokeDasharray="3 3" />

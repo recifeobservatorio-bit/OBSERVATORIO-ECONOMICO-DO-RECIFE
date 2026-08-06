@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import {
   AreaChart as RechartsAreaChart,
   Area,
@@ -12,6 +12,7 @@ import {
 
 import { tooltipFormatter, yAxisFormatter } from "@/utils/formatters/@global/graphFormatter";
 
+import { useChartCrossFilter } from "./crossFilterFill";
 import CustomLegend from "../features/CustomLegend";
 import CustomTooltip from "../features/CustomTooltip";
 
@@ -24,9 +25,12 @@ const LineAreaChart = ({
   colors,
   tooltipEntry
 }: any) => {
+  const chartId = useId();
+  const { visibleData } = useChartCrossFilter(chartId, data, (entry: any) => entry[xKey]);
+
   const gradientOffset = (dataKey: string) => {
-    const dataMax = Math.max(...data.map((i: any) => i[dataKey]));
-    const dataMin = Math.min(...data.map((i: any) => i[dataKey]));
+    const dataMax = Math.max(...visibleData.map((i: any) => i[dataKey]));
+    const dataMin = Math.min(...visibleData.map((i: any) => i[dataKey]));
 
     if (dataMax <= 0) return 0;
     if (dataMin >= 0) return 1;
@@ -45,7 +49,7 @@ const LineAreaChart = ({
       </div>
       <ResponsiveContainer width="100%" height={400}>
         <RechartsAreaChart
-          data={data}
+          data={visibleData}
           margin={{ top: 20, right: 20, left: 23, bottom: 5 }}
         >
           <CartesianGrid strokeDasharray="3 3" />
