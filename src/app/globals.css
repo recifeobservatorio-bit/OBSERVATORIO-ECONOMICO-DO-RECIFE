@@ -18,12 +18,10 @@
 
 :root {
   --yaxis-tick-color: #333;
-  --chart-dim-color: #D9DCE1;
 }
 
 .dark {
   --yaxis-tick-color: #AAA;
-  --chart-dim-color: #33445A;
 }
 
 .capture_div {

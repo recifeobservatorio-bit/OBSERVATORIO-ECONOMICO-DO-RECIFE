@@ -1,7 +1,6 @@
 import { ChartSelection } from "@/context/ChartSelectionContext";
 
 export const CROSS_FILTER_ACCENT = "#EC6625";
-export const CROSS_FILTER_DIM_COLOR = "var(--chart-dim-color)";
 
 const normalize = (value: unknown) => String(value ?? "").trim().toLowerCase();
 
@@ -9,34 +8,51 @@ export const isSameCategory = (entryValue: unknown, selectedValue: string) =>
   normalize(entryValue) !== "" && normalize(entryValue) === normalize(selectedValue);
 
 /**
- * Resolve a cor de uma barra/fatia/célula considerando, nesta ordem:
- * 1. Se este gráfico foi a origem da seleção atual, o cross-filter é ignorado
- *    (mantém o comportamento estático de sempre: highlight fixo do próprio componente, ou cor normal).
- * 2. Se há uma seleção ativa vinda de outro gráfico, destaca quem tem a mesma categoria e esmaece o resto.
- * 3. Sem seleção ativa em lugar nenhum, comportamento estático de sempre.
+ * Decide o que este gráfico deve exibir dado o estado de seleção compartilhado:
+ * - Se este gráfico foi a origem da seleção (ou não há seleção nenhuma), mostra tudo, sem filtro.
+ * - Se há seleção de outro gráfico e existe pelo menos uma categoria batendo, filtra para só essas.
+ * - Se há seleção de outro gráfico mas nenhuma categoria bate (dimensão diferente, ex. bairro x mês),
+ *   mostra tudo — esse gráfico simplesmente não é afetado por aquela seleção.
  */
-export function resolveCrossFilterFill({
+export function resolveChartCrossFilter<T>({
   myId,
   selection,
-  categoryValue,
+  data,
+  getCategory,
+}: {
+  myId: string;
+  selection: ChartSelection;
+  data: T[];
+  getCategory: (entry: T) => unknown;
+}): { active: boolean; visibleData: T[] } {
+  const crossFilterRequested = selection !== null && selection.sourceId !== myId;
+  if (!crossFilterRequested) return { active: false, visibleData: data };
+
+  const matches = data.filter((entry) => isSameCategory(getCategory(entry), selection!.value));
+  if (matches.length === 0) return { active: false, visibleData: data };
+
+  return { active: true, visibleData: matches };
+}
+
+/**
+ * Resolve a cor de uma barra/fatia/célula:
+ * - Com cross-filter ativo pra este gráfico, todas as entradas restantes já batem com a seleção
+ *   (foram filtradas antes), então usam a cor de destaque.
+ * - Sem cross-filter ativo, comportamento estático de sempre (highlight fixo do componente, ou cor normal).
+ */
+export function resolveCrossFilterFill({
+  crossFilterActive,
   defaultFill,
   isStaticHighlighted,
   staticHighlightFill,
 }: {
-  myId: string;
-  selection: ChartSelection;
-  categoryValue: unknown;
+  crossFilterActive: boolean;
   defaultFill: string;
   isStaticHighlighted: boolean;
   staticHighlightFill?: string;
 }): string {
-  const isCrossFilterActive = selection !== null && selection.sourceId !== myId;
-
-  if (!isCrossFilterActive) {
-    return isStaticHighlighted ? (staticHighlightFill ?? defaultFill) : defaultFill;
+  if (crossFilterActive) {
+    return staticHighlightFill ?? CROSS_FILTER_ACCENT;
   }
-
-  return isSameCategory(categoryValue, selection!.value)
-    ? (staticHighlightFill ?? CROSS_FILTER_ACCENT)
-    : CROSS_FILTER_DIM_COLOR;
+  return isStaticHighlighted ? (staticHighlightFill ?? defaultFill) : defaultFill;
 }

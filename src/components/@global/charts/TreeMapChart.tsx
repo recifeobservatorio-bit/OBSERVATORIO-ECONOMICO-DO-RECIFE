@@ -4,11 +4,11 @@ import { Treemap, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { useChartSelection } from '@/context/ChartSelectionContext';
 import { tooltipFormatter } from '@/utils/formatters/@global/graphFormatter';
 
-import { resolveCrossFilterFill } from './crossFilterFill';
+import { resolveChartCrossFilter, resolveCrossFilterFill } from './crossFilterFill';
 import CustomLegend from '../features/CustomLegend';
 import CustomTooltip from '../features/CustomTooltip';
 
-const CustomizedContent = ({ root, depth, x, y, width, height, index, label, colors, highlightValues = [], highlightColor, chartId, selection, onSelect }: any) => {
+const CustomizedContent = ({ root, depth, x, y, width, height, index, label, colors, highlightValues = [], highlightColor, crossFilterActive, onSelect }: any) => {
     const MIN_SIZE = 70;
 
     const adjustedWidth = Math.max(width, MIN_SIZE);
@@ -19,9 +19,7 @@ const CustomizedContent = ({ root, depth, x, y, width, height, index, label, col
     const defaultFill = colors[Math.floor((index / (root?.children?.length || 1)) * 6)];
     const fill = depth < 2
         ? resolveCrossFilterFill({
-            myId: chartId,
-            selection,
-            categoryValue: label,
+            crossFilterActive,
             defaultFill,
             isStaticHighlighted: highlightValues.some((v: string) => label?.includes(v)),
             staticHighlightFill: highlightColor,
@@ -36,7 +34,7 @@ const CustomizedContent = ({ root, depth, x, y, width, height, index, label, col
                 width={adjustedWidth}
                 height={adjustedHeight}
                 cursor={depth < 2 ? "pointer" : undefined}
-                onClick={depth < 2 ? () => onSelect(chartId, String(label)) : undefined}
+                onClick={depth < 2 ? () => onSelect(String(label)) : undefined}
                 style={{
                     fill,
                     strokeOpacity: 0,
@@ -65,10 +63,16 @@ const TreeMapChart = ({
 }: any) => {
     const chartId = useId();
     const { selection, select } = useChartSelection();
+    const { active: crossFilterActive, visibleData } = resolveChartCrossFilter({
+        myId: chartId,
+        selection,
+        data,
+        getCategory: (entry: any) => entry.label,
+    });
     const [percent, setPercent] = useState(false)
 
     // const totalValue = data.reduce((acc: number, entry: any) => acc + entry.value, 0);
-    const totalValue = data.reduce((acc: number, entry: any) => acc + Math.abs(entry.value), 0);
+    const totalValue = visibleData.reduce((acc: number, entry: any) => acc + Math.abs(entry.value), 0);
 
     const calculatePercentage = (value: number) => {
         return ((value / totalValue) * 100).toFixed(2);
@@ -78,7 +82,7 @@ const TreeMapChart = ({
         return tooltipFormatter(value, tooltipEntry || "");
     };
 
-    const dataProcessed = data.map((entry: any) => ({
+    const dataProcessed = visibleData.map((entry: any) => ({
         ...entry,
         value: Math.abs(entry.value),
         isNegative: entry.value < 0
@@ -103,12 +107,10 @@ const TreeMapChart = ({
                 </button>
 
                 <div className={`flex flex-wrap gap-2 justify-center space-x-4 border -mt-2 mb-4 rounded-md pt-6 pb-3 px-2  `}>
-                    {data?.map((entry: any, index: number) => {
+                    {visibleData?.map((entry: any, index: number) => {
                         const percentage = calculatePercentage(entry.value);
                         const legendColor = resolveCrossFilterFill({
-                            myId: chartId,
-                            selection,
-                            categoryValue: entry.label,
+                            crossFilterActive,
                             defaultFill: colors[index],
                             isStaticHighlighted: highlightValues.some((v: string) => entry.label?.includes(v)),
                             staticHighlightFill: highlightColor,
@@ -147,9 +149,8 @@ const TreeMapChart = ({
                                 colors={colors}
                                 highlightValues={highlightValues}
                                 highlightColor={highlightColor}
-                                chartId={chartId}
-                                selection={selection}
-                                onSelect={select}
+                                crossFilterActive={crossFilterActive}
+                                onSelect={(label: string) => select(chartId, label)}
                             />
                         }
                         width={400}

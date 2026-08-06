@@ -4,7 +4,7 @@ import { BarChart as RechartsBarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, T
 import { useChartSelection } from "@/context/ChartSelectionContext";
 import { tooltipFormatter, yAxisFormatter } from "@/utils/formatters/@global/graphFormatter";
 
-import { resolveCrossFilterFill } from "./crossFilterFill";
+import { resolveChartCrossFilter, resolveCrossFilterFill } from "./crossFilterFill";
 import CustomLegend from "../features/CustomLegend";
 import CustomTooltip from "../features/CustomTooltip";
 
@@ -22,6 +22,12 @@ const HorizontalScrollableBarChart = ({
 }: any) => {
   const chartId = useId();
   const { selection, select } = useChartSelection();
+  const { active: crossFilterActive, visibleData } = resolveChartCrossFilter({
+    myId: chartId,
+    selection,
+    data,
+    getCategory: (entry: any) => entry[xKey],
+  });
 
   const customTooltipFormatter = (value: any) => {
       return tooltipFormatter(value, tooltipEntry || "");
@@ -35,10 +41,10 @@ const HorizontalScrollableBarChart = ({
         {/* Wrapper div with horizontal scroll */}
         <div className="overflow-x-auto">
           {/* Adding a larger width to the ResponsiveContainer */}
-          <div style={{ width: data.length * widthMultiply + 'px' }}>
+          <div style={{ width: visibleData.length * widthMultiply + 'px' }}>
             <ResponsiveContainer width="100%" height={362}>
               <RechartsBarChart
-                data={data}
+                data={visibleData}
                 margin={
                   xAxisOrientation === "bottom"
                     ? { top: 20, right: 20, left: 13, bottom: 20 }
@@ -67,15 +73,13 @@ const HorizontalScrollableBarChart = ({
                 />
                 {bars.map((bar: any, index: any) => (
                   <Bar key={index} dataKey={bar.dataKey} fill={colors[index]} name={bar.name} radius={[6, 6, 0, 0]} maxBarSize={64}>
-                    {data.map((entry: any, dataIndex: number) => (
+                    {visibleData.map((entry: any, dataIndex: number) => (
                       <Cell
                         key={`cell-${dataIndex}`}
                         cursor="pointer"
                         onClick={() => select(chartId, String(entry[xKey]))}
                         fill={resolveCrossFilterFill({
-                          myId: chartId,
-                          selection,
-                          categoryValue: entry[xKey],
+                          crossFilterActive,
                           defaultFill: colors[index],
                           isStaticHighlighted: false,
                         })}

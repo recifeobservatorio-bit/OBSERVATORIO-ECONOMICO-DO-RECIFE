@@ -14,7 +14,7 @@ import {
 import { useChartSelection } from "@/context/ChartSelectionContext";
 import { tooltipFormatter, yAxisFormatter } from "@/utils/formatters/@global/graphFormatter";
 
-import { resolveCrossFilterFill } from "./crossFilterFill";
+import { resolveChartCrossFilter, resolveCrossFilterFill } from "./crossFilterFill";
 import CustomLegend from "../features/CustomLegend";
 import CustomTooltip from "../features/CustomTooltip";
 import { resizeDiv } from "../features/resizeDiv";
@@ -73,6 +73,12 @@ const VerticalScrollableBarChart = ({
 }: any) => {
   const chartId = useId();
   const { selection, select } = useChartSelection();
+  const { active: crossFilterActive, visibleData } = resolveChartCrossFilter({
+    myId: chartId,
+    selection,
+    data,
+    getCategory: (entry: any) => entry[xKey],
+  });
   const scrollRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -84,10 +90,10 @@ const VerticalScrollableBarChart = ({
   resizeDiv(containerRef, width, setWidth)
 
   useEffect(() => {
-    const blocks = splitDataInBlocks(data);
+    const blocks = splitDataInBlocks(visibleData);
     setDataRead(blocks[0] || []);
     setBlocksCount(1);
-  }, [data]);  
+  }, [visibleData]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -100,8 +106,8 @@ const VerticalScrollableBarChart = ({
         setScrollPosition("end");
 
         setBlocksCount((prev) => {
-          if (prev < splitDataInBlocks(data).length) {
-            setDataRead(data.slice(0, (prev + 1) * 100));
+          if (prev < splitDataInBlocks(visibleData).length) {
+            setDataRead(visibleData.slice(0, (prev + 1) * 100));
             return prev + 1;
           }
           return prev;
@@ -225,9 +231,7 @@ const VerticalScrollableBarChart = ({
                       cursor="pointer"
                       onClick={() => select(chartId, String(entry[xKey]))}
                       fill={resolveCrossFilterFill({
-                        myId: chartId,
-                        selection,
-                        categoryValue: entry[xKey],
+                        crossFilterActive,
                         defaultFill: colors[index % colors.length],
                         isStaticHighlighted: highlightValues.some((v: string) => entry[xKey]?.includes(v)),
                         staticHighlightFill: highlightColor ?? colors[(index % colors.length) + 1],

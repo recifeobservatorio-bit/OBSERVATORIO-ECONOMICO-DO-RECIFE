@@ -12,7 +12,7 @@ import {
 import { useChartSelection } from "@/context/ChartSelectionContext";
 import { tooltipFormatter } from "@/utils/formatters/@global/graphFormatter";
 
-import { resolveCrossFilterFill } from "./crossFilterFill";
+import { resolveChartCrossFilter, resolveCrossFilterFill } from "./crossFilterFill";
 // import CustomLegend from "../features/CustomLegends";
 import CustomLegend from "../features/CustomLegend";
 import CustomTooltip from "../features/CustomTooltip";
@@ -42,6 +42,12 @@ const PieChart = ({
 }) => {
   const chartId = useId();
   const { selection, select } = useChartSelection();
+  const { active: crossFilterActive, visibleData } = resolveChartCrossFilter({
+    myId: chartId,
+    selection,
+    data,
+    getCategory: (entry: any) => entry[nameKey],
+  });
   const [outerRadius, setOuterRadius] = useState(120);
 
   useEffect(() => {
@@ -104,7 +110,7 @@ const PieChart = ({
       <ResponsiveContainer width="100%" height={350}>
         <RechartsPieChart>
           <Pie
-            data={data}
+            data={visibleData}
             dataKey={dataKey}
             nameKey={nameKey}
             cx="50%"
@@ -113,15 +119,13 @@ const PieChart = ({
             label={showPercentages ? renderCustomizedLabel : undefined}
             labelLine={false}
           >
-            {data.map((entry: any, index: any) => (
+            {visibleData.map((entry: any, index: any) => (
               <Cell
                 key={`cell-${index}`}
                 cursor="pointer"
                 onClick={() => select(chartId, String(entry[nameKey]))}
                 fill={resolveCrossFilterFill({
-                  myId: chartId,
-                  selection,
-                  categoryValue: entry[nameKey],
+                  crossFilterActive,
                   defaultFill: colors[index % colors.length],
                   isStaticHighlighted: highlightValues.some((v: string) => entry[nameKey]?.includes(v)),
                   staticHighlightFill: highlightColor,

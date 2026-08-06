@@ -15,7 +15,7 @@ import {
 import { useChartSelection } from "@/context/ChartSelectionContext";
 import { tooltipFormatter, yAxisFormatter } from "@/utils/formatters/@global/graphFormatter";
 
-import { resolveCrossFilterFill } from "./crossFilterFill";
+import { resolveChartCrossFilter, resolveCrossFilterFill } from "./crossFilterFill";
 import CustomLegend from "../features/CustomLegend";
 import CustomTooltip from "../features/CustomTooltip";
 
@@ -38,6 +38,12 @@ const StackerBarChartVertical = ({
 }: any) => {
   const chartId = useId();
   const { selection, select } = useChartSelection();
+  const { active: crossFilterActive, visibleData } = resolveChartCrossFilter({
+    myId: chartId,
+    selection,
+    data,
+    getCategory: (entry: any) => entry[xKey],
+  });
   const [isSmallScreen, setIsSmallScreen] = useState(false);
 
   useEffect(() => {
@@ -49,7 +55,7 @@ const StackerBarChartVertical = ({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const totalHeight = data.length <= 5 ? 400 : data.length * heightPerCategory;
+  const totalHeight = visibleData.length <= 5 ? 400 : visibleData.length * heightPerCategory;
 
   const customTooltipFormatter = (value: any) => tooltipFormatter(value, tooltipEntry || "");
 
@@ -57,7 +63,7 @@ const StackerBarChartVertical = ({
     value.length > maxDescriptionLength ? value.substring(0, maxDescriptionLength) + "..." : value;
 
   // Mapeia totais por linha para cálculo de porcentagem
-  const totalGlobal = data.reduce((total: number, entry: any) => {
+  const totalGlobal = visibleData.reduce((total: number, entry: any) => {
     return (
       total +
       bars.reduce((sum: number, bar: any) => sum + (Number(entry[bar.dataKey]) || 0), 0)
@@ -76,7 +82,7 @@ const StackerBarChartVertical = ({
       >
         <ResponsiveContainer width="100%" height={totalHeight}>
           <RechartsBarChart
-            data={data}
+            data={visibleData}
             layout="vertical"
             margin={{ top: 0, right: 7, left, bottom: 5 }}
           >
@@ -116,15 +122,13 @@ const StackerBarChartVertical = ({
                 stackId="stack"
                 fill={colors[barIndex % colors.length]}
               >
-                {data.map((entry: any, dataIndex: number) => (
+                {visibleData.map((entry: any, dataIndex: number) => (
                   <Cell
                     key={`cell-${dataIndex}`}
                     cursor="pointer"
                     onClick={() => select(chartId, String(entry[xKey]))}
                     fill={resolveCrossFilterFill({
-                      myId: chartId,
-                      selection,
-                      categoryValue: entry[xKey],
+                      crossFilterActive,
                       defaultFill: colors[barIndex % colors.length],
                       isStaticHighlighted: entry[xKey] === "Recife",
                       staticHighlightFill: colors[(barIndex % colors.length) + 1],
@@ -135,7 +139,7 @@ const StackerBarChartVertical = ({
                 {bar.showPercentage && showPercentage && (
                   <LabelList
                   content={({ x = 0 as number, y = 0 as any, width = 0 as any, height = 0 as any, index }) => {
-                    const entry = data[index!];
+                    const entry = visibleData[index!];
                     const valor = Number(entry[bar.dataKey]) || 0;
                     const percentual = totalGlobal ? (valor / totalGlobal) * 100 : 0;
                 

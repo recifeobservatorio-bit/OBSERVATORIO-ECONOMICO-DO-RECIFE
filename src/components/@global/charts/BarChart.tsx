@@ -4,7 +4,7 @@ import { BarChart as RechartsBarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, T
 import { useChartSelection } from "@/context/ChartSelectionContext";
 import { tooltipFormatter, yAxisFormatter } from "@/utils/formatters/@global/graphFormatter";
 
-import { resolveCrossFilterFill } from "./crossFilterFill";
+import { resolveChartCrossFilter, resolveCrossFilterFill } from "./crossFilterFill";
 import CustomLegend from "../features/CustomLegend";
 import CustomTooltip from "../features/CustomTooltip";
 
@@ -20,6 +20,12 @@ const BarChart = ({
 }: any) => {
   const chartId = useId();
   const { selection, select } = useChartSelection();
+  const { active: crossFilterActive, visibleData } = resolveChartCrossFilter({
+    myId: chartId,
+    selection,
+    data,
+    getCategory: (entry: any) => entry[xKey],
+  });
 
   const customTooltipFormatter = (value: any) => {
       return tooltipFormatter(value, tooltipEntry || "");
@@ -31,36 +37,34 @@ const BarChart = ({
           <h3 className="text-center mb-4 font-semibold w-[90%] text-gray-800 dark:text-gray-100">{title}</h3>
         </div>
         <ResponsiveContainer width="100%" height={382}>
-          <RechartsBarChart data={data} margin={{ top: 20, right: 20, left: 13, bottom: 5 }} style={{ stroke: "var(--yaxis-tick-color)" }}>
+          <RechartsBarChart data={visibleData} margin={{ top: 20, right: 20, left: 13, bottom: 5 }} style={{ stroke: "var(--yaxis-tick-color)" }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.5} />
-            <XAxis 
-              dataKey={xKey} 
+            <XAxis
+              dataKey={xKey}
               tick={{ fontSize: 12, fill: "var(--yaxis-tick-color)" }}
             />
-            <YAxis 
+            <YAxis
               tick={{ fontSize: 12, fill: "var(--yaxis-tick-color)" }}
               tickFormatter={yAxisFormatter}
             />
             <Tooltip
               content={(e) => CustomTooltip({...e, customTooltipFormatter})}
             />
-            <Legend 
-              verticalAlign="top" 
+            <Legend
+              verticalAlign="top"
               align="center"
               content={({ payload }) => <CustomLegend payload={payload} />}
               iconSize={20}
             />
             {bars.map((bar: any, index: any) => (
               <Bar key={index} dataKey={bar.dataKey} fill={colors[index]} name={bar.name} radius={[6, 6, 0, 0]} maxBarSize={64}>
-                {data.map((entry: any, dataIndex: number) => (
+                {visibleData.map((entry: any, dataIndex: number) => (
                   <Cell
                     key={`cell-${dataIndex}`}
                     cursor="pointer"
                     onClick={() => select(chartId, String(entry[xKey]))}
                     fill={resolveCrossFilterFill({
-                      myId: chartId,
-                      selection,
-                      categoryValue: entry[xKey],
+                      crossFilterActive,
                       defaultFill: colors[index],
                       isStaticHighlighted: highlightValues.some((v: string) => entry[xKey]?.includes(v)),
                       staticHighlightFill: highlightColor,
