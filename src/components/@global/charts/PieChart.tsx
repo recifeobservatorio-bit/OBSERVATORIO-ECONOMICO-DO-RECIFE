@@ -9,10 +9,9 @@ import {
   Legend,
 } from "recharts";
 
-import { useChartSelection } from "@/context/ChartSelectionContext";
 import { tooltipFormatter } from "@/utils/formatters/@global/graphFormatter";
 
-import { resolveChartCrossFilter, resolveCrossFilterFill } from "./crossFilterFill";
+import { resolveCrossFilterFill, useChartCrossFilter } from "./crossFilterFill";
 // import CustomLegend from "../features/CustomLegends";
 import CustomLegend from "../features/CustomLegend";
 import CustomTooltip from "../features/CustomTooltip";
@@ -41,13 +40,11 @@ const PieChart = ({
   highlightColor?: string;
 }) => {
   const chartId = useId();
-  const { selection, select } = useChartSelection();
-  const { active: crossFilterActive, visibleData } = resolveChartCrossFilter({
-    myId: chartId,
-    selection,
+  const { crossFilterActive, visibleData, select } = useChartCrossFilter(
+    chartId,
     data,
-    getCategory: (entry: any) => entry[nameKey],
-  });
+    (entry: any) => entry[nameKey]
+  );
   const [outerRadius, setOuterRadius] = useState(120);
 
   useEffect(() => {

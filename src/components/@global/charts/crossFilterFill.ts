@@ -1,4 +1,6 @@
-import { ChartSelection } from "@/context/ChartSelectionContext";
+import { useMemo } from "react";
+
+import { ChartSelection, useChartSelection } from "@/context/ChartSelectionContext";
 
 export const CROSS_FILTER_ACCENT = "#EC6625";
 
@@ -32,6 +34,28 @@ export function resolveChartCrossFilter<T>({
   if (matches.length === 0) return { active: false, visibleData: data };
 
   return { active: true, visibleData: matches };
+}
+
+/**
+ * Hook de conveniência: memoiza o resultado de resolveChartCrossFilter. Necessário porque
+ * data.filter(...) cria um array novo a cada render — sem memoização, esse array novo vira
+ * dependência instável em qualquer useEffect que dependa dele (ex.: paginação em gráficos
+ * com scroll), causando loop infinito de setState.
+ */
+export function useChartCrossFilter<T>(
+  chartId: string,
+  data: T[],
+  getCategory: (entry: T) => unknown
+) {
+  const { selection, select } = useChartSelection();
+
+  const { active, visibleData } = useMemo(
+    () => resolveChartCrossFilter({ myId: chartId, selection, data, getCategory }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [chartId, selection, data]
+  );
+
+  return { crossFilterActive: active, visibleData, select };
 }
 
 /**

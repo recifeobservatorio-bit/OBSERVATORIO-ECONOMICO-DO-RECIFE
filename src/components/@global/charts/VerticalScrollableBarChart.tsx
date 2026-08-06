@@ -11,10 +11,9 @@ import {
   ResponsiveContainer
 } from "recharts";
 
-import { useChartSelection } from "@/context/ChartSelectionContext";
 import { tooltipFormatter, yAxisFormatter } from "@/utils/formatters/@global/graphFormatter";
 
-import { resolveChartCrossFilter, resolveCrossFilterFill } from "./crossFilterFill";
+import { resolveCrossFilterFill, useChartCrossFilter } from "./crossFilterFill";
 import CustomLegend from "../features/CustomLegend";
 import CustomTooltip from "../features/CustomTooltip";
 import { resizeDiv } from "../features/resizeDiv";
@@ -72,13 +71,11 @@ const VerticalScrollableBarChart = ({
   highlightColor,
 }: any) => {
   const chartId = useId();
-  const { selection, select } = useChartSelection();
-  const { active: crossFilterActive, visibleData } = resolveChartCrossFilter({
-    myId: chartId,
-    selection,
+  const { crossFilterActive, visibleData, select } = useChartCrossFilter(
+    chartId,
     data,
-    getCategory: (entry: any) => entry[xKey],
-  });
+    (entry: any) => entry[xKey]
+  );
   const scrollRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 

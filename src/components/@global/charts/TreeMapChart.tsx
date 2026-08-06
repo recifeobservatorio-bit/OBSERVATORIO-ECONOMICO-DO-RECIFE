@@ -1,10 +1,9 @@
 import React, { PureComponent, useId, useState } from 'react';
 import { Treemap, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 
-import { useChartSelection } from '@/context/ChartSelectionContext';
 import { tooltipFormatter } from '@/utils/formatters/@global/graphFormatter';
 
-import { resolveChartCrossFilter, resolveCrossFilterFill } from './crossFilterFill';
+import { resolveCrossFilterFill, useChartCrossFilter } from './crossFilterFill';
 import CustomLegend from '../features/CustomLegend';
 import CustomTooltip from '../features/CustomTooltip';
 
@@ -62,13 +61,11 @@ const TreeMapChart = ({
     highlightColor,
 }: any) => {
     const chartId = useId();
-    const { selection, select } = useChartSelection();
-    const { active: crossFilterActive, visibleData } = resolveChartCrossFilter({
-        myId: chartId,
-        selection,
+    const { crossFilterActive, visibleData, select } = useChartCrossFilter(
+        chartId,
         data,
-        getCategory: (entry: any) => entry.label,
-    });
+        (entry: any) => entry.label
+    );
     const [percent, setPercent] = useState(false)
 
     // const totalValue = data.reduce((acc: number, entry: any) => acc + entry.value, 0);

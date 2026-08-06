@@ -1,10 +1,9 @@
 import { useId } from "react";
 import { BarChart as RechartsBarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
-import { useChartSelection } from "@/context/ChartSelectionContext";
 import { tooltipFormatter, yAxisFormatter } from "@/utils/formatters/@global/graphFormatter";
 
-import { resolveChartCrossFilter, resolveCrossFilterFill } from "./crossFilterFill";
+import { resolveCrossFilterFill, useChartCrossFilter } from "./crossFilterFill";
 import CustomLegend from "../features/CustomLegend";
 import CustomTooltip from "../features/CustomTooltip";
 
@@ -21,13 +20,11 @@ const HorizontalScrollableBarChart = ({
   xAxisOrientation = "top",
 }: any) => {
   const chartId = useId();
-  const { selection, select } = useChartSelection();
-  const { active: crossFilterActive, visibleData } = resolveChartCrossFilter({
-    myId: chartId,
-    selection,
+  const { crossFilterActive, visibleData, select } = useChartCrossFilter(
+    chartId,
     data,
-    getCategory: (entry: any) => entry[xKey],
-  });
+    (entry: any) => entry[xKey]
+  );
 
   const customTooltipFormatter = (value: any) => {
       return tooltipFormatter(value, tooltipEntry || "");
