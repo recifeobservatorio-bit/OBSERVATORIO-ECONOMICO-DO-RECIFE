@@ -4,8 +4,8 @@ import VerticalScrollableBarChart from "@/components/@global/charts/VerticalScro
 import ChartGrabber from "@/components/@global/features/ChartGrabber";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
-const PorConstrucao = ({ data, title = "Quantidade de Transmissões por Tipo de Construção", colors = ColorPalette.default }: any) => {
-  const chartData = data?.porConstrucao ?? [];
+const PorZona = ({ data, title = "Total de Imóveis por Zona", colors = ColorPalette.default }: any) => {
+  const chartData = data?.porZona ?? [];
 
   return (
     <div className="chart-wrapper">
@@ -14,7 +14,7 @@ const PorConstrucao = ({ data, title = "Quantidade de Transmissões por Tipo de 
           data={chartData}
           title={title}
           colors={[colors[1]]}
-          xKey="tipo"
+          xKey="zona"
           bars={[{ dataKey: "quantidade", name: "Transmissões" }]}
           heightPerCategory={40}
           visibleHeight={420}
@@ -26,4 +26,4 @@ const PorConstrucao = ({ data, title = "Quantidade de Transmissões por Tipo de 
   );
 };
 
-export default PorConstrucao;
+export default PorZona;

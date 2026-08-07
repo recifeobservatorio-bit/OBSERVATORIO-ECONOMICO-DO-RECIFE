@@ -106,23 +106,27 @@ function processItbiContribuintes(rows: any[], prevYearRows: any[], year: string
     .map(([bairro, rs]) => ({ bairro, quantidade: rs.length }))
     .sort((a, b) => b.quantidade - a.quantidade);
 
+  const porZona = Object.entries(groupBy(rows, (r) => r.zona))
+    .map(([zona, rs]) => ({ zona, quantidade: rs.length }))
+    .sort((a, b) => b.quantidade - a.quantidade);
+
   const porConstrucao = Object.entries(groupBy(rows, (r) => r.tipo_construcao && simplificarTipoConstrucao(r.tipo_construcao)))
     .map(([tipo, rs]) => ({ tipo, quantidade: rs.length }))
     .sort((a, b) => b.quantidade - a.quantidade);
 
   const porUso = Object.entries(groupBy(rows, (r) => r.tipo_ocupacao)).map(([uso, rs]) => ({ uso, quantidade: rs.length }));
 
-  return { cards, linhaTransmissoes, linhaTransmissoesPorAno, tabelaAnual, porBairro, porConstrucao, porUso };
+  return { cards, linhaTransmissoes, linhaTransmissoesPorAno, tabelaAnual, porBairro, porZona, porConstrucao, porUso };
 }
 
 function processItbiAvaliacoes(rows: any[], rowsSemMes: any[] = rows, rowsPorAno: any[] = rowsSemMes) {
   const valores = rows.map((r) => parseDecimal(r.valor_avaliacao)).filter((v) => !isNaN(v));
   const maior = valores.length ? Math.max(...valores) : 0;
-  const menor = valores.length ? Math.min(...valores) : 0;
+  const valorMedio = median(valores);
 
   const cards = [
     { title: "Maior avaliação", value: parseFloat(maior.toFixed(2)) },
-    { title: "Menor avaliação", value: parseFloat(menor.toFixed(2)) },
+    { title: "Valor médio (mediana)", value: parseFloat(valorMedio.toFixed(2)) },
     { title: "Total de transmissões", value: rows.length },
   ];
 
@@ -149,6 +153,7 @@ function processItbiAvaliacoes(rows: any[], rowsSemMes: any[] = rows, rowsPorAno
     .map((r) => ({
       data: formatDateBR(r.data_transacao),
       logradouro: r.logradouro,
+      numero: r.numero,
       bairro: r.bairro,
       tipoImovel: r.tipo_imovel,
       valorAvaliacao: parseDecimal(r.valor_avaliacao),
@@ -161,7 +166,14 @@ function processItbiAvaliacoes(rows: any[], rowsSemMes: any[] = rows, rowsPorAno
     }))
     .sort((a, b) => b.mediana - a.mediana);
 
-  return { cards, medianaAvaliacoes, medianaAvaliacoesPorAno, tabelaTransacoes, medianaPorBairro };
+  const medianaPorZona = Object.entries(groupBy(rows, (r) => r.zona))
+    .map(([zona, rs]) => ({
+      zona,
+      mediana: parseFloat(median((rs as any[]).map((r: any) => parseDecimal(r.valor_avaliacao))).toFixed(2)),
+    }))
+    .sort((a, b) => b.mediana - a.mediana);
+
+  return { cards, medianaAvaliacoes, medianaAvaliacoesPorAno, tabelaTransacoes, medianaPorBairro, medianaPorZona };
 }
 
 function processItbiPesquisa(rows: any[]) {

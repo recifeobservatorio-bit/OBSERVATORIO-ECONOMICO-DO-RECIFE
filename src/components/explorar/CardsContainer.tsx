@@ -92,12 +92,12 @@ export const CardsContainer: React.FC = () => {
         },
         {
             banner: "/images/banners/tributos_banner.avif",
-            title: "Tributos",
+            title: "Mercado Imobiliário",
             logo: "/images/logos/partners/prefeitura_recife_logo.png",
             description: "Descubra como tributos e impostos impulsionam Recife!",
             detailedDescription: "Os tributos, como impostos, taxas e contribuições, são a principal fonte de recursos para serviços essenciais em Recife, como saúde, educação e infraestrutura. Eles refletem o papel da sociedade no desenvolvimento econômico e social, garantindo investimentos que melhoram a qualidade de vida.",
             route: "/observatorio/tributos",
-            name: "Tributos",
+            name: "Mercado Imobiliário",
         },
         {
             banner: "/images/banners/combustiveis_banner.avif",

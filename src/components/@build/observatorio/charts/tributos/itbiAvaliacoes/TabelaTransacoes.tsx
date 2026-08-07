@@ -8,12 +8,12 @@ const TabelaTransacoes = ({ data, title = "Transações Imobiliárias", colors =
   const rows: any[] = data?.tabelaTransacoes ?? [];
   const color = colors[0] ?? "#0155AE";
 
-  const headers = ["Data", "Logradouro", "Bairro", "Tipo do Imóvel", "Valor de Avaliação"];
-  const tableRows = rows.map((r) => [r.data, r.logradouro, r.bairro, r.tipoImovel, formatCurrency(r.valorAvaliacao)]);
+  const headers = ["Data", "Logradouro", "Número", "Bairro", "Tipo do Imóvel", "Valor de Avaliação"];
+  const tableRows = rows.map((r) => [r.data, r.logradouro, r.numero, r.bairro, r.tipoImovel, formatCurrency(r.valorAvaliacao)]);
 
   return (
     <div className="chart-wrapper w-full">
-      <TableGeneric headers={headers} rows={tableRows} title={title} color={color} rowsPerPage={10} searchIndexes={[1, 2]} maxHeight={400} />
+      <TableGeneric headers={headers} rows={tableRows} title={title} color={color} rowsPerPage={10} searchIndexes={[1, 3]} maxHeight={400} />
     </div>
   );
 };
