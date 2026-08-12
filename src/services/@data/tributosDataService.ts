@@ -42,7 +42,9 @@ function formatDateBR(d: any) {
 // ---------- ITBI (dados reais, granularidade mensal a partir de data_transacao) ----------
 
 function getItbiMonth(row: any) {
-  return new Date(row.data_transacao).getMonth();
+  // data_transacao vem como meia-noite UTC; usar getMonth() local (GMT-3) empurra os
+  // registros do dia 1 de cada mês pro mês anterior. UTC evita esse deslocamento.
+  return new Date(row.data_transacao).getUTCMonth();
 }
 
 function getItbiFilters(filters: Filters) {
