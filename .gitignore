@@ -11,3 +11,4 @@ tsconfig.tsbuildinfo
 
 # temporary screenshot/debug scripts
 screenshot_*.js
+.vercel

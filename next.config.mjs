@@ -2,7 +2,10 @@ import fs from 'fs';
 import path from 'path';
 import fetch from 'node-fetch';
 import { fileURLToPath } from 'url';
+import { PHASE_PRODUCTION_BUILD } from 'next/constants.js';
 import 'dotenv/config';
+
+const FETCH_TIMEOUT_MS = 20000;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,7 +21,7 @@ export async function fetchFileToPublic(filename, remoteUrl) {
     console.log(`✔️ Arquivo já existe: ${filename}`);
     return;
   } else {
-    const res = await fetch(remoteUrl);
+    const res = await fetch(remoteUrl, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
     if (!res.ok) throw new Error(`Erro ao baixar ${filename}`);
     const buffer = await res.arrayBuffer();
     fs.writeFileSync(filePath, Buffer.from(buffer));
@@ -27,7 +30,8 @@ export async function fetchFileToPublic(filename, remoteUrl) {
 }
 
 export async function fetchBundles() {
-  const res = await fetch(MANIFEST_URL);
+  const res = await fetch(MANIFEST_URL, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
+  if (!res.ok) throw new Error(`Erro ao baixar manifest.json: HTTP ${res.status}`);
   const manifest = await res.json();
 
   await fetchFileToPublic('manifest.json', MANIFEST_URL);
@@ -44,7 +48,8 @@ export async function fetchBundles() {
 export async function checkAndUpdateManifest() {
   try {
 
-    const res = await fetch(MANIFEST_URL);
+    const res = await fetch(MANIFEST_URL, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
+    if (!res.ok) throw new Error(`Erro ao baixar manifest.json: HTTP ${res.status}`);
     const newManifest = await res.json();
 
     const currentManifestPath = path.join(PUBLIC_DIR, 'manifest.json');
@@ -98,12 +103,27 @@ export async function checkAndUpdateManifest() {
   }
 }
 
+function isProductionBuild() {
+  return (
+    process.env.NEXT_PHASE === PHASE_PRODUCTION_BUILD ||
+    process.env.npm_lifecycle_event === 'build' ||
+    process.env.VERCEL === '1' ||
+    process.argv.includes('build')
+  );
+}
+
 async function initialBuild() {
   console.log('🚀 Build inicial: Verificando bundles...');
   await fetchBundles();
 }
 
-initialBuild().catch(console.error);
+initialBuild().catch((error) => {
+  console.error('❌ Erro ao baixar manifest/bundles no build inicial:', error);
+  if (isProductionBuild()) {
+    console.error('❌ Abortando build de produção: sem manifest/bundles o site sobe sem dados.');
+    process.exit(1);
+  }
+});
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
