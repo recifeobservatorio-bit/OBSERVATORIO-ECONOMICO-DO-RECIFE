@@ -23,21 +23,8 @@ export async function fetchItbiRaw(): Promise<any[]> {
       }
       return normalized;
     });
-    // O parquet fonte tem ~1.8% de linhas duplicadas (mesmo imóvel/avaliação repetido com
-    // "id" diferente — provável fan-out de join com partes envolvidas na transação no backend).
-    // Deduplica por conteúdo (ignorando "id") pra "Total de Transações" bater com a contagem
-    // real de transações (confirmado contra o PowerBI do Observatório: jun/2026 caiu de 1729
-    // linhas brutas pra próximo do valor oficial de 1689).
-    const seen = new Set<string>();
-    const deduped = rows.filter((row) => {
-      const { id, ...rest } = row;
-      const key = JSON.stringify(rest);
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
-    _cache = deduped;
-    return deduped;
+    _cache = rows;
+    return rows;
   })();
 
   return _fetching;
