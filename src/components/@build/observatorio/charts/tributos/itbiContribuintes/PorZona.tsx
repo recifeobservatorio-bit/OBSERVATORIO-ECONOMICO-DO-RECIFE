@@ -15,7 +15,7 @@ const PorZona = ({ data, title = "Total de Imóveis por Zona", colors = ColorPal
           title={title}
           colors={[colors[1]]}
           xKey="zona"
-          bars={[{ dataKey: "quantidade", name: "Transmissões" }]}
+          bars={[{ dataKey: "quantidade", name: "Transações" }]}
           heightPerCategory={40}
           visibleHeight={420}
           widthY={140}

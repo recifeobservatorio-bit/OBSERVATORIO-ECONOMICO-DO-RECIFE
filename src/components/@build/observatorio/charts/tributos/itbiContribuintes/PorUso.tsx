@@ -7,7 +7,7 @@ import ChartGrabber from "@/components/@global/features/ChartGrabber";
 import { ShowPercentages } from "@/components/@global/features/ShowPercentages";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
-const PorUso = ({ data, title = "Quantidade de Transmissões pelo Uso do Imóvel", colors = ColorPalette.default }: any) => {
+const PorUso = ({ data, title = "Quantidade de Transações pelo Uso do Imóvel", colors = ColorPalette.default }: any) => {
   const [showPercentage, setShowPercentage] = useState(true);
   const chartData = data?.porUso ?? [];
 

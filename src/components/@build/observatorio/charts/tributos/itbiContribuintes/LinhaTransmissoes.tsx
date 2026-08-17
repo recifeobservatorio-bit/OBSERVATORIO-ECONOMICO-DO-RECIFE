@@ -9,7 +9,7 @@ import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
 const LinhaTransmissoes = ({
   data,
-  title = "Quantidade de Transmissões Imobiliárias",
+  title = "Quantidade de Transações Imobiliárias",
   colors = ColorPalette.default,
 }: any) => {
   const [mode, setMode] = useState<"ano" | "mes">("mes");
@@ -29,7 +29,7 @@ const LinhaTransmissoes = ({
           colors={colors}
           xKey={xKey}
           tooltipEntry=""
-          lines={[{ dataKey: "quantidade", name: "Transmissões", strokeWidth: 2 }]}
+          lines={[{ dataKey: "quantidade", name: "Transações", strokeWidth: 2 }]}
         />
       </ChartGrabber>
     </div>

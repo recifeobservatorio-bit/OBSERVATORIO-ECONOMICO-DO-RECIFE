@@ -80,7 +80,7 @@ function processItbiContribuintes(rows: any[], prevYearRows: any[], year: string
   const variacao = totalAnterior ? parseFloat((((totalAtual - totalAnterior) / totalAnterior) * 100).toFixed(2)) : 0;
 
   const cards = [
-    { title: "Total de transmissões", value: totalAtual },
+    { title: "Total de transações", value: totalAtual },
     { title: "Total no ano anterior", value: totalAnterior },
     { title: "Variação", value: variacao },
   ];
@@ -129,7 +129,7 @@ function processItbiAvaliacoes(rows: any[], rowsSemMes: any[] = rows, rowsPorAno
   const cards = [
     { title: "Maior avaliação", value: parseFloat(maior.toFixed(2)) },
     { title: "Valor médio (mediana)", value: parseFloat(valorMedio.toFixed(2)) },
-    { title: "Total de transmissões", value: rows.length },
+    { title: "Total de transações", value: rows.length },
   ];
 
   const byMonth = groupBy(rows, (r) => String(getItbiMonth(r)));

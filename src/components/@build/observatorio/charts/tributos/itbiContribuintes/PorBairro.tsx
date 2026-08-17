@@ -4,7 +4,7 @@ import VerticalScrollableBarChart from "@/components/@global/charts/VerticalScro
 import ChartGrabber from "@/components/@global/features/ChartGrabber";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
-const PorBairro = ({ data, title = "Quantidade de Transmissões por Bairro", colors = ColorPalette.default }: any) => {
+const PorBairro = ({ data, title = "Quantidade de Transações por Bairro", colors = ColorPalette.default }: any) => {
   const chartData = data?.porBairro ?? [];
 
   return (
@@ -15,7 +15,7 @@ const PorBairro = ({ data, title = "Quantidade de Transmissões por Bairro", col
           title={title}
           colors={[colors[1]]}
           xKey="bairro"
-          bars={[{ dataKey: "quantidade", name: "Transmissões" }]}
+          bars={[{ dataKey: "quantidade", name: "Transações" }]}
           heightPerCategory={40}
           visibleHeight={420}
           widthY={140}
