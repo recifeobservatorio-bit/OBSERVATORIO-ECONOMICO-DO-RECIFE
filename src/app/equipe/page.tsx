@@ -28,11 +28,11 @@ const highlightedMembers: HighlightMemberProps[] = [
       "Natural do Recife, Victor Marques é engenheiro civil formado pela Universidade de Pernambuco (UPE). Foi eleito vice-prefeito do Recife nas Eleições de 2024, ao lado do prefeito João Campos, em primeiro turno, com 78,11% dos votos válidos — a maior votação da história da capital pernambucana. À frente da Secretaria de Infraestrutura do Recife desde 2025, esteve responsável pela coordenação de obras públicas e intervenções urbanas em áreas como mobilidade, drenagem, contenção de encostas, urbanização e requalificação de espaços públicos, conduzindo projetos estruturadores na cidade. Entre 2021 e 2024, atuou como chefe de gabinete da Prefeitura do Recife, participando da coordenação de ações de governo e do acompanhamento de projetos estratégicos. Anteriormente, exerceu a mesma função na Câmara dos Deputados, no período de 2019 a 2020. Victor Marques tem 31 anos e é casado com a médica Eduarda Neiva.",
   },
   {
-    name: "Felipe Matos",
+    name: "Miguel Ricardo",
     role: "Secretário de Desenvolvimento Econômico",
     image: "/images/team/secretario.jpg",
     description:
-      "Graduado e Mestre em Economia pela Universidade Federal de Pernambuco (UFPE) e MBA Executivo pelo IESE (Espanha), Felipe trabalhou por 9 anos em empresa de engenharia até se tornar Diretor Financeiro na instituição, no ano de 2018. No ano de 2021, entrou para a Administração Pública como Secretário de Planejamento, Gestão e Transformação Digital da Prefeitura do Recife, com o fito de monitorar todas as ações estratégicas do governo. Além disso, como Secretário, Felipe assumiu a liderança sobre a área de Concessões Públicas e Parcerias Público-Privadas, bem como nas áreas de Transformação Digital, Orçamento, Gestão de Pessoas e Licitações. Essa experiência transversal permitiu que o mesmo apoiasse as secretarias finalísticas da Prefeitura do Recife no desenho e viabilização de diversas políticas públicas bem-sucedidas, logrando êxito em ampliar a atuação da Secretaria para além de suas atribuições básicas.",
+      "Graduado em Administração, com pós-graduação e MBA em Gestão, Miguel Ricardo reúne sólida formação acadêmica aliada a uma trajetória consistente tanto no setor público quanto na iniciativa privada. À frente da Secretaria de Desenvolvimento Econômico, lidera ações voltadas à atração de investimentos, ao fortalecimento do ambiente de negócios e à promoção de iniciativas que impulsionam o desenvolvimento econômico sustentável do Recife.",
     reverse: true,
     imagePosition: "object-top",
   },
