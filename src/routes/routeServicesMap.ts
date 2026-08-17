@@ -115,9 +115,9 @@ export const routeServicesMap: Record<
   },
 
   "/observatorio/tributos": {
-    "itbi-contribuintes": tributosDataService,
-    "itbi-avaliacoes": tributosDataService,
-    "itbi-pesquisa": tributosDataService,
+    "mercado-imobiliario": tributosDataService,
+    "mercado-imobiliario-avaliacoes": tributosDataService,
+    "mercado-imobiliario-pesquisa": tributosDataService,
     "iptu-contribuintes": tributosDataService,
     "iptu-valores": tributosDataService,
     "iptu-pesquisa": tributosDataService,

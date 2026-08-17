@@ -154,9 +154,9 @@ export const routeFiltersMap: Record<string, TabFiltersMap> = {
   },
 
   "/observatorio/tributos": {
-    "itbi-contribuintes": tributosItbiContribuintesFilters,
-    "itbi-avaliacoes": tributosItbiAvaliacoesFilters,
-    "itbi-pesquisa": tributosItbiPesquisaFilters,
+    "mercado-imobiliario": tributosItbiContribuintesFilters,
+    "mercado-imobiliario-avaliacoes": tributosItbiAvaliacoesFilters,
+    "mercado-imobiliario-pesquisa": tributosItbiPesquisaFilters,
     "iptu-contribuintes": tributosIptuContribuintesFilters,
     "iptu-valores": tributosIptuValoresFilters,
     "iptu-pesquisa": tributosIptuPesquisaFilters,

@@ -361,7 +361,7 @@ export class TributosDataService {
 
     let processed: any;
 
-    if (tab.startsWith("itbi")) {
+    if (tab.startsWith("mercado-imobiliario")) {
       const allRows = await fetchItbiRaw();
       const f = getItbiFilters({ ...filters, year: this.currentYear });
       const rows = applyItbiFilters(allRows, f);
@@ -381,10 +381,10 @@ export class TributosDataService {
       ];
 
       switch (tab) {
-        case "itbi-avaliacoes":
+        case "mercado-imobiliario-avaliacoes":
           processed = { id: "tributos", itbiAvaliacoes: { ...processItbiAvaliacoes(rows, rowsSemMes, rowsPorAno), additionalFiltersOptions } };
           break;
-        case "itbi-pesquisa":
+        case "mercado-imobiliario-pesquisa":
           processed = { id: "tributos", itbiPesquisa: { ...processItbiPesquisa(rows), additionalFiltersOptions } };
           break;
         default: {
