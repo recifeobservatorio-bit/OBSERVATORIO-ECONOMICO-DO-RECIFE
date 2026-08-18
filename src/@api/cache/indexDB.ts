@@ -69,30 +69,3 @@
         request.onerror = (e) => reject((e.target as IDBRequest).error);
       });
     }
-
-    ///////////////////////
-    ////////////
-    //////
-
-    interface ManifestEntry {
-      bundleKey: string;
-      version: number;
-    }
-
-    export async function checkSaves(manifest: ManifestEntry[]): Promise<string[] | false> {
-      const updatedBundles: string[] = [];
-    
-      for (const { bundleKey, version } of manifest) {
-        try {
-          const currentVersion = await getVersion(bundleKey);
-          if (currentVersion === null || currentVersion < version) {
-            updatedBundles.push(bundleKey);
-          }
-        } catch (error) {
-          console.error(`Erro ao verificar a versão do bundle '${bundleKey}':`, error);
-          updatedBundles.push(bundleKey); // assume que precisa atualizar se houve erro
-        }
-      }
-    
-      return updatedBundles.length > 0 ? updatedBundles : false;
-    }

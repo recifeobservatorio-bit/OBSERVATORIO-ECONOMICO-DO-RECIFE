@@ -6,11 +6,9 @@ import { ExploreItem } from "./ExploreItem"
 
 interface ExploreDivProps {
   searchTerm: string;
-  bundleProgress: any;
-  progress: any;
 }
 
-export const ExploreDiv: React.FC<ExploreDivProps> = ({ searchTerm, bundleProgress, progress }) => {
+export const ExploreDiv: React.FC<ExploreDivProps> = ({ searchTerm }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
@@ -52,7 +50,6 @@ export const ExploreDiv: React.FC<ExploreDivProps> = ({ searchTerm, bundleProgre
                 <ExploreItem
                   key={item.label}
                   item={item}
-                  bundleProgress={bundleProgress}
                   isDarkMode={isDarkMode}
                 />
               ))}

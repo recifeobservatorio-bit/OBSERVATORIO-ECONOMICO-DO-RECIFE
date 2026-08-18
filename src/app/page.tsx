@@ -1,92 +1,25 @@
 "use client";
 import "./styles/home/style.scss";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
-import { loadAndSyncBundles } from "@/@api/cache/bundleDecompress";
-import { checkSaves } from "@/@api/cache/indexDB";
 import { Banner } from "@/components/home/Banner";
 import DataHighlightsScroller from "@/components/home/DataHighlightsScroller";
 import { ExploreSection } from "@/components/home/ExploreSection";
 import { Footer } from "@/components/home/Footer";
-import { LoadingScreen } from "@/components/home/LoadingScreen";
 import { SocialIconsContainer } from "@/components/home/SocialIconsContainer";
-import { useLoading } from "@/context/LoadingContext";
 
 const Page = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [bundleProgress, setBundleProgress] = useState<{ [key: string]: number }>({});
-  const [progress, setProgress] = useState(0);
-  const [checkBundles, setCheckBundles] = useState({});
-  const { setLoading } = useLoading();
 
   const handleSearch = (term: string) => {
     setSearchTerm(term.toLowerCase());
   };
 
-  useEffect(() => {
-    const checkDataAndLoad = async () => {
-      setLoading(true);
-
-      try {
-        const response = await fetch("/manifest.json", { cache: "no-store" });
-        if (!response.ok) throw new Error("manifest.json indisponível");
-        const manifest = await response.json();
-        const manifestEntries = Object.entries(manifest).map(([bundleKey, info]: any) => ({
-          bundleKey,
-          version: info.version,
-        }));
-
-        const outdatedBundles = await checkSaves(manifestEntries);
-        setCheckBundles(outdatedBundles);
-
-        if (!outdatedBundles || outdatedBundles.length === 0) {
-
-          const updatedBundleProgress: { [key: string]: number } = {};
-          for (const entry of manifestEntries) {
-            updatedBundleProgress[entry.bundleKey] = 100;
-          }
-          setBundleProgress(updatedBundleProgress);
-          setProgress(100);
-          return;
-        }
-
-        const updatedBundleProgress: { [key: string]: number } = {};
-        for (const entry of manifestEntries) {
-          if (!outdatedBundles.includes(entry.bundleKey)) {
-            updatedBundleProgress[entry.bundleKey] = 100;
-          }
-        }
-        setBundleProgress(updatedBundleProgress);
-        setProgress(0);
-
-        await loadAndSyncBundles((bundleKey, percent) => {
-          setBundleProgress(prev => ({
-            ...prev,
-            [bundleKey]: percent,
-          }));
-
-          const allKeys = Object.keys(manifest);
-          const individualProgresses = allKeys.map(key =>
-            key === bundleKey ? percent : (bundleProgress[key] || 0)
-          );
-          const avgProgress = individualProgresses.reduce((a, b) => a + b, 0) / allKeys.length;
-          setProgress(avgProgress);
-        });
-      } catch (error) {
-        console.error("Erro ao carregar bundles de dados:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkDataAndLoad();
-  }, []);
-
   return (
     <div className="min-h-screen dark:bg-[#0C1B2B]">
       <Banner onSearch={handleSearch} />
-      <ExploreSection searchTerm={searchTerm} bundleProgress={bundleProgress} progress={progress} />
+      <ExploreSection searchTerm={searchTerm} />
       <DataHighlightsScroller />
       <SocialIconsContainer />
       <Footer />

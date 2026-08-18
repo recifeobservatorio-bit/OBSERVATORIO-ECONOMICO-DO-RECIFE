@@ -2,12 +2,11 @@ import Link from "next/link";
 import React, { useEffect, useRef } from "react";
 import { useReward } from "react-rewards";
 
-export const ExploreItem = ({ item, bundleProgress, isDarkMode }: {
+export const ExploreItem = ({ item, isDarkMode }: {
   item: any;
-  bundleProgress: any;
   isDarkMode: boolean;
 }) => {
-  const progresso = item.bundleKey ? bundleProgress[item.bundleKey] || 0 : 100;
+  const progresso = 100;
   const isLinkDisabled = progresso < 100;
   const rewardId = `reward-${item.bundleKey}`;
   

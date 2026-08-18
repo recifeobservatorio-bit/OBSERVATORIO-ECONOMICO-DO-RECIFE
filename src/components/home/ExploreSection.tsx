@@ -6,11 +6,9 @@ import { iconsExplore } from "./ExploreIconsObservatorio";
 
 interface ExploreSectionProps {
   searchTerm: string; // Recebe o termo de busca como prop
-  bundleProgress: any;
-  progress: any;
 }
 
-export const ExploreSection: React.FC<ExploreSectionProps> = ({ searchTerm, bundleProgress, progress }) => {
+export const ExploreSection: React.FC<ExploreSectionProps> = ({ searchTerm }) => {
   // Calcula o número total de resultados encontrados
   const totalResults = iconsExplore.reduce(
     (count, section) =>
@@ -36,7 +34,7 @@ export const ExploreSection: React.FC<ExploreSectionProps> = ({ searchTerm, bund
       </div>
 
       {/* Component de exploração com filtro */}
-      <ExploreDiv searchTerm={searchTerm} bundleProgress={bundleProgress} progress={progress} />
+      <ExploreDiv searchTerm={searchTerm} />
 
       <div className="mt-40 z-50 mb-40">
         <Link href={"/explorar"}>
