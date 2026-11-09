@@ -26,9 +26,11 @@ const GruposDistribuicaoGrupos = ({
           xKey="label"
           bars={[{ dataKey: "value", name: "Quantidade" }]}
           colors={ColorPalette.default}
-          heightPerCategory={50}
-          widthY={130}
+          heightPerCategory={22}
+          widthY={220}
+          yFontSize={10}
           left={20}
+          visibleHeight={500}
         />
       </ChartGrabber>
     </div>

@@ -1,17 +1,22 @@
 import { EmpregosData } from "@/@api/http/to-charts/empregos/EmpregosData";
 import { applyGenericFilters } from "@/utils/filters/@features/applyGenericFilters";
+import { computeAvailableYears } from "@/utils/filters/@features/computeAvailableYears";
+import { monthShortName } from "@/utils/formatters/@global/monthShortName";
 
-// Soma os campos indicados por ano — usada pela série histórica multianual do toggle Mês/Ano.
-function sumByAno(rows: any[], fields: string[]) {
-  const byAno: Record<string, any> = {};
+// Soma os campos indicados por (ano, mês) — série histórica completa (todos os anos) por
+// mês, usada pelos gráficos de linha RelatorioAno/SaldoAno.
+function sumByAnoMes(rows: any[], fields: string[]) {
+  const byKey: Record<string, any> = {};
   rows.forEach((r) => {
-    const ano = String(r.Ano);
-    if (!byAno[ano]) byAno[ano] = { Ano: ano };
+    const ano = Number(r.Ano);
+    const mes = Number(r.Mes);
+    const key = `${ano}-${String(mes).padStart(2, "0")}`;
+    if (!byKey[key]) byKey[key] = { Ano: ano, Mes: mes, "Mês": `${monthShortName(mes)}/${ano}` };
     fields.forEach((f) => {
-      byAno[ano][f] = (byAno[ano][f] || 0) + (r[f] || 0);
+      byKey[key][f] = (byKey[key][f] || 0) + (r[f] || 0);
     });
   });
-  return Object.values(byAno).sort((a: any, b: any) => String(a.Ano).localeCompare(String(b.Ano)));
+  return Object.values(byKey).sort((a: any, b: any) => a.Ano - b.Ano || a.Mes - b.Mes);
 }
 
 export class EmpregosDataService {
@@ -52,14 +57,16 @@ export class EmpregosDataService {
     const filteredCagedData = applyGenericFilters(fetchData, filters, ['Municipio']);
 
     // Mesmo recorte de filteredMunicipioData, mas com a série histórica completa (todos os
-    // anos), somada por ano — usada pelo modo "Ano" do toggle Mês/Ano (RelatorioAno/SaldoAno).
+    // anos), somada por (ano, mês) — usada pelos gráficos de linha RelatorioAno/SaldoAno, que
+    // sempre mostram a série mensal inteira, não só o ano selecionado.
     const allYearsData = await empregosData.fetchAllYearsCaged();
     const filteredMunicipioPorAno = applyGenericFilters(allYearsData, filters, ['Região', 'UF', 'Mes']);
-    const municipiosPorAno = sumByAno(filteredMunicipioPorAno.filteredData, ["Saldos", "Admissões", "Demissões"]);
+    const municipiosPorMes = sumByAnoMes(filteredMunicipioPorAno.filteredData, ["Saldos", "Admissões", "Demissões"]);
+    const yearsOptions = computeAvailableYears(allYearsData, (r: any) => r.Ano);
 
     return {
-        municipios: filteredMunicipioData,
-        municipiosPorAno,
+        municipios: { ...filteredMunicipioData, yearsOptions },
+        municipiosPorMes,
         caged: filteredCagedData,
         id: "empregos-caged"
     };
@@ -86,9 +93,18 @@ export class EmpregosDataService {
     const filteredMunicipioTrimestreData = applyGenericFilters(empregosCur, filters, ['Região']);
     // tudo menos filtrar por municipio
     const filteredDesempregoData = applyGenericFilters(empregosCur, filters, ['Capital']);
-    
+
+    const allYearsDesemprego = await empregosData.fetchAllYearsCagedDesemprego();
+    const yearsOptions = computeAvailableYears(allYearsDesemprego, (r: any) => r.Ano);
+
+    // Série histórica (todos os anos) da capital filtrada + Brasil como referência,
+    // pro gráfico de linha trimestral — com só o ano selecionado ele virava 1 a 4 pontos.
+    const historicoCapital = applyGenericFilters(allYearsDesemprego, filters, ['Região', 'Trimestre']).filteredData;
+    const historicoBrasil = allYearsDesemprego.filter((r: any) => r.Capital === 'Brasil');
+
     return {
-        municipios: filteredMunicipioData,
+        municipios: { ...filteredMunicipioData, yearsOptions },
+        historico: { capital: historicoCapital, brasil: historicoBrasil },
         desemprego: filteredDesempregoData,
         trimestre: {
           municipiosTrimestre: filteredMunicipioTrimestreData,

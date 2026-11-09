@@ -5,6 +5,9 @@ import React from "react";
 import CapagNotaCard from "@/components/@build/observatorio/cards/capag/CapagNotaCard";
 import EvolucaoIndicador from "@/components/@build/observatorio/charts/capag/EvolucaoIndicador";
 import CapagClassificacaoTable from "@/components/@build/observatorio/tables/capag/CapagClassificacaoTable";
+import SectionIconBadge from "@/components/@global/cards/SectionIconBadge";
+import FitToScreen from "@/components/@global/features/FitToScreen";
+import { CapagIcon } from "@/components/@global/icons/sectionIcons";
 import ErrorBoundary from "@/utils/loader/errorBoundary";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 import { CapagMunicipioData } from "@/@types/observatorio/@data/capagData";
@@ -25,19 +28,26 @@ const CapagGeral = ({ data, year = "--", onSelectMunicipio }: CapagGeralProps) =
   const periodo = anos.length ? `(${anos[0]}-${anos[anos.length - 1]})` : "";
 
   return (
+    <FitToScreen>
     <div className="pb-4 flex flex-col gap-6">
       <div className="grid grid-cols-1 xl:grid-cols-[1.2fr_0.6fr_1.2fr] gap-6">
         {/* Tabelas (esquerda) */}
         <div className="flex flex-col gap-6">
           <ErrorBoundary>
-            <CapagClassificacaoTable data={recife ?? null} title="Classificação Capag Recife - PE" color={ColorPalette.default[0]} />
+            <div className="relative">
+              <SectionIconBadge icon={<CapagIcon />} />
+              <CapagClassificacaoTable data={recife ?? null} title="Classificação Capag Recife - PE" color={ColorPalette.default[0]} />
+            </div>
           </ErrorBoundary>
           <ErrorBoundary>
-            <CapagClassificacaoTable
-              data={comparado}
-              title={comparado ? `Classificação Capag ${comparado.municipio} - ${comparado.uf}` : "Município Comparado"}
-              color={ColorPalette.default[1]}
-            />
+            <div className="relative">
+              <SectionIconBadge icon={<CapagIcon />} />
+              <CapagClassificacaoTable
+                data={comparado}
+                title={comparado ? `Classificação Capag ${comparado.municipio} - ${comparado.uf}` : "Município Comparado"}
+                color={ColorPalette.default[1]}
+              />
+            </div>
           </ErrorBoundary>
         </div>
 
@@ -52,7 +62,8 @@ const CapagGeral = ({ data, year = "--", onSelectMunicipio }: CapagGeralProps) =
         </div>
 
         {/* Mapa (direita) */}
-        <div className="bg-white dark:bg-[#0C1B2B] rounded-lg border border-gray-200 dark:border-gray-700 p-3">
+        <div className="chart-content-wrapper relative">
+          <SectionIconBadge icon={<CapagIcon />} />
           <ErrorBoundary>
             <React.Suspense fallback={<div className="h-[500px] bg-gray-100 dark:bg-gray-800 rounded-lg animate-pulse" />}>
               <BrazilCapagMap municipioSelecionado={comparado?.municipio} onSelectMunicipio={onSelectMunicipio} />
@@ -62,24 +73,28 @@ const CapagGeral = ({ data, year = "--", onSelectMunicipio }: CapagGeralProps) =
       </div>
 
       {/* Gráficos de linha (histórico completo disponível) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="bg-white dark:bg-[#0C1B2B] rounded-lg border border-gray-200 dark:border-gray-700 p-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="chart-content-wrapper relative">
+          <SectionIconBadge icon={<CapagIcon />} />
           <ErrorBoundary>
             <EvolucaoIndicador data={data} campo="endividamento" title={`Endividamento ${periodo}`} />
           </ErrorBoundary>
         </div>
-        <div className="bg-white dark:bg-[#0C1B2B] rounded-lg border border-gray-200 dark:border-gray-700 p-3">
+        <div className="chart-content-wrapper relative">
+          <SectionIconBadge icon={<CapagIcon />} />
           <ErrorBoundary>
             <EvolucaoIndicador data={data} campo="liquidez" title={`Liquidez ${periodo}`} />
           </ErrorBoundary>
         </div>
-        <div className="bg-white dark:bg-[#0C1B2B] rounded-lg border border-gray-200 dark:border-gray-700 p-3">
+        <div className="chart-content-wrapper relative">
+          <SectionIconBadge icon={<CapagIcon />} />
           <ErrorBoundary>
             <EvolucaoIndicador data={data} campo="poupancaCorrente" title={`Poupança Corrente ${periodo}`} />
           </ErrorBoundary>
         </div>
       </div>
     </div>
+    </FitToScreen>
   );
 };
 

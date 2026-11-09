@@ -2,7 +2,7 @@
 
 import React from "react";
 
-import ScrollableBarChart from "@/components/@global/charts/VerticalScrollableBarChart";
+import HorizontalScrollableBarChart from "@/components/@global/charts/HorizontalScrollableBarChart";
 import ChartGrabber from "@/components/@global/features/ChartGrabber";
 import { uniqueLabel } from "@/functions/process_data/observatorio/rais/demografia/geralFuncition";
 import { raisDivisaoSecaoDicts } from "@/utils/dicts/rais/raisDivisaoSecaoDicts";
@@ -21,15 +21,14 @@ const GruposDistribuicaoSecao = ({
   return (
     <div className="chart-wrapper">
       <ChartGrabber>
-        <ScrollableBarChart
+        <HorizontalScrollableBarChart
           data={chartData}
           title={title}
           xKey="label"
           bars={[{ dataKey: "value", name: "Quantidade" }]}
           colors={ColorPalette.default}
-          heightPerCategory={50}
-          widthY={150}
-          left={10}
+          widthMultiply={130}
+          xAxisFontSize={9}
         />
       </ChartGrabber>
     </div>

@@ -4,11 +4,11 @@ import React from "react";
 
 import ChartGrabber from "@/components/@global/features/ChartGrabber";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
-import StackedBarChart from "@/components/@global/charts/StackedVerticalBarChart";
+import BarChart from "@/components/@global/charts/BarChart";
 
 const EmpresasPorteAtivasInativas = ({
   data,
-  colors = ColorPalette.default,
+  colors = [ColorPalette.status.good, ColorPalette.status.bad],
   municipio,
   title = "Empresas por Porte",
   year,
@@ -29,24 +29,24 @@ const EmpresasPorteAtivasInativas = ({
   return (
     <div className="chart-wrapper">
       <ChartGrabber>
-        <StackedBarChart
+        <BarChart
         data={chartData}
         title={title + ` - (${municipio})`}
-        colors={colors.slice(1)}
+        colors={colors}
         xKey="label"
         bars={[
-          { 
-            dataKey: "ativa", 
+          {
+            dataKey: "ativa",
             name: "Ativas",
           },
-          { 
-            dataKey: "inativa", 
+          {
+            dataKey: "inativa",
             name: "Inativas",
           },
         ]}
         tooltipEntry=""
-        heightPerCategory={80} // Define a altura de cada barra
-        visibleHeight={400} // Define a altura visível para scroll
+        height={480}
+        maxBarSize={40}
       />
       </ChartGrabber>
     </div>

@@ -9,6 +9,12 @@ export const empresasInativasFilters = {
         selected: [],
       },
       {
+        label: "nome_bairro",
+        displayLabel: "Bairro",
+        options: [],
+        selected: [],
+      },
+      {
         label: "mes",
         options: [],
         selected: [],

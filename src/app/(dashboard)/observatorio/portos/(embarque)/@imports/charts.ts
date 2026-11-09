@@ -7,7 +7,6 @@ const charts = [
         "@/components/@build/observatorio/charts/porto/operacao/OperacaoCargasAno"
       )
     ),
-    col: 'full'
   },
   {
     Component: React.lazy(() =>

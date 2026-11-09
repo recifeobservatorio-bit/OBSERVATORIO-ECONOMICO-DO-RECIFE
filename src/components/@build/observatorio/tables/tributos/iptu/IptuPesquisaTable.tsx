@@ -1,6 +1,7 @@
 "use client";
 
 import TableGeneric from "@/components/@global/tables/TableGeneric";
+import { formatBairroLabel } from "@/utils/formatters/@global/formatBairroLabel";
 
 const formatCurrency = (v: number) => v?.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -11,7 +12,7 @@ const IptuPesquisaTable = ({ data, color = "#0155AE" }: any) => {
   const tableRows = rows.map((r) => [
     r.ano,
     r.logradouro,
-    r.bairro,
+    formatBairroLabel(r.bairro),
     formatCurrency(r.iptu),
     r.m2Construcao,
     r.m2Terreno,

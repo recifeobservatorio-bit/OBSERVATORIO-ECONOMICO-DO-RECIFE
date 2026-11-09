@@ -1,6 +1,7 @@
 "use client";
 
 import TableGeneric from "@/components/@global/tables/TableGeneric";
+import { formatBairroLabel } from "@/utils/formatters/@global/formatBairroLabel";
 
 const formatCurrency = (v: number) => v?.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -8,7 +9,7 @@ const ItbiPesquisaTable = ({ data, color = "#0155AE" }: any) => {
   const rows: any[] = data?.registros ?? [];
 
   const headers = ["Data da Transação", "Bairro", "Tipo do Imóvel", "Valor de Avaliação"];
-  const tableRows = rows.map((r) => [r.data, r.bairro, r.tipoImovel, formatCurrency(r.valorAvaliacao)]);
+  const tableRows = rows.map((r) => [r.data, formatBairroLabel(r.bairro), r.tipoImovel, formatCurrency(r.valorAvaliacao)]);
 
   return (
     <div className="w-full">

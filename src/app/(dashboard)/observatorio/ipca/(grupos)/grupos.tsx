@@ -2,7 +2,10 @@ import React, { useRef, useEffect, useState } from "react";
 
 import { IpcaGrupoData } from "@/@types/observatorio/@data/ipcaData";
 import { IpcaGrupoHeaders } from "@/@types/observatorio/@fetch/ipca";
+import SectionIconBadge from "@/components/@global/cards/SectionIconBadge";
+import FitToScreen from "@/components/@global/features/FitToScreen";
 import { SortableDiv } from "@/components/@global/features/SortableDiv";
+import { IpcaIcon } from "@/components/@global/icons/sectionIcons";
 import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
 import { useDashboard } from "@/context/DashboardContext";
 
@@ -23,15 +26,17 @@ const Grupos = () => {
     }
   }, [data]);
   return (
+    <FitToScreen>
     <div>
-       <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="charts-items-wrapper">
+       <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="grid bi-grid-2x2 items-stretch grid-cols-1 sm:grid-cols-2 gap-4 pb-4">
         {chartOrder.map((index) => {
           const { Component } = charts[index];
           return (
             <div
               key={index}
-              className={`chart-content-wrapper`}
+              className={`chart-content-wrapper relative`}
             >
+              <SectionIconBadge icon={<IpcaIcon />} />
               <React.Suspense fallback={<GraphSkeleton />}>
                 <Component data={gruposData}   />
               </React.Suspense>
@@ -40,6 +45,7 @@ const Grupos = () => {
         })}
       </SortableDiv>
     </div>
+    </FitToScreen>
   );
 };
 

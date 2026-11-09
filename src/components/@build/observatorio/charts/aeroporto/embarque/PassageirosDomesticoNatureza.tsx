@@ -4,7 +4,7 @@ import React from "react";
 
 import { AnacGeralHeaders } from "@/@types/observatorio/@fetch/aeroporto";
 import { ChartBuild } from "@/@types/observatorio/shared";
-import VerticalScrollableBarChart from "@/components/@global/charts/VerticalScrollableBarChart";
+import HorizontalScrollableBarChart from "@/components/@global/charts/HorizontalScrollableBarChart";
 import ChartGrabber from "@/components/@global/features/ChartGrabber";
 import { processEmbarqueDesembarqueNaturezaTipo } from "@/functions/process_data/observatorio/aeroporto/embarque/embarqueDesembarqueNaturezaTipo";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
@@ -31,19 +31,21 @@ const PassageirosEmbarqueDom = ({
   return (
     <div className="chart-wrapper">
       <ChartGrabber>
-        <VerticalScrollableBarChart
+        <HorizontalScrollableBarChart
           data={chartData}
           title={`${type} ${title}`}
           colors={colors}
           xKey="uf"
           bars={[{ dataKey: "total", name: "Passageiros" }]}
-          height={400} // Altura do viewport visível para scroll
-          barSize={30} // Altura individual de cada barra
+          widthMultiply={130}
+          height={500}
         />
-        <div className="absolute -rotate-90 top-[50%] -left-6">
+        {/* Legenda do eixo embaixo, centralizada (como em "País Destino") — girada na
+            lateral ela ficava por cima dos números do eixo. */}
+        <div className="w-full flex justify-center mt-0.5">
           {subText && (
             <p
-              className="font-medium"
+              className="text-xs font-semibold leading-4"
               style={{ color: colors[6] }} // Aplica a cor dinamicamente
             >
               {subText}

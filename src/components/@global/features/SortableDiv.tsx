@@ -22,6 +22,10 @@ export const SortableDiv = ({ chartOrder, setChartOrder, sortableContainerRef, c
         }
         sortableInstance.current = Sortable.create(sortableContainerRef.current, {
           animation: 150,
+          // Controles arrastáveis dentro do card (barra de período dos gráficos de
+          // linha) não podem iniciar o arraste do card — o Sortable cancelava o gesto.
+          filter: ".bi-no-drag",
+          preventOnFilter: false,
           onEnd: (evt) => {
             if (evt.oldIndex == null || evt.newIndex == null) return;
             const newOrder = [...chartOrder];

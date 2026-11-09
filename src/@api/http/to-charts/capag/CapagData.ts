@@ -29,6 +29,11 @@ export async function fetchCapagRaw(): Promise<any[] | null> {
       return rows;
     } catch {
       return null;
+    } finally {
+      // Sem isso, uma falha (backend fora do ar) trava _fetching na promise já
+      // resolvida como null pra sempre — nunca mais tenta buscar de novo, mesmo
+      // com o backend voltando ao ar.
+      if (!_cache) _fetching = null;
     }
   })();
 

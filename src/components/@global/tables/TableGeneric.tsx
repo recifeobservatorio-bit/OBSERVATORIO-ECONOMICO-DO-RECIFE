@@ -89,10 +89,10 @@ const TableGeneric: React.FC<PaginatedTableProps> = ({
 
   return (
     <div className="bg-none">
-      <div className={`overflow-hidden flex flex-col rounded-lg h-full`} style={{ backgroundColor: `${color}` }}>
+      <div className={`bi-table overflow-hidden flex flex-col rounded-lg h-full`} style={{ backgroundColor: `${color}` }}>
         <div className="mb-4 flex-1">
         {title &&
-          <h3 className={`flex-1 bg-[${color}] w-full rounded-t-lg text-lg font-semibold px-8 py-6 text-white`}>
+          <h3 className={`bi-table-title flex-1 bg-[${color}] w-full rounded-t-lg text-lg font-semibold px-8 py-6 text-white`}>
             {title}
           </h3>}
           {/* Campos de Pesquisa para as colunas com filtros ativos */}

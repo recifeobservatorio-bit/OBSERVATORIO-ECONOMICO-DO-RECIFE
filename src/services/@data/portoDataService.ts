@@ -2,6 +2,7 @@ import { PortoData } from "@/@api/http/to-charts/porto/PortoData";
 import { PortoGeralData, PortoDataResult, PortoPassageirosData, PortoPassageirosResult } from "@/@types/observatorio/@data/portoData";
 import { Filters } from "@/@types/observatorio/shared";
 import { applyGenericFilters } from "@/utils/filters/@features/applyGenericFilters";
+import { computeAvailableYears } from "@/utils/filters/@features/computeAvailableYears";
 
 export class PortoDataService {
   private static instance: PortoDataService;
@@ -50,7 +51,10 @@ export class PortoDataService {
         portoData.fetchAtracacaoAllYears(),
       ]);
 
-      const atracacaoFiltered = applyGenericFilters(atracacao, filters);
+      const atracacaoFiltered = {
+        ...applyGenericFilters(atracacao, filters),
+        yearsOptions: computeAvailableYears(atracacaoAllYears, (r: any) => r.Ano),
+      };
       const atracacaoIds = new Set(atracacaoFiltered.filteredData.map((atracacao) => atracacao.IDAtracacao));
 
       const cargaFiltered = carga.filter(
@@ -98,7 +102,7 @@ export class PortoDataService {
             past: [pastYear, coordsPast.filter((coord) => portosSelected?.includes(coord['Porto Atracação']))],
             current: [this.currentYear, coords.filter((coord) => portosSelected?.includes(coord['Porto Atracação']))] 
           }
-        }, 
+        },
         id: "porto"
       } as PortoGeralData;
     } catch (error) {
@@ -115,15 +119,29 @@ export class PortoDataService {
       new PortoData(this.currentYear).fetchPassageirosAllYears(),
     ]);
 
-    const passageirosCurFiltered = applyGenericFilters(passageirosCur.status === 'fulfilled' ? passageirosCur.value : [], filters);
+    const passageirosCurFiltered = {
+      ...applyGenericFilters(passageirosCur.status === 'fulfilled' ? passageirosCur.value : [], filters),
+      yearsOptions: computeAvailableYears(
+        passageirosAllYears.status === 'fulfilled' ? passageirosAllYears.value : [],
+        (r: any) => r.Ano
+      ),
+    };
     const passageirosPastFiltered = applyGenericFilters(passageirosPast.status === 'fulfilled' ? passageirosPast.value : [], filters);
     // Série histórica completa (todos os anos) — usada pelo modo "Ano" do toggle Mês/Ano
     const passageirosPorAnoFiltered = applyGenericFilters(passageirosAllYears.status === 'fulfilled' ? passageirosAllYears.value : [], filters);
+
+    // Mesmo recorte, ignorando o filtro de Mes — usado só pelos gráficos de linha
+    // (PassageirosPortoAno/PassageirosVariacaoPortoAno), senão a linha vira um ponto só
+    // quando um mês é selecionado.
+    const passageirosCurSemMes = applyGenericFilters(passageirosCur.status === 'fulfilled' ? passageirosCur.value : [], filters, ["Mes"]).filteredData;
+    const passageirosPastSemMes = applyGenericFilters(passageirosPast.status === 'fulfilled' ? passageirosPast.value : [], filters, ["Mes"]).filteredData;
 
     return {
       passageiros: {
         current: passageirosCurFiltered,
         past: passageirosPastFiltered,
+        currentSemMes: passageirosCurSemMes,
+        pastSemMes: passageirosPastSemMes,
         porAno: passageirosPorAnoFiltered.filteredData,
       },
       id: "porto-passageiros"

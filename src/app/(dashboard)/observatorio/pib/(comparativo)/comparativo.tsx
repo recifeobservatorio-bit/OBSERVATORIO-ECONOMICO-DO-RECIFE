@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 
+import SectionIconBadge from "@/components/@global/cards/SectionIconBadge";
+import FitToScreen from "@/components/@global/features/FitToScreen";
 import SelectCompare from "@/components/@global/features/SelectCompare";
 import SelectPrincipal from "@/components/@global/features/SelectPrincipal";
 import { SortableDiv } from "@/components/@global/features/SortableDiv";
+import { PibIcon } from "@/components/@global/icons/sectionIcons";
 import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
 import { getUniqueValues } from "@/utils/filters/@global/getUniqueValues";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
@@ -70,6 +73,7 @@ const Comparativo = ({
   };
 
   return (
+    <FitToScreen>
     <div>
       <SelectPrincipal
         options={toCompare}
@@ -176,14 +180,15 @@ const Comparativo = ({
 
       <div className="flex flex-col gap-6">
        
-      <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="charts-items-wrapper">
+      <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="grid items-stretch grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {chartOrder.map((index) => {
           const { Component } = charts[index];
           return (
             <div
               key={index}
-              className={`chart-content-wrapper`}
+              className={`chart-content-wrapper relative`}
             >
+              <SectionIconBadge icon={<PibIcon />} />
               <React.Suspense fallback={<GraphSkeleton />}>
                 <Component
                   data={data}
@@ -195,12 +200,13 @@ const Comparativo = ({
         })}
       </SortableDiv>
 
-        <SortableDiv chartOrder={tableOrder} setChartOrder={setTableOrder} sortableContainerRef={sortableContainerTableRef} style="charts-items-wrapper">
+        <SortableDiv chartOrder={tableOrder} setChartOrder={setTableOrder} sortableContainerRef={sortableContainerTableRef} style="grid items-stretch grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {tablesRender.map(({ Component }, index) => (
             <div
               key={index}
-              className="bg-white shadow-md rounded-lg flex flex-col items-center w-full"
+              className="bg-white shadow-md rounded-lg flex flex-col items-center w-full relative"
             >
+              <SectionIconBadge icon={<PibIcon />} />
               <React.Suspense fallback={<div>Carregando...</div>}>
                 <Component
                   municipio={[...tempFiltred][index]}
@@ -214,6 +220,7 @@ const Comparativo = ({
         </SortableDiv>
       </div>
     </div>
+    </FitToScreen>
   );
 };
 

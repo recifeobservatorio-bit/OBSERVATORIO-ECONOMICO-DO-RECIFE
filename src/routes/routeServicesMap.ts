@@ -8,6 +8,9 @@ import { microCagedDataService } from "@/services/@data/microCagedService";
 import { pibDataService } from "@/services/@data/pibDataService";
 import { portoDataService } from "@/services/@data/portoDataService";
 import { raisDataService } from "@/services/@data/raisDataService";
+import { economiaCriativaDataService } from "@/services/@data/economiaCriativaDataService";
+import { cnaeHistoricoDataService } from "@/services/@data/cnaeHistoricoDataService";
+import { rfcDataService } from "@/services/@data/rfcDataService";
 import { rankingDataService } from "@/services/@data/rankingDataService";
 import { combustiveisDataService } from "@/services/@data/combustiveisDataService";
 import { tributosDataService } from "@/services/@data/tributosDataService";
@@ -79,7 +82,20 @@ export const routeServicesMap: Record<
     estoque: raisDataService,
     remuneracao: raisDataService,
   },
-  
+
+  "/observatorio/economia-criativa": {
+    perfil: economiaCriativaDataService,
+    movimentacao: economiaCriativaDataService,
+    diversidade: economiaCriativaDataService,
+    "empregos-setor": economiaCriativaDataService,
+    "empregos-empresas": economiaCriativaDataService,
+    salarios: economiaCriativaDataService,
+    "negocios-criativos": cnaeHistoricoDataService,
+    "rfc-producoes": rfcDataService,
+    "rfc-locacoes": rfcDataService,
+    "rfc-painel": rfcDataService,
+  },
+
   "/observatorio/micro-caged": {
     geral: microCagedDataService,
     saldo: microCagedDataService,

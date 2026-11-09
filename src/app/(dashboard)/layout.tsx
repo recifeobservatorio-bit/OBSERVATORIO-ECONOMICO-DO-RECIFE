@@ -9,7 +9,7 @@ import ChartSelectionIndicator from "@/components/@global/features/ChartSelectio
 import HiddenChartsPanel from "@/components/@global/features/HiddenChartsPanel";
 import ToggleDarkMode from "@/components/@global/features/ToggleDarkMode";
 import { LoadingScreen } from "@/components/home/LoadingScreen";
-import Navbar from "@/components/random_temp/Navbar";
+import FilterSidebar from "@/components/random_temp/FilterSidebar";
 import { Sidebar } from "@/components/random_temp/Sidebar";
 import { ChartSelectionProvider, useChartSelection } from "@/context/ChartSelectionContext";
 import { DashboardProvider } from "@/context/DashboardContext";
@@ -32,51 +32,26 @@ export default function DashboardLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = usePathname();
-
-  // Define backgrounds para cada rota específica
-const getBackgroundForRoute = () => {
-  switch (pathname) {
-    case "/observatorio/balanca-comercial":
-      return "bg-[url('/images/backgrounds/dashboard/light/bal_comercial.avif')] dark:bg-[url('/images/backgrounds/dashboard/dark/bal_comercial.avif')]";
-    case "/observatorio/aeroportos":
-      return "bg-[url('/images/backgrounds/dashboard/light/aeroportos.avif')] dark:bg-[url('/images/backgrounds/dashboard/dark/aeroportos.avif')]";
-    case "/observatorio/ipca":
-      return "bg-[url('/images/backgrounds/dashboard/light/ipca.avif')] dark:bg-[url('/images/backgrounds/dashboard/dark/ipca.avif')]";
-    case "/observatorio/ranking-municipios":
-      return "bg-[url('/images/backgrounds/dashboard/light/ranking.avif')] dark:bg-[url('/images/backgrounds/dashboard/dark/ranking.avif')]";
-    case "/observatorio/portos":
-      return "bg-[url('/images/backgrounds/dashboard/light/portos.avif')] dark:bg-[url('/images/backgrounds/dashboard/dark/portos.avif')]";
-    case "/observatorio/pib":
-      return "bg-[url('/images/backgrounds/dashboard/light/pib.avif')] dark:bg-[url('/images/backgrounds/dashboard/dark/pib.avif')]";
-    case "/observatorio/empregos":
-    case "/observatorio/rais":
-      return "bg-[url('/images/backgrounds/dashboard/light/empregos.avif')] dark:bg-[url('/images/backgrounds/dashboard/dark/empregos.avif')]";
-    default:
-      return "bg-[#F7F8FA] dark:bg-[#0C1B2B]";
-  }
-};
-
   return (
     <Suspense fallback={< LoadingScreen />}>
       <DashboardProvider>
         <ChartSelectionProvider>
           <ChartSelectionResetOnNavigate />
-          <div className="h-screen flex overflow-hidden">
+          <div className="h-screen flex flex-col overflow-hidden">
             <Sidebar />
-            <div
-              className={`flex-1 ${getBackgroundForRoute()} bg-cover overflow-scroll flex flex-col pb-[1em]`}
-            >
-              <Navbar />
-              <ToggleDarkMode />
-              <HiddenChartsPanel />
-              <ChartSelectionIndicator />
-              <DrawingStoreProvider>
-                <ExcalidrawProvider>
-                  {children}
-                  <FloatingExcalidrawButton />
-                </ExcalidrawProvider>
-              </DrawingStoreProvider>
+            <div className="flex-1 min-h-0 flex overflow-hidden">
+              <FilterSidebar />
+              <div className="flex-1 bi-canvas overflow-y-auto overflow-x-hidden flex flex-col pb-[1em] lg:pb-0">
+                <ToggleDarkMode />
+                <HiddenChartsPanel />
+                <ChartSelectionIndicator />
+                <DrawingStoreProvider>
+                  <ExcalidrawProvider>
+                    {children}
+                    <FloatingExcalidrawButton />
+                  </ExcalidrawProvider>
+                </DrawingStoreProvider>
+              </div>
             </div>
           </div>
         </ChartSelectionProvider>

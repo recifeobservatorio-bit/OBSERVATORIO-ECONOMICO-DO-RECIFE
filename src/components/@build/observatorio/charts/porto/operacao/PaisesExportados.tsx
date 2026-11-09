@@ -13,7 +13,7 @@ import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
 const PaisesExportados = ({
   data,
-  title = "Passageiros por Aeroporto",
+  title = "Países de Destino das Exportações (Ton)",
 }: ChartBuild<PortoGeralData>) => {
 
   const chartData = getPortoCountryNameByCode(processCargasLongoCurso(data.atracacao as PortoAtracacaoHeaders[], data.carga, 'exportacao') as any, data.dictionaries.destino, 'Destino')
@@ -26,7 +26,7 @@ const PaisesExportados = ({
           title={title}
           xKey="pais"
           bars={[{ dataKey: "totalVLPesoCargaBruta", name: "Carga (Ton)" }]}
-          colors={ColorPalette.default}
+          colors={[ColorPalette.status.good]}
           heightPerCategory={50}
         />
       </ChartGrabber>

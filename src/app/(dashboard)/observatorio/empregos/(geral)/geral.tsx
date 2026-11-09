@@ -2,7 +2,10 @@
 
 import React, { useEffect, useRef, useState } from "react";
 
+import SectionIconBadge from "@/components/@global/cards/SectionIconBadge";
+import FitToScreen from "@/components/@global/features/FitToScreen";
 import { SortableDiv } from "@/components/@global/features/SortableDiv";
+import { EmpregosIcon } from "@/components/@global/icons/sectionIcons";
 import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
 import ErrorBoundary from "@/utils/loader/errorBoundary";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
@@ -28,6 +31,7 @@ const Geral = ({
   }, [data])
 
   return (
+    <FitToScreen>
     <div>
       <div className="flex flex-wrap gap-4 justify-center mb-8">
         {cards.map(({ Component }, index) => (
@@ -37,14 +41,15 @@ const Geral = ({
         ))}
       </div>
 
-      <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="charts-items-wrapper">
+      <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="charts-items-wrapper !grid-cols-1 sm:!grid-cols-2 lg:!grid-cols-3">
         {chartOrder.map((index) => {
           const { Component } = charts[index];
           return (
             <div
               key={index}
-              className={`chart-content-wrapper`}
+              className={`chart-content-wrapper relative`}
             >
+              <SectionIconBadge icon={<EmpregosIcon />} />
               <React.Suspense fallback={<GraphSkeleton />}>
                 <ErrorBoundary>
                   <Component data={data} months={months} />
@@ -55,6 +60,7 @@ const Geral = ({
         })}
       </SortableDiv>
     </div>
+    </FitToScreen>
   );
 };
 

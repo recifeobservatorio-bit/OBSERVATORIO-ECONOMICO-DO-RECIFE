@@ -29,7 +29,7 @@ const DiversidadeGeral = ({
     
     const chartData = {
       totalEmpregos: dataFiltred.length,
-      remuneracaoMed: total / dataFiltred.filter((item: any) => item['Vl Remun Dezembro Nom'] != '0').length, 
+      remuneracaoMed: total / dataFiltred.filter((item: any) => item['Vl Remun Dezembro Nom'] != null && item['Vl Remun Dezembro Nom'] !== 0).length,
       remuneracaoMax: valMax
     }
 

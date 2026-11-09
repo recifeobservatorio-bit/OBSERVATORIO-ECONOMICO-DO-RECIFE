@@ -12,7 +12,7 @@ import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
 const TotalImportacaoExportacao = ({
   data = [],
-  colors = ColorPalette.default,
+  colors = [ColorPalette.status.bad, ColorPalette.status.good],
   title = "Total Importação e Exportação",
 }: ChartBuild<BalancaHeaders[]>) => {
   const [showPercentage, setShowPercentage] = useState(true);

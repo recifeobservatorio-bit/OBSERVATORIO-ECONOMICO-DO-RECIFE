@@ -2,7 +2,10 @@
 
 import React, { memo, useEffect, useMemo, useRef, useState } from "react";
 
+import SectionIconBadge from "@/components/@global/cards/SectionIconBadge";
+import FitToScreen from "@/components/@global/features/FitToScreen";
 import { SortableDiv } from "@/components/@global/features/SortableDiv";
+import { EmpresasIcon } from "@/components/@global/icons/sectionIcons";
 import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
 import ErrorBoundary from "@/utils/loader/errorBoundary";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
@@ -23,7 +26,7 @@ const EmpresasAtivasInativas = ({
 
   const sortableContainerRef = useRef<HTMLDivElement>(null);
 
-  const params = ['nome_bairro', 'Grupo', 'desc_atividade', 'mes', 'rpa', 'zona']
+  const params = ['nome_bairro', 'Grupo', 'desc_atividade', 'mes']
 
   const chartData = useMemo(() => {
     const ativas = geralAccFunction(data['ativas'], params)
@@ -39,6 +42,7 @@ const EmpresasAtivasInativas = ({
   }, [data, params])
 
   return (
+    <FitToScreen>
     <div>
       <div className="flex flex-wrap gap-4 justify-center mb-8">
         {cards.map(({ Component }, index) => (
@@ -54,16 +58,17 @@ const EmpresasAtivasInativas = ({
         ))}
       </div>
 
-      <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="charts-items-wrapper">
+      <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="charts-items-wrapper !grid-cols-1 sm:!grid-cols-2 lg:!grid-cols-2 !place-items-stretch">
         {chartOrder.map((index) => {
-          const { Component } = charts[index];
-          console.log('ChartData ->', chartData)
+          const chart = charts[index] as typeof charts[number] & { full?: boolean; rowSpan?: number };
+          const { Component, full, rowSpan } = chart;
 
           return (
             <div
               key={index}
-              className={`chart-content-wrapper`}
+              className={`chart-content-wrapper relative ${full ? "col-span-full" : ""} ${rowSpan === 2 ? "row-span-2" : ""}`}
             >
+              <SectionIconBadge icon={<EmpresasIcon />} />
               <React.Suspense fallback={<GraphSkeleton />}>
                 <ErrorBoundary>
                   <Component data={chartData} />
@@ -74,6 +79,7 @@ const EmpresasAtivasInativas = ({
         })}
       </SortableDiv>
     </div>
+    </FitToScreen>
   );
 };
 

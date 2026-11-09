@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import { observeMapResize } from "../observeMapResize";
 
 const UF_POR_CODIGO: Record<string, string> = {
   "11": "RO", "12": "AC", "13": "AM", "14": "RR", "15": "PA", "16": "AP", "17": "TO",
@@ -99,6 +100,9 @@ export default function BrazilCapagMap({ municipioSelecionado, onSelectMunicipio
       maxBounds: LIMITES_BRASIL,
       maxBoundsViscosity: 1.0,
     }).setView([-14.673, -51.26], 4);
+    // Container muda de tamanho depois de criado (escala do painel, grade) —
+    // sem isso o mapa ficava metade cinza.
+    const stopResizeWatch = observeMapResize(map, mapDivRef.current);
     mapRef.current = map;
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -130,6 +134,7 @@ export default function BrazilCapagMap({ municipioSelecionado, onSelectMunicipio
 
     return () => {
       cancelado = true;
+      stopResizeWatch();
       map.remove();
       mapRef.current = null;
     };
@@ -137,13 +142,13 @@ export default function BrazilCapagMap({ municipioSelecionado, onSelectMunicipio
   }, []);
 
   return (
-    <div className="w-full h-full">
-      <div className="flex w-full justify-between items-center mb-2">
-        <strong className="text-lg">Selecione um município para comparar</strong>
+    <div className="w-full h-full flex flex-col">
+      <div className="bi-chart-title flex justify-between items-center">
+        <strong className="text-[15px] font-semibold">Selecione um município para comparar</strong>
         {ufAtivo && (
           <button
             onClick={voltarParaEstados}
-            className="text-sm px-3 py-1 rounded-md bg-[#0155AE] text-white hover:opacity-90"
+            className="text-xs px-3 py-0.5 rounded-md bg-white/20 text-white hover:bg-white/30"
           >
             ← Voltar aos estados
           </button>
@@ -155,7 +160,9 @@ export default function BrazilCapagMap({ municipioSelecionado, onSelectMunicipio
         </p>
       )}
       {carregando && <p className="text-sm text-gray-400 mb-2">Carregando municípios...</p>}
-      <div ref={mapDivRef} style={{ height: "500px", width: "100%" }} />
+      {/* Preenche o card (bi-map-fill) — com a altura padrão sobrava espaço
+          branco embaixo do mapa. Fora do modo tela única: mínimo de 420px. */}
+      <div ref={mapDivRef} className="bi-map-fill flex-1" style={{ minHeight: "420px", width: "100%" }} />
     </div>
   );
 }

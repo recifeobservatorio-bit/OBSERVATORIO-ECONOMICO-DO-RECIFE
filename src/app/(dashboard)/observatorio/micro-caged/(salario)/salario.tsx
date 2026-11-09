@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 
+import SectionIconBadge from "@/components/@global/cards/SectionIconBadge";
+import FitToScreen from "@/components/@global/features/FitToScreen";
 import SelectPrincipal from "@/components/@global/features/SelectPrincipal";
 import { SortableDiv } from "@/components/@global/features/SortableDiv";
+import { EmpregosIcon } from "@/components/@global/icons/sectionIcons";
 import { getSmFiltred } from "@/functions/process_data/observatorio/micro-caged/getSmFiltred";
 import { microCagedCboDicts } from "@/utils/dicts/micro-caged/microCagedCboDicts";
 import { getUniqueValues } from "@/utils/filters/@global/getUniqueValues";
@@ -64,6 +67,7 @@ const Salario = ({
   }, [data])
 
   return (
+    <FitToScreen>
     <div>
       <div className="">
         <SelectPrincipal
@@ -101,7 +105,7 @@ const Salario = ({
       </div>
 
       <div className="flex flex-col gap-6">
-        <SortableDiv chartOrder={tableOrder} setChartOrder={setTableOrder} sortableContainerRef={sortableContainerTableRef} style={`charts-items-wrapper ${selectCompare.length > 1 ? "md:!grid-cols-2 " : "!grid-cols-1"}`}>
+        <SortableDiv chartOrder={tableOrder} setChartOrder={setTableOrder} sortableContainerRef={sortableContainerTableRef} style={`grid items-stretch grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4 ${selectCompare.length > 1 ? "md:!grid-cols-2 " : "!grid-cols-1"}`}>
           {tablesRender.map(({ Component }, index) => { 
 
             return (
@@ -110,25 +114,25 @@ const Salario = ({
                   {selectCompare[index]}
                 </p>
                 <div
-                  className="bg-white shadow-md rounded-lg flex flex-col items-center w-full min-h-[800px]"
+                  className="bg-white shadow-md rounded-lg flex flex-col items-center w-full min-h-[800px] relative"
                 >
-          
+                    <SectionIconBadge icon={<EmpregosIcon />} />
                     <Component
                       profissao={[...tempFiltred, ...tempFiltredCBO.map((cbo) => microCagedCboDicts[cbo])]}
                       color={ColorPalette.default[index]}
                       data={chartData.filter((obj: any) => obj['município'] === selectCompare[index])}
                       year={year}
                     />
-                </div> 
+                </div>
               </div>
- 
+
           )})}
         </SortableDiv>
       </div>
 
       <div className="flex flex-col gap-6">
-        <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerTableRef} style={`charts-items-wrapper ${selectCompare.length > 1 ? "md:!grid-cols-2 " : "!grid-cols-1"}`}>
-          {chartsRender.map(({ Component }, index) => { 
+        <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerTableRef} style={`grid items-stretch grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4 ${selectCompare.length > 1 ? "md:!grid-cols-2 " : "!grid-cols-1"}`}>
+          {chartsRender.map(({ Component }, index) => {
 
             return (
               <div  key={index} className="w-full">
@@ -136,9 +140,9 @@ const Salario = ({
                   {selectCompare[index]}
                 </p>
                 <div
-                  className="chart-content-wrapper"
+                  className="chart-content-wrapper relative"
                 >
-          
+                    <SectionIconBadge icon={<EmpregosIcon />} />
                     <Component
                       profissao={[...tempFiltred, ...tempFiltredCBO.map((cbo) => microCagedCboDicts[cbo])]}
                       color={ColorPalette.default[index]}
@@ -152,6 +156,7 @@ const Salario = ({
         </SortableDiv>
       </div>
     </div>
+    </FitToScreen>
   );
 };
 

@@ -26,8 +26,8 @@ const CapagPage = () => {
   if (isLoading) return <LoadingScreen />;
 
   return (
-    <div className="p-6 min-h-screen mt-48">
-      <h1 className="text-4xl font-bold text-gray-800 text-center mb-8 tracking-wide dark:text-gray-200">
+    <div className="bi-page">
+      <h1 className="bi-page-title">
         CAPAG — Capacidade de Pagamento
       </h1>
 

@@ -10,7 +10,7 @@ import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
 const EstoqueCeiVinculado = ({
   data,
-  title = "Distribuição formal de empregos por Gênero",
+  title = "Indicador de CEI Vinculado",
   year,
 }: any) => {
   const [showPercentage, setShowPercentage] = useState(true);

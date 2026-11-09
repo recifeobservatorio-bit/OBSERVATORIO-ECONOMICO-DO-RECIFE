@@ -24,15 +24,21 @@ const PortoOperacoesTable = ({
 
   const header = ["Mês", yearCur, yearPast, "Variação"];  
 
+  const formatTon = (value: number) =>
+    Number(value || 0).toLocaleString("pt-BR", { maximumFractionDigits: 0 });
+
   const getRows = (values: any) => {
       const rows: string[][] = [];
 
       values.map((obj: any) => {
+        // Mês ainda não divulgado pela Antaq vem como 0 — mostrava "0.00" e
+        // "-100%", como se a movimentação tivesse zerado.
+        const semDado = !Number(obj["current"]);
         rows.push([
           obj["mes"],
-          `${obj["current"]}`,
-          `${obj["past"]}`,
-          `${percentFormatter(obj["variation"])}%`,
+          semDado ? "—" : formatTon(obj["current"]),
+          formatTon(obj["past"]),
+          semDado ? "—" : `${String(percentFormatter(obj["variation"])).replace(".", ",")}%`,
         ]);
       });
 

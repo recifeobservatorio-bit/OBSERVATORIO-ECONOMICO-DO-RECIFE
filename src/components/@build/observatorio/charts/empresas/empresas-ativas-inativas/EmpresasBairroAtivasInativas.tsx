@@ -2,13 +2,14 @@
 
 import React from "react";
 
+import HorizontalScrollableBarChart from "@/components/@global/charts/HorizontalScrollableBarChart";
 import ChartGrabber from "@/components/@global/features/ChartGrabber";
+import { formatBairroLabel } from "@/utils/formatters/@global/formatBairroLabel";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
-import StackedBarChart from "@/components/@global/charts/StackedVerticalBarChart";
 
 const EmpresasBairroAtivasInativas = ({
   data,
-  colors = ColorPalette.default,
+  colors = [ColorPalette.status.good, ColorPalette.status.bad],
   title = "Empresas por Bairro",
   year,
 }: any) => {
@@ -18,30 +19,32 @@ const EmpresasBairroAtivasInativas = ({
     const ativaNum = data['ativas']['nome_bairro'][key] || 0
     const inativaNum = data['inativas']['nome_bairro'][key] || 0
 
-    return { label: key, ativa: ativaNum, inativa: inativaNum } 
+    return { label: formatBairroLabel(key), ativa: ativaNum, inativa: inativaNum }
   }).sort((a, b) => (b['ativa'] + b['inativa']) - (a['ativa'] + a['inativa']))
 
   return (
     <div className="chart-wrapper">
       <ChartGrabber>
-        <StackedBarChart
+        <HorizontalScrollableBarChart
         data={chartData}
         title={title}
-        colors={colors.slice(1)}
+        colors={colors}
         xKey="label"
         bars={[
-          { 
-            dataKey: "ativa", 
+          {
+            dataKey: "ativa",
             name: "Ativas",
+            stackId: "empresas",
           },
-          { 
-            dataKey: "inativa", 
+          {
+            dataKey: "inativa",
             name: "Inativas",
+            stackId: "empresas",
           },
         ]}
-        tooltipEntry=""
-        heightPerCategory={80} // Define a altura de cada barra
-        visibleHeight={400} // Define a altura visível para scroll
+        widthMultiply={110}
+        heightToPass={362}
+        maxBarSize={28}
       />
       </ChartGrabber>
     </div>

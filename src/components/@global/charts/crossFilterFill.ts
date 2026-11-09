@@ -1,6 +1,9 @@
 import { useMemo } from "react";
 
 import { ChartSelection, useChartSelection } from "@/context/ChartSelectionContext";
+import { useOptionalDashboard } from "@/context/DashboardContext";
+
+import { useChartEmphasis } from "./useChartEmphasis";
 
 export const CROSS_FILTER_ACCENT = "#EC6625";
 
@@ -45,17 +48,42 @@ export function resolveChartCrossFilter<T>({
 export function useChartCrossFilter<T>(
   chartId: string,
   data: T[],
-  getCategory: (entry: T) => unknown
+  getCategory: (entry: T) => unknown,
+  title?: string,
+  options: { emphasis?: boolean } = {}
 ) {
-  const { selection, select } = useChartSelection();
+  const { selection, select: selectLocal } = useChartSelection();
+  const dashboard = useOptionalDashboard();
+  const toggleFilterValue = dashboard?.toggleFilterValue;
+
+  // Em gráficos de categoria (`emphasis`), a categoria escolhida no filtro da página fica em
+  // evidência e as outras esmaecidas, em vez de sumirem.
+  const { data: emphasizedData, emphasisOpacity } = useChartEmphasis({
+    enabled: !!options.emphasis,
+    data,
+    getCategory,
+    title,
+    filters: dashboard?.filters,
+  });
 
   const { active, visibleData } = useMemo(
-    () => resolveChartCrossFilter({ myId: chartId, selection, data, getCategory }),
+    () => resolveChartCrossFilter({ myId: chartId, selection, data: emphasizedData, getCategory }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [chartId, selection, data]
+    [chartId, selection, emphasizedData]
   );
 
-  return { crossFilterActive: active, visibleData, select };
+  // Clicar numa categoria muda o filtro da própria página (Navbar) quando o valor pertence a algum
+  // filtro dela. Se não pertence (dimensão sem filtro) ou é ambíguo, cai no cross-filter local antigo.
+  const select = (sourceId: string, value: string) => {
+    if (toggleFilterValue?.(value, { hint: title })) return;
+    selectLocal(sourceId, value);
+  };
+
+  // Só filtro real, sem cross-filter local — para gráficos que nunca foram origem de seleção local
+  // (linhas: clicar num mês/ano muda o filtro de mês/ano, e não faz nada se não houver filtro).
+  const pickFilter = (value: string) => toggleFilterValue?.(value, { hint: title }) ?? false;
+
+  return { crossFilterActive: active, visibleData, select, pickFilter, emphasisOpacity };
 }
 
 /**

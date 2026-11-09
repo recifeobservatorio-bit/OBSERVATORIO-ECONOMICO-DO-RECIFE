@@ -3,11 +3,12 @@
 import { useEffect, useState } from "react";
 
 import { EmpresasData } from "@/@api/http/to-charts/empresas/EmpresasData";
-import StackerBarChartVertical from "@/components/@global/charts/StackedVerticalBarChart";
+import CompactHorizontalBarChart from "@/components/@global/charts/CompactHorizontalBarChart";
 import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
 import { getAccTextGroup } from "@/functions/process_data/observatorio/micro-caged/getAccTextGroup";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
+import { EmpresasIcon } from "./icons";
 import PanoramaCard from "./PanoramaCard";
 
 const EmpresasPorGrupo = ({ year }: { year: string }) => {
@@ -32,22 +33,29 @@ const EmpresasPorGrupo = ({ year }: { year: string }) => {
   if (!chartData) return <GraphSkeleton />;
 
   const hasData = chartData.some((d) => d.value > 0);
+  const total = chartData.reduce((acc, d) => acc + (Number(d.value) || 0), 0);
 
   return (
-    <PanoramaCard title="Empresas Ativadas por Grupo Econômico">
+    <PanoramaCard
+      title="Empresas Ativadas por Grupo"
+      icon={<EmpresasIcon />}
+      metricLabel="Total ativadas"
+      metric={total.toLocaleString("pt-BR")}
+      source="Fonte: Prefeitura do Recife"
+    >
       {!hasData ? (
         <p className="text-center text-sm text-gray-500 dark:text-gray-400 py-8">
           Sem dados de empresas abertas para {year}.
         </p>
       ) : (
-        <StackerBarChartVertical
+        <CompactHorizontalBarChart
           data={chartData}
           xKey="label"
           colors={ColorPalette.default}
-          bars={[{ dataKey: "value", name: "Empresas", showPercentage: true }]}
-          heightPerCategory={55}
-          visibleHeight={300}
-          widthY={130}
+          bars={[{ dataKey: "value", name: "Empresas" }]}
+          height={340}
+          widthY={80}
+          showPercentage
         />
       )}
     </PanoramaCard>

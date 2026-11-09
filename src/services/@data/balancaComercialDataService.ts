@@ -2,6 +2,7 @@ import { BalancaComercialData } from "@/@api/http/to-charts/bal_comercial/Balanc
 import type { BalancaGeralData } from "@/@types/observatorio/@data/balancaComercialData";
 import { Filters } from "@/@types/observatorio/shared";
 import { applyGenericFilters } from "@/utils/filters/@features/applyGenericFilters";
+import { computeAvailableYears } from "@/utils/filters/@features/computeAvailableYears";
 
 export class BalancaDataService {
   private static instance: BalancaDataService;
@@ -31,10 +32,12 @@ export class BalancaDataService {
     const balancaService = new BalancaComercialData(this.currentYear);
 
     const raw = await balancaService.fetchProcessedData();
+    const allYears = await balancaService.fetchAllYearsData();
 
     const filtered = {
       ...applyGenericFilters(raw, filters),
       filteredDataSemMes: applyGenericFilters(raw, filters, ["Mês"]).filteredData,
+      yearsOptions: computeAvailableYears(allYears, (r: any) => r.Ano),
     };
 
 

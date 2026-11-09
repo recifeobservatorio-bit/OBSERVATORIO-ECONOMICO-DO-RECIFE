@@ -39,10 +39,12 @@ const TaxaDesempregoCapitais = ({
           title={titleAdd}
           xKey="label"
           bars={[{ dataKey: "value", name: "Taxa" }]}
-          colors={ColorPalette.default}
+          colors={[ColorPalette.status.bad]}
+          highlightColor={ColorPalette.status.good}
           heightPerCategory={50}
           widthY={130}
           left={-15}
+          visibleHeight={430}
         />
       </ChartGrabber>
     </div>

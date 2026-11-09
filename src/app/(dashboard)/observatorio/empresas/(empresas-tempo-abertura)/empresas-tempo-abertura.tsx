@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 
+import SectionIconBadge from "@/components/@global/cards/SectionIconBadge";
+import FitToScreen from "@/components/@global/features/FitToScreen";
 import SelectCompare from "@/components/@global/features/SelectCompare";
 import SelectPrincipal from "@/components/@global/features/SelectPrincipal";
 import { SortableDiv } from "@/components/@global/features/SortableDiv";
+import { EmpresasIcon } from "@/components/@global/icons/sectionIcons";
 import { getGroupValues, getUniqueValues } from "@/utils/filters/@global/getUniqueValues";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
@@ -44,17 +47,20 @@ const EmpresasTempoAbertura = ({
 
 
   const tempFiltredCard = tempFiltred.filter((municipio) => municipio !== selectCompare)
+  // Sem outro município escolhido pra comparar, mostra os cards do próprio município base
+  // (selectCompare) em vez de esconder tudo atrás do aviso "Selecione um município".
+  const citiesToShow = tempFiltredCard.length >= 1 ? tempFiltredCard : (selectCompare ? [selectCompare] : [])
 
   const handlePageChange = (direction: "prev" | "next") => {
     setAnimationClass("card-exit"); // Aplica a animação de saída
     setTimeout(() => {
       setPageCompare((prevPage) =>
         direction === "next"
-          ? prevPage === tempFiltredCard.length - 1
+          ? prevPage === citiesToShow.length - 1
             ? 0
             : prevPage + 1
           : prevPage === 0
-          ? tempFiltredCard.length - 1
+          ? citiesToShow.length - 1
           : prevPage - 1
       );
       setAnimationClass("card-enter"); // Aplica a animação de entrada após a mudança
@@ -63,6 +69,7 @@ const EmpresasTempoAbertura = ({
 
 
   return (
+    <FitToScreen>
     <div>
       <SelectPrincipal
         options={toCompare}
@@ -87,32 +94,34 @@ const EmpresasTempoAbertura = ({
       </div>
 
       <div className="flex justify-between items-center gap-2">
-        {tempFiltredCard.length >= 1 ? (
+        {citiesToShow.length >= 1 ? (
           <>
-            <button
-              className="border transition duration-500 hover:bg-slate-200 dark:hover:bg-[#0F253D] bg-white dark:bg-[#0C1A28] dark:border-gray-600 rounded-full w-10 h-10 flex items-center justify-center"
-              onClick={() => handlePageChange("prev")}
-            >
-              <svg
-                className={`h-4 w-4 text-gray-500 dark:text-gray-300 transition-transform duration-200 rotate-90`}
-                viewBox="0 0 20 20"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+            {citiesToShow.length > 1 && (
+              <button
+                className="border transition duration-500 hover:bg-slate-200 dark:hover:bg-[#0F253D] bg-white dark:bg-[#0C1A28] dark:border-gray-600 rounded-full w-10 h-10 flex items-center justify-center"
+                onClick={() => handlePageChange("prev")}
               >
-                <path d="M6 8l4 4 4-4" />
-              </svg>
-            </button>
+                <svg
+                  className={`h-4 w-4 text-gray-500 dark:text-gray-300 transition-transform duration-200 rotate-90`}
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M6 8l4 4 4-4" />
+                </svg>
+              </button>
+            )}
 
             <div className="w-[85%] flex flex-wrap gap-4 justify-center mb-2">
-              {tempFiltredCard.map((toCompare: string) => {
+              {citiesToShow.map((toCompare: string) => {
                 return cards.map(({ Component }, index) => (
                   <React.Suspense fallback={<div>Carregando...</div>} key={index}>
                     <div
                       className={`${
-                        toCompare === tempFiltredCard[pageCompare]
+                        toCompare === citiesToShow[pageCompare]
                           ? animationClass
                           : "hidden"
                       } flex-1`}
@@ -130,22 +139,24 @@ const EmpresasTempoAbertura = ({
               })}
             </div>
 
-            <button
-              className="border transition duration-500 hover:bg-slate-200 dark:hover:bg-[#0F253D] bg-white dark:bg-[#0C1A28] dark:border-gray-600 rounded-full w-10 h-10 flex items-center justify-center"
-              onClick={() => handlePageChange("next")}
-            >
-              <svg
-                className={`h-4 w-4 text-gray-500 dark:text-gray-300 transition-transform duration-200 -rotate-90`}
-                viewBox="0 0 20 20"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+            {citiesToShow.length > 1 && (
+              <button
+                className="border transition duration-500 hover:bg-slate-200 dark:hover:bg-[#0F253D] bg-white dark:bg-[#0C1A28] dark:border-gray-600 rounded-full w-10 h-10 flex items-center justify-center"
+                onClick={() => handlePageChange("next")}
               >
-                <path d="M6 8l4 4 4-4" />
-              </svg>
-            </button>
+                <svg
+                  className={`h-4 w-4 text-gray-500 dark:text-gray-300 transition-transform duration-200 -rotate-90`}
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M6 8l4 4 4-4" />
+                </svg>
+              </button>
+            )}
           </>
         ) : (
           <p className="text-center w-full text-gray-700 dark:text-gray-300">
@@ -155,7 +166,7 @@ const EmpresasTempoAbertura = ({
       </div>
 
       <div className="flex items-center justify-center mb-6 gap-2">
-        {tempFiltredCard.map((_, i) => {
+        {citiesToShow.length > 1 && citiesToShow.map((_, i) => {
           return (
             <button
               key={i}
@@ -170,15 +181,16 @@ const EmpresasTempoAbertura = ({
 
       <div className="flex flex-col gap-6">
 
-      <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="charts-items-wrapper">
+      <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="charts-items-wrapper 2xl:!grid-cols-2">
         {chartOrder.map((index) => {
           const { Component } = charts[index];
 
           return (
             <div
               key={index}
-              className={`chart-content-wrapper`}
+              className={`chart-content-wrapper relative`}
             >
+              <SectionIconBadge icon={<EmpresasIcon />} />
               <React.Suspense fallback={<GraphSkeleton />}>
                 <ErrorBoundary>
                   <Component toCompare={[...tempFiltred]} data={chartData} color={ColorPalette.default[0]} />
@@ -190,6 +202,7 @@ const EmpresasTempoAbertura = ({
       </SortableDiv>
       </div>
     </div>
+    </FitToScreen>
   );
 };
 

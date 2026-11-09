@@ -41,9 +41,7 @@ export const ExploreDiv: React.FC<ExploreDivProps> = ({ searchTerm }) => {
               className={`grid w-full justify-center ${
                 totalResults === 1
                   ? "grid-cols-1 justify-center"
-                  : totalResults === 4
-                  ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-8 sm:gap-x-8 lg:px-16 sm:px-8"
-                  : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 lg:px-32 sm:px-32"
+                  : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-y-8 sm:gap-x-8 lg:px-16 sm:px-8"
               } justify-items-center text-center gap-y-24 mt-24 observatorio-icon-wrapper`}
             >
               {section.items.map((item) => (

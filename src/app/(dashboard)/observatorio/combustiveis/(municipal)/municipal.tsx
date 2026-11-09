@@ -2,7 +2,10 @@
 
 import React, { useRef, useState } from "react";
 
+import SectionIconBadge from "@/components/@global/cards/SectionIconBadge";
+import FitToScreen from "@/components/@global/features/FitToScreen";
 import { SortableDiv } from "@/components/@global/features/SortableDiv";
+import { CombustiveisIcon } from "@/components/@global/icons/sectionIcons";
 import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
 import ErrorBoundary from "@/utils/loader/errorBoundary";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
@@ -14,12 +17,14 @@ const Municipal = ({ data }: { data: any }) => {
   const sortableContainerRef = useRef<HTMLDivElement>(null);
 
   return (
+    <FitToScreen>
     <div className="pb-4">
-      <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="charts-items-wrapper">
+      <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="grid bi-grid-2x2 items-stretch grid-cols-1 lg:grid-cols-2 gap-4 pb-4">
         {chartOrder.map((index) => {
-          const { Component, wide } = charts[index];
+          const { Component } = charts[index];
           return (
-            <div key={index} className={`chart-content-wrapper${wide ? " col-span-full" : ""}`}>
+            <div key={index} className="chart-content-wrapper relative">
+              <SectionIconBadge icon={<CombustiveisIcon />} />
               <React.Suspense fallback={<GraphSkeleton />}>
                 <ErrorBoundary>
                   <Component data={data} colors={ColorPalette.default} />
@@ -30,6 +35,7 @@ const Municipal = ({ data }: { data: any }) => {
         })}
       </SortableDiv>
     </div>
+    </FitToScreen>
   );
 };
 

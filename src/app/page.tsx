@@ -18,9 +18,9 @@ const Page = () => {
 
   return (
     <div className="min-h-screen dark:bg-[#0C1B2B]">
-      <Banner onSearch={handleSearch} />
-      <ExploreSection searchTerm={searchTerm} />
+      <Banner />
       <DataHighlightsScroller />
+      <ExploreSection searchTerm={searchTerm} onSearch={handleSearch} />
       <SocialIconsContainer />
       <Footer />
     </div>

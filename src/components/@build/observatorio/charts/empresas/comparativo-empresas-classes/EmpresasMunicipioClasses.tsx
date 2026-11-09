@@ -9,7 +9,7 @@ import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
 const EmpresasMunicipioClasses = ({
   data,
-  title = "Empresas por Natureza Jurídica",
+  title = "Empresas por Natureza Jurídica nas Capitais NE",
   year,
 }: any) => {
   const dataRawData = data 
@@ -29,6 +29,7 @@ const EmpresasMunicipioClasses = ({
           heightPerCategory={50}
           widthY={130}
           left={-15}
+          maxBarSize={20}
         />
       </ChartGrabber>
     </div>

@@ -18,8 +18,45 @@ function normalizeBigInt(rows: any[]) {
 const cache: Record<string, any[] | undefined> = {};
 const fetching: Record<string, Promise<any[]> | undefined> = {};
 
+// RAIS não tem um dataset "todos os anos" pra inspecionar (ver comentário acima) — pra saber
+// quais anos existem sem editar código quando um rais_<ano>.parquet novo é publicado, sondamos
+// (HEAD, sem baixar o arquivo) os anos seguintes ao maior já conhecido, parando na primeira
+// falha. Resultado cacheado uma vez por sessão (não sonda de novo a cada fetch).
+const KNOWN_YEARS = ["2021", "2022", "2023", "2024", "2025"];
+const MAX_YEARS_TO_PROBE_AHEAD = 5;
+let probedYearsCache: string[] | null = null;
+let probedYearsPromise: Promise<string[]> | null = null;
+
+async function probeAvailableYears(): Promise<string[]> {
+  if (probedYearsCache) return probedYearsCache;
+  if (probedYearsPromise) return probedYearsPromise;
+
+  probedYearsPromise = (async () => {
+    const years = [...KNOWN_YEARS];
+    let nextYear = Math.max(...years.map(Number)) + 1;
+    for (let i = 0; i < MAX_YEARS_TO_PROBE_AHEAD; i++) {
+      try {
+        const url = `${process.env.NEXT_PUBLIC_API_BASE_LOGIN}/data/rais_${nextYear}.parquet`;
+        const res = await fetch(url, { method: "HEAD" });
+        if (!res.ok) break;
+        years.push(String(nextYear));
+        nextYear++;
+      } catch {
+        break;
+      }
+    }
+    probedYearsCache = years;
+    return years;
+  })();
+  return probedYearsPromise;
+}
+
 export class RaisData {
   constructor(private year: string) {}
+
+  static probeAvailableYears(): Promise<string[]> {
+    return probeAvailableYears();
+  }
 
   async fetchProcessedDataRais(): Promise<any[]> {
     const year = this.year;

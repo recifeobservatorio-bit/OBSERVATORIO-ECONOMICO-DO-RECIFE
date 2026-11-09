@@ -9,7 +9,7 @@ import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
 const ImportacaoExportacaoPorPais = ({
   data = [],
-  colors = ColorPalette.default,
+  colors = [ColorPalette.status.bad, ColorPalette.status.good],
 }: ChartBuild<BalancaHeaders[]>) => {
   const chartData = processImportacaoExportacaoPorPais(data);
 
@@ -19,7 +19,7 @@ const ImportacaoExportacaoPorPais = ({
         <StackerBarChartVertical
         data={chartData}
         title="Importação vs Exportação por País"
-        colors={colors.slice(1)}
+        colors={colors}
         xKey="pais"
         bars={[
           { 
@@ -36,7 +36,7 @@ const ImportacaoExportacaoPorPais = ({
           },
         ]}
         tooltipEntry=" dólares"
-        heightPerCategory={60}  // Define a altura de cada categoria (barra)
+        heightPerCategory={36}  // Define a altura de cada categoria (barra)
         visibleHeight={400}  // Ajuste a altura do scroll
         left={0}
         widthY={100}

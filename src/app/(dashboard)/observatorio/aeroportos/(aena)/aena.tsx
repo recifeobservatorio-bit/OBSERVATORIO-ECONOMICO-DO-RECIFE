@@ -2,7 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 
 import { AenaCargasData, AenaPassageirosData } from "@/@types/observatorio/@data/aeroportoData";
 import { AenaCargasHeaders, AenaPassageirosHeaders } from "@/@types/observatorio/@fetch/aeroporto";
+import SectionIconBadge from "@/components/@global/cards/SectionIconBadge";
+import FitToScreen from "@/components/@global/features/FitToScreen";
 import { SortableDiv } from "@/components/@global/features/SortableDiv";
+import { AeroportoIcon } from "@/components/@global/icons/sectionIcons";
 import { LoadingScreen } from "@/components/home/LoadingScreen";
 import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
 import { useDashboard } from "@/context/DashboardContext";
@@ -38,6 +41,7 @@ const [filteredCargas, setFilteredCargas] = useState<AenaCargasHeaders[]>([]);
   if (isLoading) return <LoadingScreen />;
 
   return (
+    <FitToScreen>
     <div className="p-6">
       <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-8 text-center">
         Movimentação AENA
@@ -78,7 +82,8 @@ const [filteredCargas, setFilteredCargas] = useState<AenaCargasHeaders[]>([]);
             const rawData = type === 'carga' ? data?.cargas?.rawDataCargas|| [] : data?.passageiros?.rawDataPassageiros || [];
 
             return (
-              <div key={`chart-${index}`} className="chart-content-wrapper">
+              <div key={`chart-${index}`} className="chart-content-wrapper relative">
+                <SectionIconBadge icon={<AeroportoIcon />} />
                 <React.Suspense fallback={<GraphSkeleton />}>
                 <Component data={filteredData as AenaCargasHeaders[] & AenaPassageirosHeaders[]} dataSemMes={filteredDataSemMes as AenaCargasHeaders[] & AenaPassageirosHeaders[]} rawData={rawData as AenaCargasHeaders[] & AenaPassageirosHeaders[]} months={months} />
                 </React.Suspense>
@@ -88,6 +93,7 @@ const [filteredCargas, setFilteredCargas] = useState<AenaCargasHeaders[]>([]);
         })}
       </SortableDiv>
     </div>
+    </FitToScreen>
   );
 };
 

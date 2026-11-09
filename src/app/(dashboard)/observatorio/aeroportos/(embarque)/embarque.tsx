@@ -3,7 +3,10 @@ import React, { useRef, useState } from "react";
 import { AnacGeralData } from "@/@types/observatorio/@data/aeroportoData";
 import { AnacGeralHeaders } from "@/@types/observatorio/@fetch/aeroporto";
 import { ChartBuild } from "@/@types/observatorio/shared";
+import SectionIconBadge from "@/components/@global/cards/SectionIconBadge";
+import FitToScreen from "@/components/@global/features/FitToScreen";
 import { SortableDiv } from "@/components/@global/features/SortableDiv";
+import { AeroportoIcon } from "@/components/@global/icons/sectionIcons";
 import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
 
 import charts from "./@imports/charts";
@@ -19,11 +22,12 @@ const Embarque: React.FC<ChartBuild> = ({
   const sortableContainerRef = useRef<HTMLDivElement>(null);
 
   return (
+    <FitToScreen>
     <div>
-      <div className="flex items-center justify-center mb-6"> 
+      <div className="flex items-center justify-center mb-2">
           <div className="bg-[#D1D5DB] dark:bg-gray-600 rounded-full p-1">
-            <div className="bg-white dark:bg-gray-800 rounded-full font-semibold items-center grid grid-cols-2  gap-2 text-center relative text-gray-500 dark:text-gray-400 p-2">
-             <div className={`transition duration-300 absolute bg-gradient-to-r from-blue-500 to-blue-700 w-1/2 h-full rounded-full ${type[0] === 'Embarque' ? 'transform translate-x-0' : 'transform translate-x-full'} p-4 `}></div>
+            <div className="bg-white dark:bg-gray-800 rounded-full font-semibold items-center grid grid-cols-2  gap-2 text-center relative text-gray-500 dark:text-gray-400 px-1 py-0.5 text-sm">
+             <div className={`transition duration-300 absolute bg-gradient-to-r from-blue-500 to-blue-700 w-1/2 h-full rounded-full ${type[0] === 'Embarque' ? 'transform translate-x-0' : 'transform translate-x-full'} `}></div>
              <button onClick={() => {
               if (type[0] !== 'Embarque') {
                 setType(['Embarque'])
@@ -46,14 +50,15 @@ const Embarque: React.FC<ChartBuild> = ({
           </div>
       </div>
 
-      <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="charts-items-wrapper">
-        {chartOrder.map((index) => { 
+      <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="grid items-stretch grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-4">
+        {chartOrder.map((index) => {
           const { Component } = charts[index];
             return (
             <div
               key={index}
-              className={`chart-content-wrapper`}
+              className={`chart-content-wrapper relative`}
             >
+              <SectionIconBadge icon={<AeroportoIcon />} />
               <React.Suspense fallback={<GraphSkeleton />}>
                 <Component
                   toCompare={toCompare ?? []}
@@ -66,6 +71,7 @@ const Embarque: React.FC<ChartBuild> = ({
           )})}
       </SortableDiv>
     </div>
+    </FitToScreen>
   );
 };
 

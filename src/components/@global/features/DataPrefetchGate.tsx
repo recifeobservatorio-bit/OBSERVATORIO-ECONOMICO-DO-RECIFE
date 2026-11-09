@@ -6,6 +6,7 @@ import { AeroportoData } from "@/@api/http/to-charts/aeroporto/AeroportoData";
 import { BalancaComercialData } from "@/@api/http/to-charts/bal_comercial/BalancaComercialData";
 import { fetchCapagRaw } from "@/@api/http/to-charts/capag/CapagData";
 import { fetchCombustiveisRaw } from "@/@api/http/to-charts/combustiveis/CombustiveisData";
+import { EconomiaCriativaRaisData } from "@/@api/http/to-charts/economia-criativa/EconomiaCriativaRaisData";
 import { EmpregosData } from "@/@api/http/to-charts/empregos/EmpregosData";
 import { EmpresasData } from "@/@api/http/to-charts/empresas/EmpresasData";
 import { IpcaData } from "@/@api/http/to-charts/ipca/IPCAData";
@@ -57,6 +58,7 @@ function buildWarmers(): Array<() => Promise<unknown>> {
     () => porto.fetchCargaPorAno(),
     () => porto.fetchPassageirosPorAno(),
     () => new RaisData(YEAR).fetchProcessedDataRais(),
+    () => new EconomiaCriativaRaisData(YEAR).fetchProcessedDataRais(),
     () => ranking.fetchProcessedGeralData(),
     () => ranking.fetchProcessedDimensaoData(),
     () => ranking.fetchProcessedIndicadorData(),

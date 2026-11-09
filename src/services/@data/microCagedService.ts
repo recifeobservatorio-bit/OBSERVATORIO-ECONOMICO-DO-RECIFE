@@ -1,6 +1,7 @@
 import { MicroCagedData } from "@/@api/http/to-charts/micro_caged/MicroCagedData";
 import { applyGenericFilters } from "@/utils/filters/@features/applyGenericFilters";
 import { applyHashedFilters } from "@/utils/filters/@features/applyHashedFilters";
+import { computeAvailableYears } from "@/utils/filters/@features/computeAvailableYears";
 import { gropoHash } from "@/utils/hashs/micro-caged/gropoHash";
 
 export class MicroCagedDataService {
@@ -33,12 +34,14 @@ export class MicroCagedDataService {
     const microCagedData = new MicroCagedData(this.currentYear);
 
     const fetchData = await microCagedData.fetchProcessedDataMicroCaged()
+    const allYears = await microCagedData.fetchAllYearsMicroCaged();
 
     const filteredData = {
       ...applyGenericFilters(fetchData, filtersHashed, ['grupamento']),
       // Usado só pelo comparativo-mov (ComparativoMovimentacao/ComparativoSaldo, linhas por
       // mês) — ignora também 'mês', senão a linha vira um ponto só quando um mês é selecionado.
       filteredDataSemMes: applyGenericFilters(fetchData, filtersHashed, ['grupamento', 'mês']).filteredData,
+      yearsOptions: computeAvailableYears(allYears, (r: any) => r["Ano"]),
     };
 
     return {
@@ -55,7 +58,8 @@ export class MicroCagedDataService {
 
     // comparativo-med (ComparativoMedia/ComparativoVariacao) só tem gráficos de linha por mês —
     // ignora o filtro de 'mês' aqui, senão a linha vira um ponto só quando um mês é selecionado.
-    const filteredDataCur = applyGenericFilters(microCagedCur, filters, ['mês'])
+    const allYears = await microCagedData.fetchAllYearsMicroCaged();
+    const filteredDataCur = { ...applyGenericFilters(microCagedCur, filters, ['mês']), yearsOptions: computeAvailableYears(allYears, (r: any) => r["Ano"]) };
     const filteredDataPast = applyGenericFilters(microCagedPast, filters, ['mês'])
 
     // const fetchData = await microCagedData.fetchProcessedDataMicroCaged() 

@@ -150,7 +150,7 @@ const Navbar = () => {
                   const remaining = f.selected.length - 5;
                   return (
                     <li key={f.label}>
-                      {f.label}: <strong>{visible}</strong>
+                      {f.displayLabel || f.label}: <strong>{visible}</strong>
                       {remaining > 0 && <span> ... e outros {remaining}</span>}
                     </li>
                   );
@@ -199,7 +199,7 @@ const Navbar = () => {
                   {/* Additional filters */}
                   {tempFilters.additionalFilters?.map((f: AdditionalFilter) => (
                     <div key={f.label} className="relative flex flex-col">
-                      <label className="text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">{f.label}</label>
+                      <label className="text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">{f.displayLabel || f.label}</label>
                       <button
                         onClick={() => {
                           toggleDropdown(f.label);
@@ -229,16 +229,18 @@ const Navbar = () => {
                               }}
                               className="border rounded mb-2 px-2 py-1 text-sm w-full dark:text-gray-300 dark:bg-[#152638] dark:border-gray-600"
                             />
-                            <button
-                              onClick={() => {
-                                handleSelectAll(f.label);
-                              }}
-                              className="text-blue-600 font-medium hover:underline w-[max-content] block mb-2"
-                            >
-                              {f.selected.length === f.options.length
-                                ? "Desselecionar Todos"
-                                : "Selecionar Todos"}
-                            </button>
+                            {f.allowMultiple !== false && (
+                              <button
+                                onClick={() => {
+                                  handleSelectAll(f.label);
+                                }}
+                                className="text-blue-600 font-medium hover:underline w-[max-content] block mb-2"
+                              >
+                                {f.selected.length === f.options.length
+                                  ? "Desselecionar Todos"
+                                  : "Selecionar Todos"}
+                              </button>
+                            )}
 
                             {f.options
                               .sort((a: string, b: string) => {

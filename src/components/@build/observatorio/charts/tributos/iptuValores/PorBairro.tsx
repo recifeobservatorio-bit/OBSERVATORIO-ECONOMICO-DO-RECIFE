@@ -1,6 +1,6 @@
 "use client";
 
-import HorizontalScrollableBarChart from "@/components/@global/charts/HorizontalScrollableBarChart";
+import VerticalScrollableBarChart from "@/components/@global/charts/VerticalScrollableBarChart";
 import ChartGrabber from "@/components/@global/features/ChartGrabber";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
@@ -10,15 +10,12 @@ const PorBairro = ({ data, title = "Valor Total do IPTU por Bairro", colors = Co
   return (
     <div className="chart-wrapper">
       <ChartGrabber>
-        <HorizontalScrollableBarChart
+        <VerticalScrollableBarChart
           data={chartData}
           title={title}
           colors={[colors[1]]}
           xKey="bairro"
           bars={[{ dataKey: "valor", name: "Valor Total (R$)" }]}
-          widthMultiply={130}
-          heightToPass={285}
-          tooltipEntry="R$"
         />
       </ChartGrabber>
     </div>

@@ -40,7 +40,7 @@ const SelectCompare = ({
 
 
   return (
-    <div className="relative flex flex-col">
+    <div className="bi-compare-select relative flex flex-col">
         <label className="text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">{label}</label>
         <button
         onClick={() => {

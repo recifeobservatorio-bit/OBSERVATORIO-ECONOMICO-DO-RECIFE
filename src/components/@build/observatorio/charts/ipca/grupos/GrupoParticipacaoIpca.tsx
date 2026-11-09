@@ -4,7 +4,7 @@ import React from "react";
 
 import { IpcaGrupoHeaders } from "@/@types/observatorio/@fetch/ipca";
 import { ChartBuild } from "@/@types/observatorio/shared";
-import VerticalScrollableBarChart from "@/components/@global/charts/VerticalScrollableBarChart";
+import BarChart from "@/components/@global/charts/BarChart";
 import ChartGrabber from "@/components/@global/features/ChartGrabber";
 import { processPercentageByType } from "@/functions/process_data/observatorio/ipca/grupos/charts/participacaoGrupo";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
@@ -21,7 +21,7 @@ const GrupoParticipacaoIpca = ({
   return (
     <div className="chart-wrapper">
       <ChartGrabber>
-        <VerticalScrollableBarChart
+        <BarChart
           data={chartData}
           title={title}
           colors={colors.slice(1)}

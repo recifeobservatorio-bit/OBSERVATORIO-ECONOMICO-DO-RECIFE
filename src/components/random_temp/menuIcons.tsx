@@ -177,6 +177,23 @@ export const menuItems = [
 
         // COMBUSTÍVEIS
         {
+          label: "Economia Criativa",
+          icon: (
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="stroke-gray-500 dark:stroke-[#e5e7eb]">
+              <rect x="3" y="11" width="18" height="9" rx="1.5" style={{ fill: "none !important" }} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              <g transform="rotate(-8 12 6.2)" style={{ fill: "none !important" }} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="4.2" width="18" height="4" rx="1" />
+                <line x1="7" y1="4.2" x2="7" y2="8.2" />
+                <line x1="11" y1="4.2" x2="11" y2="8.2" />
+                <line x1="15" y1="4.2" x2="15" y2="8.2" />
+                <line x1="19" y1="4.2" x2="19" y2="8.2" />
+              </g>
+            </svg>
+          ),
+          href: "/observatorio/economia-criativa?tab=perfil",
+          visible: ["admin", "teacher", "student", "parent"],
+        },
+        {
           label: "Combustíveis",
           icon: (
             <svg viewBox="0 0 74 74" fill="none" xmlns="http://www.w3.org/2000/svg" className="stroke-gray-500 dark:stroke-[#e5e7eb]">

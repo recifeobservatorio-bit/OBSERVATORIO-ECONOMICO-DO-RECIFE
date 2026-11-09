@@ -2,7 +2,10 @@
 
 import React, {  useMemo, useRef, useState } from "react";
 
+import SectionIconBadge from "@/components/@global/cards/SectionIconBadge";
+import FitToScreen from "@/components/@global/features/FitToScreen";
 import { SortableDiv } from "@/components/@global/features/SortableDiv";
+import { EmpresasIcon } from "@/components/@global/icons/sectionIcons";
 import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
 import ErrorBoundary from "@/utils/loader/errorBoundary";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
@@ -41,6 +44,7 @@ const EmpresasClasses = ({
   
 
   return (
+    <FitToScreen>
     <div>
       <div className="flex flex-wrap gap-4 justify-center mb-8">
         {cards.map(({ Component }, index) => (
@@ -56,14 +60,15 @@ const EmpresasClasses = ({
         ))}
       </div>
 
-      <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="charts-items-wrapper">
+      <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="flex flex-wrap items-center justify-center gap-8 pb-16">
         {chartOrder.map((index) => {
           const { Component } = charts[index];
           return (
             <div
               key={index}
-              className={`chart-content-wrapper`}
+              className={`chart-content-wrapper relative grow basis-full sm:basis-[calc(50%-1rem)] lg:basis-[calc(33.333%-1.333rem)]`}
             >
+              <SectionIconBadge icon={<EmpresasIcon />} />
               <React.Suspense fallback={<GraphSkeleton />}>
                 <ErrorBoundary>
                   <Component data={chartData} />
@@ -74,6 +79,7 @@ const EmpresasClasses = ({
         })}
       </SortableDiv>
     </div>
+    </FitToScreen>
   );
 };
 

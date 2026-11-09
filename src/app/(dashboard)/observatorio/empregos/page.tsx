@@ -42,7 +42,7 @@ const EmpregosPage = () => {
         setCaged({
           caged: data.caged.filteredData,
           municipios: data.municipios.filteredData,
-          municipiosPorAno: data.municipiosPorAno ?? [],
+          municipiosPorMes: data.municipiosPorMes ?? [],
         })
 
         clearInterval(intervalId)
@@ -50,7 +50,7 @@ const EmpregosPage = () => {
         setCaged({
           caged: [],
           municipios: [],
-          municipiosPorAno: [],
+          municipiosPorMes: [],
         })
       }
 
@@ -58,6 +58,7 @@ const EmpregosPage = () => {
         setDesemprego({
           desemprego: data.desemprego.filteredData,
           municipios: data.municipios.filteredData,
+          historico: data.historico ?? { capital: [], brasil: [] },
           trimestre: {
             municipiosTrimestre:
               data.trimestre.municipiosTrimestre.filteredData,
@@ -71,6 +72,7 @@ const EmpregosPage = () => {
         setDesemprego({
           desemprego: [],
           municipios: [],
+          historico: { capital: [], brasil: [] },
           trimestre: {
             municipiosTrimestre: [],
             municipiosTrimestrePast: [],
@@ -134,58 +136,58 @@ const EmpregosPage = () => {
   if (isLoading) return <LoadingScreen />
 
   return (
-    <div className="p-6 min-h-screen mt-48">
-      <h1 className="text-4xl font-bold text-gray-800 text-center mb-8 tracking-wide dark:text-gray-200">
+    <div className="bi-page">
+      <h1 className="bi-page-title">
         Variação e Atividade dos Empregos
       </h1>
-      <div className="flex justify-center gap-6 mb-8 flex-wrap">
+      <div className="bi-tabs">
         {/* Botões de navegação */}
         <button
           onClick={() => handleNavigation('geral')}
-          className={`px-6 py-3 rounded-lg flex-1 sm:flex-0 min-w-[250px] max-w-[350px] text-lg font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg ${
+          className={`bi-tab ${
             activeTab === 'geral'
-              ? 'bg-gradient-to-r from-orange-500 to-orange-700 text-white'
-              : 'bg-gray-300 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
+              ? 'bi-tab-active'
+              : ''
           }`}
         >
           Resumo Geral
         </button>
         <button
           onClick={() => handleNavigation('comparativo')}
-          className={`px-6 py-3 rounded-lg flex-1 sm:flex-0 min-w-[300px] max-w-[350px] text-lg font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg ${
+          className={`bi-tab ${
             activeTab === 'comparativo'
-              ? 'bg-gradient-to-r from-blue-500 to-blue-700 text-white'
-              : 'bg-gray-300 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
+              ? 'bi-tab-active'
+              : ''
           }`}
         >
           Comparativo
         </button>
         <button
           onClick={() => handleNavigation('desemprego')}
-          className={`px-6 py-3 rounded-lg flex-1 sm:flex-0 min-w-[250px] max-w-[350px] text-lg font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg ${
+          className={`bi-tab ${
             activeTab === 'desemprego'
-              ? 'bg-gradient-to-r from-green-500 to-green-700 text-white'
-              : 'bg-gray-300 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
+              ? 'bi-tab-active'
+              : ''
           }`}
         >
           Desemprego
         </button>
         <Link
           href={'rais?tab=geral'}
-          className={`px-6 py-3 rounded-lg flex items-center justify-center flex-1 sm:flex-0 min-w-[250px] max-w-[350px] text-lg font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg ${
+          className={`bi-tab flex items-center justify-center ${
             activeTab === 'rais'
-              ? 'bg-gradient-to-r from-purple-500 to-purple-700 text-white'
-              : 'bg-gray-300 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
+              ? 'bi-tab-active'
+              : ''
           }`}
         >
           <i>RAIS</i>
         </Link>
         <Link
           href={'micro-caged?tab=geral'}
-          className={`px-6 py-3 rounded-lg flex items-center justify-center flex-1 sm:flex-0 min-w-[250px] max-w-[350px] text-lg font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg ${
+          className={`bi-tab flex items-center justify-center ${
             activeTab === 'rais'
-              ? 'bg-gradient-to-r from-purple-500 to-purple-700 text-white'
-              : 'bg-gray-300 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
+              ? 'bi-tab-active'
+              : ''
           }`}
         >
           <i>Microdados (CAGED)</i>

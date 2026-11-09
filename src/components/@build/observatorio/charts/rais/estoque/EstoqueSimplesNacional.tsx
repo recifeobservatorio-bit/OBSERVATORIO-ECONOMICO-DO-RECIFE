@@ -10,7 +10,7 @@ import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
 const EstoqueSimplesNacional = ({
   data,
-  title = "Distribuição formal de empregos por Gênero",
+  title = "Indicador de Simples Nacional",
   year,
 }: any) => {
   const [showPercentage, setShowPercentage] = useState(true);

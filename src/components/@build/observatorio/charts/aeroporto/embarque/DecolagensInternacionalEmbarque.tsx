@@ -4,7 +4,7 @@ import React from "react";
 
 import { AnacGeralHeaders } from "@/@types/observatorio/@fetch/aeroporto";
 import { ChartBuild } from "@/@types/observatorio/shared";
-import HorizontalScrollableBarChart from "@/components/@global/charts/HorizontalScrollableBarChart";
+import VerticalScrollableBarChart from "@/components/@global/charts/VerticalScrollableBarChart";
 import ChartGrabber from "@/components/@global/features/ChartGrabber";
 import { processEmbarqueDesembarqueNaturezaTipo } from "@/functions/process_data/observatorio/aeroporto/embarque/embarqueDesembarqueNaturezaTipo";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
@@ -31,21 +31,17 @@ const DecolagensIntEmbarque = ({
   return (
     <div className="chart-wrapper">
       <ChartGrabber>
-        <HorizontalScrollableBarChart
+        <VerticalScrollableBarChart
           data={chartData}
           title={`${type} ${title}`}
           colors={[colors[1]]}
           xKey="uf"
           bars={[{ dataKey: "total", name: "Decolagens" }]}
-          height={400} // Altura do viewport visível para scroll
-          barSize={30} // Altura individual de cada barra
-          widthMultiply={130}
-          heightToPass={285}
         />
-        <div className="w-full flex justify-center mt-4">
+        <div className="w-full flex justify-center mt-0.5">
           {subText && (
             <p
-              className="font-medium"
+              className="text-xs font-semibold leading-4"
               style={{ color: colors[1] }} // Aplica a cor dinamicamente
             >
               {subText}

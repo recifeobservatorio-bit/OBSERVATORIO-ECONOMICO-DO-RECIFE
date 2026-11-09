@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 
 import { PortoPassageirosOutputData } from "@/@types/observatorio/@data/portoData";
+import SectionIconBadge from "@/components/@global/cards/SectionIconBadge";
+import FitToScreen from "@/components/@global/features/FitToScreen";
 import { SortableDiv } from "@/components/@global/features/SortableDiv";
+import { PortosIcon } from "@/components/@global/icons/sectionIcons";
 import { LoadingScreen } from "@/components/home/LoadingScreen";
 import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
 import { useDashboard } from "@/context/DashboardContext";
@@ -16,6 +19,8 @@ const defaultPassageiros: PortoPassageirosOutputData = {
   passageiros: {
     current: [],
     past: [],
+    currentSemMes: [],
+    pastSemMes: [],
     porAno: [],
   },
 };
@@ -39,6 +44,8 @@ const AenaPage = () => {
           passageiros: {
             current: data?.passageiros?.current.filteredData || [],
             past: data?.passageiros?.past.filteredData || [],
+            currentSemMes: data?.passageiros?.currentSemMes || [],
+            pastSemMes: data?.passageiros?.pastSemMes || [],
             porAno: data?.passageiros?.porAno || [],
           }
         };
@@ -52,13 +59,16 @@ const AenaPage = () => {
   if (isLoading) return <LoadingScreen />;
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-8 text-center">
+    <FitToScreen>
+    {/* Tela única: 3 gráficos + tabela numa grade 2×2 (a tabela ocupava uma
+        linha inteira e os gráficos ficavam baixos); título e margens enxutos. */}
+    <div className="lg:grid lg:grid-cols-2 lg:gap-4">
+      <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-2 text-center lg:col-span-2 lg:mb-0">
         Movimentação Passageiros (Recife)
       </h2>
 
       {/* Cards de Passageiros e Cargas */}
-      <div className="flex flex-wrap gap-4 justify-center mb-8">
+      <div className="flex flex-wrap gap-4 justify-center mb-8 lg:col-span-2 lg:mb-0">
         {cards.slice(0, 1).map(({ Component }, index) => (
           <React.Suspense fallback={<div>Carregando...</div>} key={index}>
             <Component data={passageiros} cards={cards.slice(1)} year={""} color={ColorPalette.default} />
@@ -67,17 +77,18 @@ const AenaPage = () => {
       </div>
 
     {/* Gráficos de Passageiros e Cargas */}
-    <SortableDiv 
-        chartOrder={chartOrder} 
-        setChartOrder={setChartOrder} 
-        sortableContainerRef={sortableContainerRef} 
-        style="charts-items-wrapper"
+    <SortableDiv
+        chartOrder={chartOrder}
+        setChartOrder={setChartOrder}
+        sortableContainerRef={sortableContainerRef}
+        style="grid items-stretch grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:contents"
       >
         {chartOrder.map((index) => {
-          const { Component, col } = charts[index];
+          const { Component } = charts[index];
 
           return (
-            <div key={index} className={`chart-content-wrapper ${col === 'full' && 'col-span-full'}`}>
+            <div key={index} className="chart-content-wrapper relative">
+              <SectionIconBadge icon={<PortosIcon />} />
               <React.Suspense fallback={<GraphSkeleton />}>
                 <Component data={passageiros} months={12} />
               </React.Suspense>
@@ -88,15 +99,16 @@ const AenaPage = () => {
         {/* se colocar o tablerOrder.map aki o nda pra trocar a tabela de lugar se n da erro  */}
       </SortableDiv>
 
-      <SortableDiv chartOrder={tableOrder} setChartOrder={setTableOrder} sortableContainerRef={sortableContainerTableRef} style="charts-items-wrapper">
+      <SortableDiv chartOrder={tableOrder} setChartOrder={setTableOrder} sortableContainerRef={sortableContainerTableRef} style="grid items-stretch grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4 lg:contents">
           {tableOrder.map((index) => {
           const { Component } = tables[index];
          
           return ( 
             <div
               key={index}
-              className="bg-white shadow-md rounded-lg flex flex-col items-center w-full"
+              className="bg-white shadow-md rounded-lg flex flex-col items-center w-full relative"
             >
+              <SectionIconBadge icon={<PortosIcon />} />
               <React.Suspense fallback={<div>Carregando...</div>}>
                 <Component
                   color={ColorPalette.default[index]}
@@ -107,6 +119,7 @@ const AenaPage = () => {
           )})}
         </SortableDiv>
     </div>
+    </FitToScreen>
   );
 };
 

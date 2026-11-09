@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 
 import { EmpregosData } from "@/@api/http/to-charts/empregos/EmpregosData";
-import VerticalScrollableBarChart from "@/components/@global/charts/VerticalScrollableBarChart";
+import CompactHorizontalBarChart from "@/components/@global/charts/CompactHorizontalBarChart";
 import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
+import { EmpregosIcon } from "./icons";
 import PanoramaCard from "./PanoramaCard";
 
 const EmpregosMovimentacao = ({ year }: { year: string }) => {
@@ -37,20 +38,26 @@ const EmpregosMovimentacao = ({ year }: { year: string }) => {
   const hasData = chartData.some((d) => d.value > 0);
 
   return (
-    <PanoramaCard title="Movimentação de Empregos" subtitle={`Saldo: ${saldo.toLocaleString("pt-BR")} vagas`}>
+    <PanoramaCard
+      title="Movimentação de Empregos"
+      icon={<EmpregosIcon />}
+      metricLabel="Saldo"
+      metric={`${saldo.toLocaleString("pt-BR")} vagas`}
+      source="Fonte: Novo Caged"
+    >
       {!hasData ? (
         <p className="text-center text-sm text-gray-500 dark:text-gray-400 py-8">
           Sem dados de empregos para {year}.
         </p>
       ) : (
-        <VerticalScrollableBarChart
+        <CompactHorizontalBarChart
           data={chartData}
           xKey="label"
           colors={ColorPalette.default}
           bars={[{ dataKey: "value", name: "Pessoas" }]}
           highlightValues={[]}
-          visibleHeight={280}
-          widthY={130}
+          height={340}
+          widthY={80}
         />
       )}
     </PanoramaCard>

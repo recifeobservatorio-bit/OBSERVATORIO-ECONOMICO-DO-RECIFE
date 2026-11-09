@@ -7,6 +7,7 @@ import LineChart from "@/components/@global/charts/LineChart";
 import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
+import { IpcaIcon } from "./icons";
 import PanoramaCard from "./PanoramaCard";
 
 const IpcaMensal = () => {
@@ -27,13 +28,22 @@ const IpcaMensal = () => {
 
   if (!chartData) return <GraphSkeleton />;
 
+  const latest = chartData[chartData.length - 1];
+
   return (
-    <PanoramaCard title="IPCA Índice Mensal Recife">
+    <PanoramaCard
+      title="IPCA Índice Mensal"
+      icon={<IpcaIcon />}
+      metricLabel="Variação atual"
+      metric={latest ? `${Number(latest.variacao).toLocaleString("pt-BR", { maximumFractionDigits: 2 })}%` : "-"}
+      source="Fonte: IBGE"
+    >
       <LineChart
         data={chartData}
         xKey="mes"
         colors={ColorPalette.default}
         lines={[{ dataKey: "variacao", name: "Variação Mensal (%)" }]}
+        height={340}
       />
     </PanoramaCard>
   );

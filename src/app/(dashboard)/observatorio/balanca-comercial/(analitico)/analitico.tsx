@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 
 import { BalancaHeaders } from "@/@types/observatorio/@fetch/balanca-comercial";
+import SectionIconBadge from "@/components/@global/cards/SectionIconBadge";
+import FitToScreen from "@/components/@global/features/FitToScreen";
 import SelectPrincipal from "@/components/@global/features/SelectPrincipal";
+import { BalancaComercialIcon } from "@/components/@global/icons/sectionIcons";
 import { getUniqueValues } from "@/utils/filters/@global/getUniqueValues";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
@@ -56,6 +59,7 @@ const Analitico = ({
   };
 
   return (
+    <FitToScreen>
     <div>
       <SelectPrincipal
         options={toCompare}
@@ -66,8 +70,11 @@ const Analitico = ({
       />
 
       <div className="flex justify-between items-center gap-2 h-full">
-        <div className="flex flex-col gap-6">
-       
+        {/* Tela única: com um município só, as seções Negociações e Grupos de
+            Produtos ficam lado a lado (empilhadas a aba não cabia na tela). Com
+            comparação, cada seção mostra os dois municípios lado a lado. */}
+        <div className={tablesRender.length === 1 ? "grid grid-cols-1 lg:grid-cols-2 gap-4 w-full bi-tables-fill-screen" : "flex flex-col gap-6 w-full"}>
+        <div className="flex flex-col gap-3 min-w-0">
          <div className="flex items-center justify-between gap-2">
             <div className="flex-1 h-[1px] bg-gray-800 dark:bg-gray-200"></div>
             <p className="text-gray-800 dark:text-gray-200">Negociações</p>
@@ -84,8 +91,9 @@ const Analitico = ({
                 <React.Suspense fallback={<div>Carregando...</div>} key={index}>
                     <div
                       style={{ backgroundColor: ColorPalette.default[index] }}
-                      className="shadow-md rounded-lg w-100 flex flex-col items-center"
+                      className="shadow-md rounded-lg w-100 flex flex-col items-center relative"
                     >
+                      <SectionIconBadge icon={<BalancaComercialIcon />} />
                       <Component
                         municipio={[...tempFiltred][index]}
                         color={ColorPalette.default[index]}
@@ -102,6 +110,8 @@ const Analitico = ({
             })}
           </div>
           
+        </div>
+        <div className="flex flex-col gap-3 min-w-0">
           <div className="flex items-center justify-between gap-2">
             <div className="flex-1 h-[1px] bg-gray-800 dark:bg-gray-200"></div>
             <p className="text-gray-800 dark:text-gray-200">Grupos de Produtos</p>
@@ -116,7 +126,8 @@ const Analitico = ({
 
               return (
                 <React.Suspense fallback={<div>Carregando...</div>} key={index}>
-                    <div className="bg-white shadow-md rounded-lg w-100 flex flex-col items-center">
+                    <div className="bg-white shadow-md rounded-lg w-100 flex flex-col items-center relative">
+                      <SectionIconBadge icon={<BalancaComercialIcon />} />
                       <Secundary
                         municipio={[...tempFiltred][index]}
                         color={ColorPalette.default[index]}
@@ -130,10 +141,12 @@ const Analitico = ({
               );
             })}
           </div>
+        </div>
          
         </div>
       </div>
     </div>
+    </FitToScreen>
   );
 };
 

@@ -1,6 +1,7 @@
 import { EmpresasData } from "@/@api/http/to-charts/empresas/EmpresasData";
 import { applyGenericFilters } from "@/utils/filters/@features/applyGenericFilters";
 import { applyHashedFilters } from "@/utils/filters/@features/applyHashedFilters";
+import { computeAvailableYears } from "@/utils/filters/@features/computeAvailableYears";
 import { gropoHash } from "@/utils/hashs/micro-caged/gropoHash";
 
 export class EmpresasDataService {
@@ -37,11 +38,13 @@ export class EmpresasDataService {
       new EmpresasData(pastYear).fetchProcessedEmpresasAtivasRecife().catch(() => []),
     ]);
 
+    const allYears = await empresasData.fetchAllYearsEmpresasAtivasRecife();
     const filteredData = {
       ...applyGenericFilters(fetchData, filters),
       filteredDataSemMes: applyGenericFilters(fetchData, filters, ["mes"]).filteredData,
       // Ano anterior inteiro (sem filtro de mês) — usado para Janeiro "puxar" Dezembro do ano passado.
       filteredDataSemMesPast: applyGenericFilters(fetchDataPast, filters, ["mes"]).filteredData,
+      yearsOptions: computeAvailableYears(allYears, (r: any) => r.Ano),
     };
 
     return {
@@ -60,12 +63,14 @@ export class EmpresasDataService {
       new EmpresasData(pastYear).fetchProcessedEmpresasAtivasPorAno().catch(() => []),
     ]);
 
+    const allYears = await empresasData.fetchAllYearsEmpresasAtivas();
     const filteredData = {
       ...applyGenericFilters(fetchData, filters),
       filteredDataSemMes: applyGenericFilters(fetchData, filters, ["mes"]).filteredData,
       // Ano anterior inteiro (sem filtro de mês) — usado pra comparar o mês atual com o
       // mesmo mês do ano passado ("Variação" e "Empresas Abertas anteriormente").
       filteredDataSemMesPast: applyGenericFilters(fetchDataPast, filters, ["mes"]).filteredData,
+      yearsOptions: computeAvailableYears(allYears, (r: any) => r.Ano),
     };
 
     return {
@@ -84,12 +89,14 @@ export class EmpresasDataService {
       new EmpresasData(pastYear).fetchProcessedEmpresasInativasPorAno().catch(() => []),
     ]);
 
+    const allYears = await empresasData.fetchAllYearsEmpresasInativas();
     const filteredData = {
       ...applyGenericFilters(fetchData, filters),
       filteredDataSemMes: applyGenericFilters(fetchData, filters, ["mes"]).filteredData,
       // Ano anterior inteiro (sem filtro de mês) — usado pra comparar o período atual com o
       // mesmo período do ano passado ("Ano Anterior" e "Variação").
       filteredDataSemMesPast: applyGenericFilters(fetchDataPast, filters, ["mes"]).filteredData,
+      yearsOptions: computeAvailableYears(allYears, (r: any) => r.Ano),
     };
 
     return {
@@ -105,13 +112,20 @@ export class EmpresasDataService {
     const fetchDataAtivas = await empresasData.fetchProcessedEmpresasAtivasPorAno()
     const fetchDataInativas = await empresasData.fetchProcessedEmpresasInativasPorAno()
 
+    const [allYearsAtivas, allYearsInativas] = await Promise.all([
+      empresasData.fetchAllYearsEmpresasAtivas(),
+      empresasData.fetchAllYearsEmpresasInativas(),
+    ]);
+
     const filteredDataAtivas = {
       ...applyGenericFilters(fetchDataAtivas, filters),
       filteredDataSemMes: applyGenericFilters(fetchDataAtivas, filters, ["mes"]).filteredData,
+      yearsOptions: computeAvailableYears(allYearsAtivas, (r: any) => r.Ano),
     };
     const filteredDataInativas = {
       ...applyGenericFilters(fetchDataInativas, filters),
       filteredDataSemMes: applyGenericFilters(fetchDataInativas, filters, ["mes"]).filteredData,
+      yearsOptions: computeAvailableYears(allYearsInativas, (r: any) => r.Ano),
     };
 
     return {
@@ -133,7 +147,8 @@ export class EmpresasDataService {
         new EmpresasData(pastYear).fetchProcessedNaturezas().catch(() => []),
       ]);
 
-      const filteredData = applyGenericFilters(fetchData, filters);
+      const allYears = await empresasData.fetchAllYearsNaturezas();
+      const filteredData = { ...applyGenericFilters(fetchData, filters), yearsOptions: computeAvailableYears(allYears, (r: any) => r.Ano) };
       const filteredDataRawDataMunicipio = applyGenericFilters(fetchData, filters, ['Municipio']);
       const filteredDataRawDataMes = applyGenericFilters(fetchData, filters, ['mes']);
       // Ano anterior inteiro (sem filtro de mês) — usado pelos cards pra comparar o período
@@ -164,7 +179,8 @@ export class EmpresasDataService {
         new EmpresasData(pastYear).fetchProcessedClasses().catch(() => []),
       ]);
 
-      const filteredData = applyGenericFilters(fetchData, filters);
+      const allYears = await empresasData.fetchAllYearsClasses();
+      const filteredData = { ...applyGenericFilters(fetchData, filters), yearsOptions: computeAvailableYears(allYears, (r: any) => r.Ano) };
       const filteredDataRawDataMunicipio = applyGenericFilters(fetchData, filters, ['Municipio']);
       const filteredDataRawDataMes = applyGenericFilters(fetchData, filters, ['mes']);
       // comparativo-empresas-classes builds its 'mes' breakdown from rawData.municipio (it needs
@@ -195,8 +211,13 @@ export class EmpresasDataService {
     const fetchDataAbertas = await empresasData.fetchProcessedEmpresasAbertas() 
     const fetchDataFechadas = await empresasData.fetchProcessedEmpresasFechadas() 
 
-    const filteredDataAbertas = applyGenericFilters(fetchDataAbertas, filters);
-    const filteredDataFechadas = applyGenericFilters(fetchDataFechadas, filters);
+    const [allYearsAbertas, allYearsFechadas] = await Promise.all([
+      empresasData.fetchAllYearsAbertas(),
+      empresasData.fetchAllYearsFechadas(),
+    ]);
+
+    const filteredDataAbertas = { ...applyGenericFilters(fetchDataAbertas, filters), yearsOptions: computeAvailableYears(allYearsAbertas, (r: any) => r.Ano) };
+    const filteredDataFechadas = { ...applyGenericFilters(fetchDataFechadas, filters), yearsOptions: computeAvailableYears(allYearsFechadas, (r: any) => r["Ano de Baixa"]) };
 
     return {
       empresas: {
@@ -216,11 +237,12 @@ export class EmpresasDataService {
 
     // const fetchDataAbertas = await empresasData.fetchProcessedEmpresasAbertas() 
     // const fetchDataFechadas = await empresasData.fetchProcessedEmpresasFechadas() 
-    const fetchData = await empresasData.fetchProcessedTempoMedio() 
+    const fetchData = await empresasData.fetchProcessedTempoMedio()
+    const allYears = await empresasData.fetchAllYearsTempoMedio();
 
     // const filteredDataAbertas = applyGenericFilters(fetchDataAbertas, filters);
     // const filteredDataFechadas = applyGenericFilters(fetchDataFechadas, filters);
-    const filteredData = applyGenericFilters(fetchData, filters);
+    const filteredData = { ...applyGenericFilters(fetchData, filters), yearsOptions: computeAvailableYears(allYears, (r: any) => r.Ano) };
 
     return {
       empresas: filteredData,

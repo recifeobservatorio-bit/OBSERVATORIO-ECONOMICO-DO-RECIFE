@@ -5,7 +5,10 @@ import React, { useRef, useState } from "react";
 import { AnacGeralData } from "@/@types/observatorio/@data/aeroportoData";
 import { AnacGeralHeaders } from "@/@types/observatorio/@fetch/aeroporto";
 import { ChartBuild } from "@/@types/observatorio/shared";
+import SectionIconBadge from "@/components/@global/cards/SectionIconBadge";
+import FitToScreen from "@/components/@global/features/FitToScreen";
 import { SortableDiv } from "@/components/@global/features/SortableDiv";
+import { AeroportoIcon } from "@/components/@global/icons/sectionIcons";
 import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
 import ErrorBoundary from "@/utils/loader/errorBoundary";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
@@ -23,6 +26,7 @@ const Geral: React.FC<ChartBuild> = ({
   const sortableContainerRef = useRef<HTMLDivElement>(null);
 
   return (
+    <FitToScreen>
     <div>
       <div className="flex flex-wrap gap-4 justify-center mb-8">
         {cards.map(({ Component }, index) => (
@@ -32,14 +36,15 @@ const Geral: React.FC<ChartBuild> = ({
         ))}
       </div>
 
-      <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="charts-items-wrapper">
+      <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="grid items-stretch grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-4">
         {chartOrder.map((index) => {
           const { Component } = charts[index];
           return (
             <div
               key={index}
-              className={`chart-content-wrapper`}
+              className={`chart-content-wrapper relative`}
             >
+              <SectionIconBadge icon={<AeroportoIcon />} />
               <React.Suspense fallback={<GraphSkeleton />}>
                 <ErrorBoundary>
                   <Component data={data as AnacGeralHeaders[]} dataSemMes={dataSemMes as AnacGeralHeaders[]} rawData={rawData as AnacGeralHeaders[]} months={months} />
@@ -50,6 +55,7 @@ const Geral: React.FC<ChartBuild> = ({
         })}
       </SortableDiv>
     </div>
+    </FitToScreen>
   );
 };
 

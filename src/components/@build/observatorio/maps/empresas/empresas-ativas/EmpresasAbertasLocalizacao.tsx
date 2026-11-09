@@ -5,6 +5,7 @@ import L from "leaflet";
 
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 import { colorGroupHash, GroupType } from "@/utils/hashs/colorGroupHash";
+import { observeMapResize } from "../../observeMapResize";
 
 const LIMITES_BRASIL: L.LatLngBoundsExpression = [
   [-35, -75], // sudoeste
@@ -99,6 +100,9 @@ export default function EmpresasAbertas({ data }: CapitaisLocalizacaoProps) {
         </svg>
         Observatório Econômico do Recife`,
     }).addTo(map);
+    // Container muda de tamanho depois de criado (escala do painel, grade) —
+    // sem isso o mapa ficava metade cinza.
+    const stopResizeWatch = observeMapResize(map, mapRef.current);
 
     const geoJsonData = convertToGeoJSON(data);
 
@@ -138,24 +142,27 @@ export default function EmpresasAbertas({ data }: CapitaisLocalizacaoProps) {
     
 
     return () => {
+      stopResizeWatch();
       map.remove();
     };
 
 }, [data]);
 
   return (
-    <div className="w-full h-full">
-      <div className="flex w-full justify-center mb-2 text-lg">
-        <strong>Localiação de Empresas Ativas</strong>
+    <div className="w-full h-full flex flex-col">
+      <div className="flex w-full justify-center mb-1 text-base">
+        <strong>Localização de Empresas Ativas</strong>
       </div>
-      <div className="rounded-md border flex items-center justify-center p-4 gap-3 mb-3">
+      <div className="rounded-md border flex flex-wrap items-center justify-center px-2 py-1 gap-x-3 gap-y-1 mb-2 text-xs">
         {['Agropecuária', 'Comércio', 'Construção Civil', 'Indústria', 'Serviços'].map((group) => <div className="flex items-center gap-2">
-          <div style={{ backgroundColor: colorGroupHash[group as GroupType] ?? ColorPalette.default[1] }} className="h-4 w-4 rounded-full"></div>
+          <div style={{ backgroundColor: colorGroupHash[group as GroupType] ?? ColorPalette.default[1] }} className="h-3 w-3 rounded-full"></div>
           <p style={{ color: colorGroupHash[group as GroupType] ?? ColorPalette.default[1] }}>{group}</p>
         </div>)}
         
       </div>
-      <div ref={mapRef} style={{ height: "500px", width: "100%" }} />
+      {/* Preenche a altura da coluna do painel (bi-map-fill); fora do modo tela
+          única fica com no mínimo 420px. */}
+      <div ref={mapRef} className="bi-map-fill flex-1" style={{ minHeight: "420px", width: "100%" }} />
     </div>
   );
 }

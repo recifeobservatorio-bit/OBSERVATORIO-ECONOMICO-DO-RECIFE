@@ -15,7 +15,15 @@ const RelatorioGeral = ({
   year,
 }: any) => {
   const [showPercentage, setShowPercentage] = useState(true);
-  const chartData = processAccValues(data['caged']) 
+  const chartData = processAccValues(data['caged'])
+
+  // processAccValues ordena por valor, então a cor precisa seguir o rótulo, não o índice.
+  const colorByLabel: Record<string, string> = {
+    "Admissão": ColorPalette.status.good,
+    "Demissão": ColorPalette.status.bad,
+    "Saldo": ColorPalette.status.neutral,
+  };
+  const colors = chartData.map((entry: any) => colorByLabel[entry.label] ?? ColorPalette.default[0]);
 
   return (
     <div className="chart-wrapper">
@@ -31,7 +39,7 @@ const RelatorioGeral = ({
           }
           dataKey="value"
           nameKey="label"
-          colors={ColorPalette.default}
+          colors={colors}
           showPercentages={showPercentage}
           tooltipEntry=""
         />

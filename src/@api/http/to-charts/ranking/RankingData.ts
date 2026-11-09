@@ -60,12 +60,24 @@ export class RankingData {
     return filterByYear(await dimensaoFetcher.fetchAll(), this.year);
   }
 
+  async fetchProcessedDimensaoAllYears(): Promise<any[]> {
+    return dimensaoFetcher.fetchAll();
+  }
+
   async fetchProcessedIndicadorData(): Promise<any[]> {
     return filterByYear(await indicadorFetcher.fetchAll(), this.year);
   }
 
+  async fetchProcessedIndicadorAllYears(): Promise<any[]> {
+    return indicadorFetcher.fetchAll();
+  }
+
   async fetchProcessedPilaresData(): Promise<any[]> {
     return filterByYear(await pilaresFetcher.fetchAll(), this.year);
+  }
+
+  async fetchProcessedPilaresAllYears(): Promise<any[]> {
+    return pilaresFetcher.fetchAll();
   }
 
   clearCache(): void {

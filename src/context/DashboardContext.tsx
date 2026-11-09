@@ -14,8 +14,15 @@ import { HiddenChart, DashboardContextProps, DashboardData  } from "@/@types/obs
 import { Filters, AdditionalFilter } from "@/@types/observatorio/shared";
 import { getFiltersForRoute } from "@/utils/filters/@features/getFiltersForRoute";
 import { getServiceForRoute } from "@/utils/filters/@features/getServiceForRoute";
+import { clearChartSnapshots } from "@/utils/filters/@global/chartEmphasis";
+import { resolveFilterTarget } from "@/utils/filters/@global/resolveFilterTarget";
 
 const DashboardContext = createContext<DashboardContextProps<unknown> | undefined>(undefined);
+
+/** Quantos valores de filtro o usuário pode ter ativos por clique em gráfico, por aba. */
+export const MAX_CHART_PICKS_PER_TAB = 2;
+
+type ChartPick = { label: string; option: string };
 
 
 
@@ -29,6 +36,8 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
   const [hiddenCharts, setHiddenCharts] = useState<HiddenChart[]>([]);
 
   const prevFiltersRef = useRef<Filters | null>(null); // armazenar os filtros anteriores
+  // Valores de filtro escolhidos clicando em gráficos nesta aba, do mais antigo pro mais novo.
+  const chartPicksRef = useRef<ChartPick[]>([]);
 
   // Função para buscar os dados com base nos filtros
   const fetchData = async (filtersToUse: Filters) => {
@@ -116,6 +125,33 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
           return { ...prev, additionalFilters: merged };
         });
       }
+
+      // Anos realmente disponíveis nos dados, calculados pelo service (mesmo padrão do
+      // additionalFiltersOptions acima) — substitui a lista estática do config assim que
+      // os dados chegam, sem exigir editar código quando um ano novo é publicado.
+      const dynamicYears: string[] | undefined = Object.keys(fetched)
+        .filter((key) => key !== "id")
+        .map((key) => {
+          if (fetched?.[key]?.yearsOptions) return fetched[key].yearsOptions;
+          if (fetched?.[key] && typeof fetched[key] === "object") {
+            return Object.keys(fetched[key]).map((keyInter) => fetched[key][keyInter]?.yearsOptions);
+          }
+          return undefined;
+        })
+        .flat(Infinity)
+        .filter((val): val is string[] => Array.isArray(val) && val.length > 0)[0];
+
+      if (dynamicYears?.length) {
+        setFilters((prev) => {
+          const currentYear = prev.year ?? prev.years?.[prev.years.length - 1];
+          const yearStillValid = currentYear && dynamicYears.includes(currentYear);
+          return {
+            ...prev,
+            years: dynamicYears,
+            year: yearStillValid ? currentYear : dynamicYears[dynamicYears.length - 1],
+          };
+        });
+      }
     } catch (error) {
       console.error("Erro ao carregar dados:", error);
       setData(null);
@@ -132,6 +168,7 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const resetFilters = () => {
+    chartPicksRef.current = [];
     const tab = searchParams.get("tab") || "geral"; // Pega o valor do parâmetro 'tab' ou define como 'geral'
     let baseFilters = getFiltersForRoute(pathname, tab) as Filters;
   
@@ -164,6 +201,60 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
   };
   
 
+  const toggleFilterValue = (value: string, opts?: { filterLabel?: string; hint?: string }): boolean => {
+    const additional = filters.additionalFilters ?? [];
+    const target = resolveFilterTarget(value, additional, opts);
+    if (!target) {
+      // Ano não é um filtro adicional (vive em filters.year), então tem caminho próprio.
+      // Sempre um ano selecionado: clicar troca, e clicar no atual não faz nada.
+      if (!opts?.filterLabel && filters.years?.includes(String(value))) {
+        if (String(value) !== filters.year) void applyFilters({ ...filters, year: String(value) });
+        return true;
+      }
+      return false;
+    }
+
+    const { filter, option } = target;
+    const isSelected = !!filter.selected?.includes(option);
+
+    // Filtro de seleção única (ex.: mês) sempre tem exatamente um valor: clicar troca, e clicar
+    // no já selecionado não faz nada (não dá pra "desmarcar" — quem limpa é o botão do Navbar).
+    // Fica fora do limite de cliques por aba, que é para filtros exploratórios.
+    if (filter.allowMultiple === false) {
+      if (!isSelected) {
+        void applyFilters({
+          ...filters,
+          additionalFilters: additional.map((f) => (f.label === filter.label ? { ...f, selected: [option] } : f)),
+        });
+      }
+      return true;
+    }
+
+    const nextSelected = new Map<string, string[]>(additional.map((f) => [f.label, [...(f.selected ?? [])]]));
+    // Descarta cliques antigos que o usuário já desfez por outro caminho (Navbar).
+    let picks = chartPicksRef.current.filter((p) => nextSelected.get(p.label)?.includes(p.option));
+
+    if (isSelected) {
+      nextSelected.set(filter.label, nextSelected.get(filter.label)!.filter((o) => o !== option));
+      picks = picks.filter((p) => !(p.label === filter.label && p.option === option));
+    } else {
+      nextSelected.set(filter.label, [...nextSelected.get(filter.label)!, option]);
+      picks.push({ label: filter.label, option });
+      // Passou do limite: o clique mais antigo sai do filtro.
+      while (picks.length > MAX_CHART_PICKS_PER_TAB) {
+        const oldest = picks.shift()!;
+        nextSelected.set(oldest.label, nextSelected.get(oldest.label)!.filter((o) => o !== oldest.option));
+      }
+    }
+
+    chartPicksRef.current = picks;
+    void applyFilters({
+      ...filters,
+      additionalFilters: additional.map((f) => ({ ...f, selected: nextSelected.get(f.label)! })),
+    });
+    return true;
+  };
+
   // PARA GERENCIAR OS GRÁFICOS ESCONDIDOS
 
   const addHiddenChart = (chart: HiddenChart) => {
@@ -185,6 +276,8 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
     setData(null);
+    chartPicksRef.current = [];
+    clearChartSnapshots();
     console.log("🔵 Filtros mudaram, chamando fetchData...");
     prevFiltersRef.current = baseFilters;
     setFilters(baseFilters);
@@ -198,7 +291,8 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
       data, 
       isLoading, 
       applyFilters, 
-      resetFilters, 
+      resetFilters,
+      toggleFilterValue,
       setData,
       hiddenCharts,
       addHiddenChart,
@@ -208,6 +302,9 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
     </DashboardContext.Provider>
   );
 };
+
+/** Como useDashboard, mas devolve undefined fora do DashboardProvider em vez de lançar erro. */
+export const useOptionalDashboard = () => useContext(DashboardContext);
 
 export const useDashboard = () => {
   const context = useContext(DashboardContext);

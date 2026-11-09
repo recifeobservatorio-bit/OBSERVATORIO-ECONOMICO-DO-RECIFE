@@ -59,7 +59,7 @@ export const CardsCarousel = ({ absoluteDivRef, dataPassed, children, pageCompar
               </svg>
             </button>
 
-            <div className="w-[85%] flex flex-wrap gap-4 justify-center mb-2 relative overflow-hidden" style={{ height: height ? `${height}px` : "auto" }}>
+            <div className="flex-1 min-w-0 flex flex-wrap gap-4 justify-center mb-2 relative overflow-hidden" style={{ height: height ? `${height}px` : "auto" }}>
               {children}
             </div>
 

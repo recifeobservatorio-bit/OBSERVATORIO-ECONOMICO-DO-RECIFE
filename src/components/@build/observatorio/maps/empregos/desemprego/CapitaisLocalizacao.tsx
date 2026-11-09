@@ -3,9 +3,11 @@ import React, { useEffect, useRef } from "react";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
+import { useOptionalDashboard } from "@/context/DashboardContext";
 import { processDesempregoTaxaCapital } from "@/functions/process_data/observatorio/empregos/desemprego/desempregoTaxaCapital";
 import { capitaisCoordsDicts } from "@/utils/dicts/empregos/desemprego/capitaisCoordsDicts";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
+import { observeMapResize } from "../../observeMapResize";
 
 const LIMITES_BRASIL: L.LatLngBoundsExpression = [
   [-35, -75], // sudoeste
@@ -99,6 +101,10 @@ export default function CapitaisLocalizacao({ data }: CapitaisLocalizacaoProps) 
   console.log('DataMAp', data)
 
   const mapRef = useRef<HTMLDivElement | null>(null);
+  // Ref pra o efeito do Leaflet (que só re-roda quando os dados mudam) enxergar sempre a versão atual.
+  const toggleFilterValue = useOptionalDashboard()?.toggleFilterValue;
+  const toggleFilterRef = useRef(toggleFilterValue);
+  toggleFilterRef.current = toggleFilterValue;
 
   useEffect(() => {
 
@@ -134,6 +140,9 @@ export default function CapitaisLocalizacao({ data }: CapitaisLocalizacaoProps) 
         </svg>
         Observatório Econômico do Recife`,
     }).addTo(map);
+    // Container muda de tamanho depois de criado (escala do painel, grade) —
+    // sem isso o mapa ficava metade cinza.
+    const stopResizeWatch = observeMapResize(map, mapRef.current);
 
     const geoJsonData = convertToGeoJSON(data['desemprego']);
     console.log('RetrunGeo', geoJsonData)
@@ -157,6 +166,9 @@ export default function CapitaisLocalizacao({ data }: CapitaisLocalizacaoProps) 
           fillOpacity: 0.8,
         });
     
+        // Clicar no marcador escolhe essa capital no filtro da página.
+        circleMarker.on("click", () => toggleFilterRef.current?.(name));
+
         circleMarker.bindPopup(`
           <div>
             <h3 style="margin: 0; color: #0077cc; font-size: 17px;">📈 ${name}</h3>
@@ -173,6 +185,7 @@ export default function CapitaisLocalizacao({ data }: CapitaisLocalizacaoProps) 
     
 
     return () => {
+      stopResizeWatch();
       map.remove();
     };
 
@@ -183,7 +196,7 @@ export default function CapitaisLocalizacao({ data }: CapitaisLocalizacaoProps) 
       <div className="flex w-full justify-center mb-2 text-lg">
         <strong>Taxa das capitais por Localização</strong>
       </div>
-      <div ref={mapRef} style={{ height: "500px", width: "100%" }} />
+      <div ref={mapRef} style={{ height: "400px", width: "100%" }} />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import Card from '@/components/@global/cards/Card'
 import ComparativeCard from '@/components/@global/cards/ComparativeCard'
 import { monthLongName } from '@/utils/formatters/@global/monthLongName'
+import { monthOptionIndex } from '@/utils/filters/@global/monthFilterHelpers'
 
 const EmpresasTempoAberturaViabilidade = ({
   data,
@@ -17,15 +18,16 @@ const EmpresasTempoAberturaViabilidade = ({
     
     const dataFlat = dataKeys.map((dataMap) => dataEmpresas[dataMap]).flat()
     
-    const curMonthData = Array.from(new Set(dataFlat.map((data) => data['mes']))).sort((a: number, b: number) => b - a)[0]
+    const monthIndexes = dataFlat.map((data) => monthOptionIndex(data['Mes Deferimento'])).filter((idx) => idx >= 1 && idx <= 12)
+    const curMonthIndex = monthIndexes.length ? Math.max(...monthIndexes) : 0
 
-    const dataFiltred = dataFlat.filter((data: any) => data['mes'] === curMonthData)
+    const dataFiltred = dataFlat.filter((data: any) => monthOptionIndex(data['Mes Deferimento']) === curMonthIndex)
 
-    const curMonthName = monthLongName(+curMonthData)
+    const curMonthName = monthLongName(curMonthIndex)
 
-    const chartData = dataFiltred.find(data => data['Municipio'] === compare)?.['Tempo_Medio_Viabilidade'] || 0
-    
-    const chartData2 = dataFiltred.find(data => data['Municipio'] === toCompare)?.['Tempo_Medio_Viabilidade'] || 0
+    const chartData = dataFiltred.find(data => data['Municipio'] === compare)?.['Tempo Médio de Viabilidade'] || 0
+
+    const chartData2 = dataFiltred.find(data => data['Municipio'] === toCompare)?.['Tempo Médio de Viabilidade'] || 0
 
   return (
     <ComparativeCard
@@ -36,6 +38,7 @@ const EmpresasTempoAberturaViabilidade = ({
       data2={chartData2}
       comparative={comparative}
       compare={[toCompare, compare]}
+      lowerIsBetter
     />
   )
 }

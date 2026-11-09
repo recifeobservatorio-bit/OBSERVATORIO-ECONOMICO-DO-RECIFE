@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 
+import SectionIconBadge from "@/components/@global/cards/SectionIconBadge";
+import FitToScreen from "@/components/@global/features/FitToScreen";
 import SelectCompare from "@/components/@global/features/SelectCompare";
 import SelectPrincipal from "@/components/@global/features/SelectPrincipal";
 import { SortableDiv } from "@/components/@global/features/SortableDiv";
+import { EmpregosIcon } from "@/components/@global/icons/sectionIcons";
 import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
 import { raisCboDicts } from "@/utils/dicts/rais/raisCboDicts";
 import { raisCodCboDicts } from "@/utils/dicts/rais/raisCodCboDicts";
@@ -39,7 +42,8 @@ const Remuneracao = ({
   const cboOption = toCompare.map((opt: string) => `${raisCboDicts[opt]}`)
 
   return (
-    <div>
+    <FitToScreen>
+      <div>
       <div className="sm:grid sm:grid-cols-[60fr_40fr] gap-5">
         <SelectPrincipal
           options={toCompare}
@@ -72,8 +76,9 @@ const Remuneracao = ({
             return (
             <div
               key={index}
-              className="bg-white shadow-md rounded-lg flex flex-col items-center w-full min-h-[800px]"
+              className="bg-white shadow-md rounded-lg flex flex-col items-center w-full min-h-[800px] relative"
             >
+                <SectionIconBadge icon={<EmpregosIcon />} />
                 <Component
                   profissao={[...tempFiltred, ...tempFiltredCBO.map((cbo) => raisCodCboDicts[cbo])]}
                   color={ColorPalette.default[index]}
@@ -84,7 +89,8 @@ const Remuneracao = ({
           )})}
         </SortableDiv>
       </div>
-    </div>
+      </div>
+    </FitToScreen>
   );
 };
 

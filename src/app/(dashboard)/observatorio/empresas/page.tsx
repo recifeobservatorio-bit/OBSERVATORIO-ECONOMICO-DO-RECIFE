@@ -11,7 +11,6 @@ import { getYearSelected } from "@/utils/filters/@global/getYearSelected";
 
 import ComparativoMed from "./(comparativo-med)/comparativo-med";
 import EmpresasAtivas from "./(empresas-ativas)/empresas-ativas";
-import EmpresasAtivasRecife from "./(empresas-ativas-recife)/empresas-ativas-recife";
 import EmpresasInativas from "./(empresas-inativas)/empresas-inativas";
 import Salario from "./(salario)/salario";
 import EmpresasAtivasInativas from "./(empresas-ativas-inativas)/empresas-ativas-inativas";
@@ -30,7 +29,7 @@ const EmpresasPage = () => {
   const [dataObj, setDataObj] = useState<any>({});
   const [dataTest, setDataTest] = useState<any>({});
   const [dataTestTwo, setDataTestTwo] = useState<any>({});
-  const [activeTab, setActiveTab] = useState("geral");
+  const [activeTab, setActiveTab] = useState("empresas-ativas");
 
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -41,8 +40,8 @@ const EmpresasPage = () => {
       if (tab && tab !== activeTab) {
         setActiveTab(tab);
       } else if (!tab) {
-        setActiveTab('geral');
-        router.replace(`?tab=geral`);
+        setActiveTab('empresas-ativas');
+        router.replace(`?tab=empresas-ativas`);
       }
     }, [searchParams, activeTab, router]);
 
@@ -133,7 +132,6 @@ const EmpresasPage = () => {
     
   const isActiveTabDataReady = () => {
     switch (activeTab) {
-      case "geral":
       case "empresas-ativas":
       case "empresas-inativas":
         return !!dataArr?.length;
@@ -158,13 +156,6 @@ const EmpresasPage = () => {
     }
 
     switch (activeTab) {
-      case "geral":
-        return <EmpresasAtivasRecife
-        data={dataArr}
-        dataSemMes={dataArrSemMes}
-        dataSemMesPast={dataArrSemMesPast}
-        year={getYearSelected(filters)}
-        />
       case "empresas-ativas":
         return <EmpresasAtivas
         data={dataArr}
@@ -228,7 +219,7 @@ const EmpresasPage = () => {
       //   year={getYearSelected(filters)} 
       //   /> 
       default:
-        return <EmpresasAtivasRecife
+        return <EmpresasAtivas
         data={dataArr}
         dataSemMes={dataArrSemMes}
         dataSemMesPast={dataArrSemMesPast}
@@ -244,98 +235,88 @@ const EmpresasPage = () => {
   if (isLoading) return <LoadingScreen />;
 
   return (
-    <div className="p-6 min-h-screen mt-48">
-       <h1 className="text-4xl font-bold text-gray-800 text-center mb-8 tracking-wide dark:text-gray-200">
+    <div className="bi-page">
+       <h1 className="bi-page-title">
         Empresas
       </h1>
-      
-      <div className="flex justify-center gap-6 mb-8 flex-wrap">
-        <button
-          onClick={() => handleNavigation("geral")}
-          className={`px-6 py-3 rounded-lg flex-1 sm:flex-0 min-w-[250px] max-w-[350px] text-lg font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg ${
-            activeTab === "geral"
-              ? "bg-gradient-to-r from-orange-500 to-orange-700 text-white"
-              : "bg-gray-300 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
-          }`}
-        >
-          Panorama Empresas Ativas  
-        </button>
+
+      <div className="bi-tabs">
         <button
           onClick={() => handleNavigation("empresas-ativas")}
-          className={`px-6 py-3 rounded-lg flex-1 sm:flex-0 min-w-[300px] max-w-[350px] text-lg font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg ${
+          className={`bi-tab ${
             activeTab === "empresas-ativas"
-              ? "bg-gradient-to-r from-blue-500 to-blue-700 text-white"
-              : "bg-gray-300 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+              ? "bi-tab-active"
+              : ""
           }`}
         >
           Empresas Ativas  
         </button>
         <button
           onClick={() => handleNavigation("empresas-inativas")}
-          className={`px-6 py-3 rounded-lg flex-1 sm:flex-0 min-w-[250px] max-w-[350px] text-lg font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg ${
+          className={`bi-tab ${
             activeTab === "empresas-inativas"
-              ? "bg-gradient-to-r from-green-500 to-green-700 text-white"
-              : "bg-gray-300 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+              ? "bi-tab-active"
+              : ""
           }`}
         >
           Empresas Inativas  
         </button>
         <button
           onClick={() => handleNavigation("empresas-ativas-inativas")}
-          className={`px-6 py-3 rounded-lg flex-1 sm:flex-0 min-w-[250px] max-w-[350px] text-lg font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg ${
+          className={`bi-tab ${
             activeTab === "empresas-ativas-inativas"
-              ? "bg-gradient-to-r from-purple-500 to-purple-700 text-white"
-              : "bg-gray-300 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+              ? "bi-tab-active"
+              : ""
           }`}
         >
           Empresas Inativas X Ativas 
         </button>
         <button
           onClick={() => handleNavigation("empresas-naturezas")}
-          className={`px-6 py-3 rounded-lg flex-1 sm:flex-0 min-w-[250px] max-w-[350px] text-lg font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg ${
+          className={`bi-tab ${
             activeTab === "empresas-naturezas"
-              ? "bg-gradient-to-r from-purple-500 to-purple-700 text-white"
-              : "bg-gray-300 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+              ? "bi-tab-active"
+              : ""
           }`}
         >
           Empresas Naturezas
         </button>
         <button
           onClick={() => handleNavigation("empresas-classes")}
-          className={`px-6 py-3 rounded-lg flex-1 sm:flex-0 min-w-[250px] max-w-[350px] text-lg font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg ${
+          className={`bi-tab ${
             activeTab === "empresas-classes"
-              ? "bg-gradient-to-r from-purple-500 to-purple-700 text-white"
-              : "bg-gray-300 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+              ? "bi-tab-active"
+              : ""
           }`}
         >
           Ativas Geral NE
         </button>
         <button
           onClick={() => handleNavigation("comparativo-empresas-classes")}
-          className={`px-6 py-3 rounded-lg flex-1 sm:flex-0 min-w-[250px] max-w-[350px] text-lg font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg ${
+          className={`bi-tab ${
             activeTab === "comparativo-empresas-classes"
-              ? "bg-gradient-to-r from-orange-500 to-orange-700 text-white"
-              : "bg-gray-300 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+              ? "bi-tab-active"
+              : ""
           }`}
         >
           Compartivo Ativas Geral NE
         </button>
         <button
           onClick={() => handleNavigation("empresas-abertas-fechadas")}
-          className={`px-6 py-3 rounded-lg flex-1 sm:flex-0 min-w-[300px] max-w-[350px] text-lg font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg ${
+          className={`bi-tab ${
             activeTab === "empresas-abertas-fechadas"
-              ? "bg-gradient-to-r from-blue-500 to-blue-700 text-white"
-              : "bg-gray-300 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+              ? "bi-tab-active"
+              : ""
           }`}
         >
           Empresas Abertas e Fechadas  
         </button>
         <button
           onClick={() => handleNavigation("empresas-tempo-abertura")}
-          className={`px-6 py-3 rounded-lg flex-1 sm:flex-0 min-w-[250px] max-w-[350px] text-lg font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg ${
+          className={`bi-tab ${
             activeTab === "empresas-tempo-abertura"
-              ? "bg-gradient-to-r from-green-500 to-green-700 text-white"
-              : "bg-gray-300 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+              ? "bi-tab-active"
+              : ""
           }`}
         >
           Empresas Tempo Abertura  

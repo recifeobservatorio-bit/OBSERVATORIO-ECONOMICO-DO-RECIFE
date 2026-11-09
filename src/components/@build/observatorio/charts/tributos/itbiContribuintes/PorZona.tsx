@@ -1,6 +1,6 @@
 "use client";
 
-import VerticalScrollableBarChart from "@/components/@global/charts/VerticalScrollableBarChart";
+import BarChart from "@/components/@global/charts/BarChart";
 import ChartGrabber from "@/components/@global/features/ChartGrabber";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
@@ -10,15 +10,12 @@ const PorZona = ({ data, title = "Total de Imóveis por Zona", colors = ColorPal
   return (
     <div className="chart-wrapper">
       <ChartGrabber>
-        <VerticalScrollableBarChart
+        <BarChart
           data={chartData}
           title={title}
           colors={[colors[1]]}
           xKey="zona"
           bars={[{ dataKey: "quantidade", name: "Transações" }]}
-          heightPerCategory={40}
-          visibleHeight={420}
-          widthY={140}
           highlightValues={[]}
         />
       </ChartGrabber>

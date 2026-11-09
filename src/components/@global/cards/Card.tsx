@@ -1,5 +1,7 @@
 import { tooltipFormatter } from "@/utils/formatters/@global/graphFormatter";
 
+import CardEmojiBadge from "./CardEmojiBadge";
+
 const Card = ({
   title = "",
   data,
@@ -9,6 +11,7 @@ const Card = ({
   percent = false,
   position = false,
   minWidth = 310,
+  icon,
 }: {
   title: string;
   local?: string;
@@ -18,27 +21,24 @@ const Card = ({
   percent?: boolean;
   position?: boolean;
   minWidth?: number;
+  icon?: React.ReactNode;
 }) => {
+  // Card de KPI no estilo Power BI: título na faixa azul-marinho, número
+  // grande no corpo (emoji ao lado), local/ano discretos embaixo.
   return (
-    // w-fit - w-full
-    <div
-      className="rounded-lg  p-4 flex-1 shrink-0  w-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#0C1B2B] shadow-sm hover:shadow-md transition-shadow duration-300 ease-in-out"
-      style={{ borderLeft: `8px solid ${color}`, minWidth: `${minWidth}px` }}
-    >
-      {/* Header: Local and Year */}
-      <div className="flex justify-between items-center mb-3">
-        <span className="text-xs font-light text-gray-600 dark:text-gray-400">
-          {local ? `${local} -` : ""} {year}
-        </span>
+    <div className="bi-kpi shrink-0 w-full sm:w-auto" style={{ minWidth: `${minWidth}px` }}>
+      <h2 className="bi-kpi-title">{title}</h2>
+
+      <div className="flex-1 flex justify-between items-center gap-3 px-4 pt-3 pb-1">
+        <p className="text-4xl font-semibold text-gray-900 dark:text-gray-100 w-fit">
+          {percent ? `${tooltipFormatter(+data)}%` : ( position ? `${tooltipFormatter(+data)}°` : tooltipFormatter(+data))}
+        </p>
+        <CardEmojiBadge title={title} icon={icon} color={color} />
       </div>
 
-      {/* Main Data */}
-      <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2 w-fit">
-        {percent ? `${tooltipFormatter(+data)}%` : ( position ? `${tooltipFormatter(+data)}°` : tooltipFormatter(+data))}
-      </h1>
-
-      {/* Title */}
-      <h2 className="text-lg font-medium text-gray-700 dark:text-gray-300 opacity-80">{title}</h2>
+      <span className="px-4 pb-2 text-xs text-gray-500 dark:text-gray-400">
+        {local ? `${local} -` : ""} {year}
+      </span>
     </div>
   );
 };

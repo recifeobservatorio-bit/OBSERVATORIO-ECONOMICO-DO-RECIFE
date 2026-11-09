@@ -1,4 +1,4 @@
-import { useState, useEffect, useId, ReactNode } from "react";
+import { useId, ReactNode } from "react";
 import {
   PieChart as RechartsPieChart,
   Pie,
@@ -11,12 +11,14 @@ import {
 
 import { tooltipFormatter } from "@/utils/formatters/@global/graphFormatter";
 
+import BarChart from "./BarChart";
 import { resolveCrossFilterFill, useChartCrossFilter } from "./crossFilterFill";
+import VerticalScrollableBarChart from "./VerticalScrollableBarChart";
 // import CustomLegend from "../features/CustomLegends";
 import CustomLegend from "../features/CustomLegend";
 import CustomTooltip from "../features/CustomTooltip";
 
-const PieChart = ({
+const PieSlices = ({
   data,
   title,
   underTitle,
@@ -40,30 +42,16 @@ const PieChart = ({
   highlightColor?: string;
 }) => {
   const chartId = useId();
-  const { crossFilterActive, visibleData, select } = useChartCrossFilter(
+  const { crossFilterActive, visibleData, select, emphasisOpacity } = useChartCrossFilter(
     chartId,
     data,
-    (entry: any) => entry[nameKey]
+    (entry: any) => entry[nameKey],
+    title,
+    { emphasis: true }
   );
-  const [outerRadius, setOuterRadius] = useState(120);
-
-  useEffect(() => {
-    const handleResize = () => {
-      const width = window.innerWidth;
-      if (width < 768) {
-        setOuterRadius(80);
-      } else if (width >= 768 && width < 1024) {
-        setOuterRadius(100);
-      } else {
-        setOuterRadius(120);
-      }
-    };
-
-    handleResize(); // Ajusta inicialmente
-    window.addEventListener("resize", handleResize);
-
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  // Raio relativo ao espaço do gráfico (já sem a legenda): acompanha a altura
+  // que a tela única dá a cada card, em vez de um raio fixo por largura da janela.
+  const outerRadius = "80%";
 
   const renderCustomizedLabel = ({
     cx,
@@ -96,15 +84,16 @@ const PieChart = ({
   };
 
   return (
-    <div className="relative bg-white dark:bg-[#0C1B2B] w-full h-full">
+    <div className="relative bg-transparent w-full h-full">
       <div className="flex flex-col items-center justify-center">
-        <h3 className="text-center mb-4 font-semibold w-[90%] text-gray-800 dark:text-gray-200">{title}</h3>
+        <h3 className="bi-chart-title text-center mb-4 font-semibold w-[90%] text-gray-800 dark:text-gray-200">{title}</h3>
         <div className="mb-2">
         {underTitle}
         </div>
       </div>
 
-      <ResponsiveContainer width="100%" height={350}>
+      <div className="bi-chart-box" style={{ height: 350 }}>
+<ResponsiveContainer width="100%" height="100%">
         <RechartsPieChart>
           <Pie
             data={visibleData}
@@ -112,14 +101,16 @@ const PieChart = ({
             nameKey={nameKey}
             cx="50%"
             cy="50%"
-            outerRadius={outerRadius} // Valor dinâmico
+            outerRadius={outerRadius}
             label={showPercentages ? renderCustomizedLabel : undefined}
             labelLine={false}
+            isAnimationActive={false}
           >
             {visibleData.map((entry: any, index: any) => (
               <Cell
                 key={`cell-${index}`}
                 cursor="pointer"
+                fillOpacity={emphasisOpacity(entry)}
                 onClick={() => select(chartId, String(entry[nameKey]))}
                 fill={resolveCrossFilterFill({
                   crossFilterActive,
@@ -141,12 +132,40 @@ const PieChart = ({
                 />
         </RechartsPieChart>
       </ResponsiveContainer>
+</div>
       {/* <CustomLegend
         dataSetter={data}
         colors={colors}
         nameKey={nameKey}
       /> */}
     </div>
+  );
+};
+
+// Pizza só com até 3 fatias — com mais que isso fica difícil comparar os
+// pedaços, então o mesmo gráfico vira colunas (poucos itens, nomes curtos) ou
+// barras deitadas (muitos itens ou nomes longos). Conta pelos dados originais,
+// não pelos já filtrados por clique, pra o tipo não trocar ao selecionar.
+export const MAX_PIE_SLICES = 3;
+const MAX_COLUMNS = 7;
+const MAX_COLUMN_LABEL = 14;
+
+const PieChart = (props: Parameters<typeof PieSlices>[0]) => {
+  const { data, title, dataKey, nameKey, colors = [], tooltipEntry, highlightValues = [], highlightColor } = props;
+  const rows: any[] = Array.isArray(data) ? data : [];
+  if (rows.length <= MAX_PIE_SLICES) return <PieSlices {...props} />;
+
+  const bars = [{ dataKey, name: title }];
+  const longestLabel = rows.reduce((max, r) => Math.max(max, String(r?.[nameKey] ?? "").length), 0);
+  if (rows.length <= MAX_COLUMNS && longestLabel <= MAX_COLUMN_LABEL) {
+    return (
+      <BarChart data={rows} title={title} colors={[colors[0]]} xKey={nameKey} bars={bars}
+        tooltipEntry={tooltipEntry} highlightValues={highlightValues} highlightColor={highlightColor} />
+    );
+  }
+  return (
+    <VerticalScrollableBarChart data={rows} title={title} colors={[colors[0]]} xKey={nameKey} bars={bars}
+      highlightValues={highlightValues} highlightColor={highlightColor} />
   );
 };
 

@@ -40,10 +40,12 @@ const DecolagensEmbarqueDom = ({
           barSize={30} // Altura individual de cada barra
         />
         {/* Renderiza o subText dentro do ChartGrabber */}
-        <div className="absolute -rotate-90 top-[50%] -left-6">
+        {/* Legenda do eixo embaixo, centralizada (como em "País Destino") — girada na
+            lateral ela ficava por cima dos números do eixo. */}
+        <div className="w-full flex justify-center mt-0.5">
           {subText && (
             <p
-              className="font-medium"
+              className="text-xs font-semibold leading-4"
               style={{ color: colors[6] }} // Aplica a cor dinamicamente
             >
               {subText}

@@ -2,6 +2,9 @@
 
 import React, { useState } from "react";
 
+import SectionIconBadge from "@/components/@global/cards/SectionIconBadge";
+import FitToScreen from "@/components/@global/features/FitToScreen";
+import { RankingMunicipiosIcon } from "@/components/@global/icons/sectionIcons";
 import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
 import ErrorBoundary from "@/utils/loader/errorBoundary";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
@@ -23,44 +26,48 @@ const Geral = ({
   const [tablesRender, setTablesRender] = useState(tables);
 
   return (
-    <div className="pb-4">
-      <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="h-full">
-          {tablesRender.map(({ Component }, index) => (
-            <div
-              key={index}
-              className="h-full"
-            >
-              <React.Suspense fallback={<div>Carregando...</div>}>
-                <ErrorBoundary>
-                  <Component
-                    airport={["Recife", ...tempFiltred][index]}
-                    color={ColorPalette.default[index]}
-                    data={rawData}
-                    year={year}
-                  />
-                </ErrorBoundary>
-              </React.Suspense>
-            </div>
-          ))}
-        </div>
-
-        <div className="flex flex-col w-full gap-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-6 h-full">
-            {charts.map(({ Component }, index) => (
+    <FitToScreen>
+      <div className="pb-4">
+        <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="h-full bi-table-fill">
+            {tablesRender.map(({ Component }, index) => (
               <div
                 key={index}
-                className="chart-content-wrapper"
+                className="h-full relative"
               >
-                <React.Suspense fallback={<GraphSkeleton />}>
-                  <Component data={data} />
+                <SectionIconBadge icon={<RankingMunicipiosIcon />} />
+                <React.Suspense fallback={<div>Carregando...</div>}>
+                  <ErrorBoundary>
+                    <Component
+                      airport={["Recife", ...tempFiltred][index]}
+                      color={ColorPalette.default[index]}
+                      data={rawData}
+                      year={year}
+                    />
+                  </ErrorBoundary>
                 </React.Suspense>
               </div>
             ))}
           </div>
+
+          <div className="flex flex-col w-full gap-6">
+            <div className="grid grid-cols-1 gap-6 h-full">
+              {charts.map(({ Component }, index) => (
+                <div
+                  key={index}
+                  className="chart-content-wrapper relative"
+                >
+                  <SectionIconBadge icon={<RankingMunicipiosIcon />} />
+                  <React.Suspense fallback={<GraphSkeleton />}>
+                    <Component data={data} />
+                  </React.Suspense>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </FitToScreen>
   );
 };
 

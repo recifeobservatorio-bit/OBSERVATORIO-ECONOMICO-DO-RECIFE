@@ -2,7 +2,10 @@
 
 import React, { useRef, useState } from "react";
 
+import SectionIconBadge from "@/components/@global/cards/SectionIconBadge";
+import FitToScreen from "@/components/@global/features/FitToScreen";
 import { SortableDiv } from "@/components/@global/features/SortableDiv";
+import { CombustiveisIcon } from "@/components/@global/icons/sectionIcons";
 import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
 import ErrorBoundary from "@/utils/loader/errorBoundary";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
@@ -25,7 +28,8 @@ const Geral = ({ data, year }: { data: any; year?: string }) => {
     const { Component, span } = chart;
     const spanClass = span === 2 ? " md:col-span-2 lg:col-span-2" : "";
     return (
-      <div key={index} className={`chart-content-wrapper w-full${spanClass}`}>
+      <div key={index} className={`chart-content-wrapper w-full${spanClass} relative`}>
+        <SectionIconBadge icon={<CombustiveisIcon />} />
         <React.Suspense fallback={<GraphSkeleton />}>
           <ErrorBoundary>
             <Component data={data} colors={ColorPalette.default} />
@@ -36,6 +40,7 @@ const Geral = ({ data, year }: { data: any; year?: string }) => {
   };
 
   return (
+    <FitToScreen>
     <div className="pb-4">
       {/* Cards */}
       <div className="flex flex-wrap gap-4 justify-center mb-8">
@@ -53,7 +58,7 @@ const Geral = ({ data, year }: { data: any; year?: string }) => {
         chartOrder={topOrder}
         setChartOrder={setTopOrder}
         sortableContainerRef={topContainerRef}
-        style="grid items-center grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 2xl:grid-cols-3 gap-8 place-items-stretch pb-8"
+        style="grid items-stretch grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4 pb-4"
       >
         {topOrder.map((index) => renderChart(topCharts[index], index))}
       </SortableDiv>
@@ -63,11 +68,12 @@ const Geral = ({ data, year }: { data: any; year?: string }) => {
         chartOrder={bottomOrder}
         setChartOrder={setBottomOrder}
         sortableContainerRef={bottomContainerRef}
-        style="grid items-center grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 2xl:grid-cols-3 gap-8 place-items-center pb-16"
+        style="grid items-stretch grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-4"
       >
         {bottomOrder.map((index) => renderChart(bottomCharts[index], TOP_ROW_SIZE + index))}
       </SortableDiv>
     </div>
+    </FitToScreen>
   );
 };
 

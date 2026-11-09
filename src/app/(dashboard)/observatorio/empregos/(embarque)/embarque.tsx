@@ -1,6 +1,9 @@
 import React, { useRef, useState } from "react";
 
+import SectionIconBadge from "@/components/@global/cards/SectionIconBadge";
+import FitToScreen from "@/components/@global/features/FitToScreen";
 import { SortableDiv } from "@/components/@global/features/SortableDiv";
+import { EmpregosIcon } from "@/components/@global/icons/sectionIcons";
 import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
 
 import charts from "./@imports/charts";
@@ -22,8 +25,9 @@ const Embarque = ({
   const sortableContainerRef = useRef<HTMLDivElement>(null);
 
   return (
+    <FitToScreen>
     <div>
-      <div className="flex items-center justify-center mb-6"> 
+      <div className="flex items-center justify-center mb-6">
           <div className="bg-[#D1D5DB] rounded-full p-1">
             <div className="bg-white rounded-full font-semibold items-center grid grid-cols-2  gap-2 text-center relative text-gray-500 p-2">
              <div className={`transition duration-300 absolute bg-gradient-to-r from-blue-500 to-blue-700 w-1/2 h-full rounded-full ${type[0] === 'Embarque' ? 'transform translate-x-0' : 'transform translate-x-full'} p-4 `}></div>
@@ -49,14 +53,15 @@ const Embarque = ({
           </div>
       </div>
 
-      <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="charts-items-wrapper">
-        {chartOrder.map((index) => { 
+      <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="charts-items-wrapper !grid-cols-1 sm:!grid-cols-2 lg:!grid-cols-3">
+        {chartOrder.map((index) => {
           const { Component } = charts[index];
             return (
             <div
               key={index}
-              className={`chart-content-wrapper`}
+              className={`chart-content-wrapper relative`}
             >
+              <SectionIconBadge icon={<EmpregosIcon />} />
               <React.Suspense fallback={<GraphSkeleton />}>
                 <Component
                   toCompare={toCompare}
@@ -69,6 +74,7 @@ const Embarque = ({
           )})}
       </SortableDiv>
     </div>
+    </FitToScreen>
   );
 };
 

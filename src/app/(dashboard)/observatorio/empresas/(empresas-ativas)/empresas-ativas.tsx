@@ -2,7 +2,10 @@
 
 import React, { memo, useEffect, useMemo, useRef, useState } from "react";
 
+import SectionIconBadge from "@/components/@global/cards/SectionIconBadge";
+import FitToScreen from "@/components/@global/features/FitToScreen";
 import { SortableDiv } from "@/components/@global/features/SortableDiv";
+import { EmpresasIcon } from "@/components/@global/icons/sectionIcons";
 import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
 import { getDataObj } from "@/functions/process_data/observatorio/micro-caged/getDataObj";
 import { getSaldoData } from "@/functions/process_data/observatorio/micro-caged/getSaldoData";
@@ -30,7 +33,7 @@ const EmpresasAtivas = ({
 
   const sortableContainerRef = useRef<HTMLDivElement>(null);
 
-  const params = ['nome_bairro', 'Grupo', 'desc_atividade', 'mes', 'rpa', 'zona']
+  const params = ['nome_bairro', 'Grupo', 'desc_atividade', 'mes']
 
   const chartData = useMemo(() => {
     const acc = geralAccFunction(data, params)
@@ -49,6 +52,7 @@ const EmpresasAtivas = ({
   const { Component }: any = maps[0]
 
   return (
+    <FitToScreen>
     <div>
       <div className="flex flex-wrap gap-4 justify-center mb-8">
         {cards.map(({ Component }, index) => (
@@ -64,14 +68,21 @@ const EmpresasAtivas = ({
         ))}
       </div>
 
-      <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="charts-items-wrapper">
+      {/* Como num painel Power BI: gráficos à esquerda (3/4) e o mapa numa
+          coluna à direita com a altura toda — numa faixa larga embaixo a aba
+          não cabia na tela única. */}
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,3fr)_minmax(0,1fr)] gap-4 items-stretch">
+      <div className="min-w-0">
+      <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="charts-items-wrapper !grid-cols-1 sm:!grid-cols-2 lg:!grid-cols-3 !place-items-stretch">
         {chartOrder.map((index) => {
-          const { Component } = charts[index];
+          const chart = charts[index] as typeof charts[number] & { full?: boolean; colSpan?: number; rowSpan?: number };
+          const { Component, full, colSpan, rowSpan } = chart;
           return (
             <div
               key={index}
-              className={`chart-content-wrapper`}
+              className={`chart-content-wrapper relative ${full ? "col-span-full" : ""} ${colSpan === 2 ? "col-span-2" : ""} ${rowSpan === 2 ? "row-span-2" : ""}`}
             >
+              <SectionIconBadge icon={<EmpresasIcon />} />
               <React.Suspense fallback={<GraphSkeleton />}>
                 <ErrorBoundary>
                   <Component data={chartData} />
@@ -81,13 +92,17 @@ const EmpresasAtivas = ({
           );
         })}
       </SortableDiv>
+      </div>
 
-      <div className="place-items-center z-0 mb-6">
-        <div className="bg-white shadow-md rounded-lg p-4 w-full overflow-x-hidden flex flex-col items-center">
+      <div className="z-0 min-w-0">
+        <div className="bg-white dark:bg-[#0C1A28] shadow-md rounded-lg p-3 w-full h-full overflow-x-hidden flex flex-col relative">
+          <SectionIconBadge icon={<EmpresasIcon />} />
           <Component data={data} />
         </div>
       </div>
+      </div>
     </div>
+    </FitToScreen>
   );
 };
 

@@ -7,6 +7,7 @@ import LineChart from "@/components/@global/charts/LineChart";
 import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
+import { SelicIcon } from "./icons";
 import PanoramaCard from "./PanoramaCard";
 
 const TaxaSelic = () => {
@@ -25,13 +26,22 @@ const TaxaSelic = () => {
 
   if (!chartData) return <GraphSkeleton />;
 
+  const latest = chartData[chartData.length - 1];
+
   return (
-    <PanoramaCard title="Taxa Selic">
+    <PanoramaCard
+      title="Taxa Selic"
+      icon={<SelicIcon />}
+      metricLabel="Taxa atual"
+      metric={latest ? `${Number(latest.taxa).toLocaleString("pt-BR", { maximumFractionDigits: 2 })}%` : "-"}
+      source="Fonte: Banco Central do Brasil"
+    >
       <LineChart
         data={chartData}
         xKey="data"
         colors={ColorPalette.default}
         lines={[{ dataKey: "taxa", name: "Taxa Selic (%)" }]}
+        height={340}
       />
     </PanoramaCard>
   );

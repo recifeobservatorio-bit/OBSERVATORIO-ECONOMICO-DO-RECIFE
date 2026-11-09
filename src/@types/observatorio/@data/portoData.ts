@@ -21,6 +21,7 @@ export interface PortoGeralData {
     mercado: PortoMercadoHeaders[];
   };
   rawData: RawDataPortos;
+  yearsOptions?: string[];
 }
 
 export interface RawDataPortos {
@@ -43,13 +44,18 @@ export interface PassageirosPortoAno extends DataWithFilters<PortoPassageirosHea
 export interface PortoPassageirosData {
     current: PassageirosPortoAno;
     past: PassageirosPortoAno;
+    /** Mesmo recorte de current/past, mas ignorando o filtro de Mes — usado pelos gráficos
+     * de linha (PassageirosPortoAno/PassageirosVariacaoPortoAno) pra não colapsar num ponto só. */
+    currentSemMes?: PortoPassageirosHeaders[];
+    pastSemMes?: PortoPassageirosHeaders[];
     /** Série histórica completa (todos os anos) — usada pelo modo "Ano" do toggle Mês/Ano. */
     porAno?: PortoPassageirosHeaders[];
 }
   
 export interface PortoPassageirosResult {
     id?: "porto-passageiros";
-    passageiros: PortoPassageirosData
+    passageiros: PortoPassageirosData;
+    yearsOptions?: string[];
 }
 
 export interface PortoPassageirosCardData {
@@ -62,6 +68,10 @@ export interface PortoPassageirosOutputData extends PortoPassageirosCardData {
   passageiros: {
     current: PortoPassageirosHeaders[];
     past: PortoPassageirosHeaders[];
+    /** Mesmo recorte de current/past, mas ignorando o filtro de Mes — usado pelos gráficos
+     * de linha (PassageirosPortoAno/PassageirosVariacaoPortoAno) pra não colapsar num ponto só. */
+    currentSemMes?: PortoPassageirosHeaders[];
+    pastSemMes?: PortoPassageirosHeaders[];
     /** Série histórica completa (todos os anos) — usada pelo modo "Ano" do toggle Mês/Ano. */
     porAno?: PortoPassageirosHeaders[];
   }

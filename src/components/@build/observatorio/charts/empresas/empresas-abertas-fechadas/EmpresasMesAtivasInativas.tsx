@@ -5,18 +5,16 @@ import { useEffect, useState } from "react";
 import { EmpresasData } from "@/@api/http/to-charts/empresas/EmpresasData";
 import LineChart from "@/components/@global/charts/LineChart";
 import ChartGrabber from "@/components/@global/features/ChartGrabber";
-import MesAnoToggle from "@/components/@global/features/MesAnoToggle";
 import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
+import { monthOptionIndex } from "@/utils/filters/@global/monthFilterHelpers";
 import { monthShortName } from "@/utils/formatters/@global/monthShortName";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
 const EmpresasMesAtivasInativas = ({
-  data,
-  colors = ColorPalette.default,
+  colors = [ColorPalette.status.good, ColorPalette.status.badLine],
   municipio,
   title = "Quantidade de Empresas Abertas e Fechadas",
   }: any) => {
-    const [mode, setMode] = useState<"ano" | "mes">("ano");
     const [anoRows, setAnoRows] = useState<{ abertas: any[]; fechadas: any[] } | null>(null);
 
     useEffect(() => {
@@ -33,7 +31,7 @@ const EmpresasMesAtivasInativas = ({
       };
     }, []);
 
-    if (mode === "ano" && !anoRows) {
+    if (!anoRows) {
       return (
         <div className="chart-wrapper">
           <GraphSkeleton />
@@ -41,41 +39,35 @@ const EmpresasMesAtivasInativas = ({
       );
     }
 
-    let chartData: any[] = []
+    // Série histórica multianual (empresas_abertas.parquet / empresas_fechadas.parquet têm
+    // 2021-2026), agrupada por mês — ignora o filtro de ano/mês da aba, filtra só pelo
+    // município selecionado.
+    const byYearMonth = new Map<string, any>()
+    const order = new Map<string, number>()
 
-    if (mode === "ano") {
-      // Série histórica multianual (empresas_abertas.parquet / empresas_fechadas.parquet têm
-      // 2021-2026) — ignora o filtro de ano/mês da aba, filtra só pelo município selecionado.
-      const byYear = new Map<string, any>()
+    ;(anoRows?.abertas || []).filter((r: any) => r['Município'] === municipio).forEach((r: any) => {
+      const mes = monthOptionIndex(r['mes'])
+      if (r['Ano'] == null || mes < 1 || mes > 12) return
+      const key = `${r['Ano']}-${mes}`
+      const label = `${monthShortName(mes)}/${r['Ano']}`
+      if (!byYearMonth.has(key)) byYearMonth.set(key, { label, ativa: 0, inativa: 0 })
+      byYearMonth.get(key).ativa += r['Quantidade de Empresas'] || 0
+      order.set(key, r['Ano'] * 100 + mes)
+    })
 
-      ;(anoRows?.abertas || []).filter((r: any) => r['Município'] === municipio).forEach((r: any) => {
-        const ano = String(r['Ano'])
-        if (!byYear.has(ano)) byYear.set(ano, { label: ano, ativa: 0, inativa: 0 })
-        byYear.get(ano).ativa += r['Quantidade de Empresas'] || 0
-      })
+    ;(anoRows?.fechadas || []).filter((r: any) => r['Município'] === municipio).forEach((r: any) => {
+      const mes = monthOptionIndex(r['mes'])
+      if (r['Ano de Baixa'] == null || mes < 1 || mes > 12) return
+      const key = `${r['Ano de Baixa']}-${mes}`
+      const label = `${monthShortName(mes)}/${r['Ano de Baixa']}`
+      if (!byYearMonth.has(key)) byYearMonth.set(key, { label, ativa: 0, inativa: 0 })
+      byYearMonth.get(key).inativa += r['Quantidade de Empresas'] || 0
+      order.set(key, r['Ano de Baixa'] * 100 + mes)
+    })
 
-      ;(anoRows?.fechadas || []).filter((r: any) => r['Município'] === municipio).forEach((r: any) => {
-        const ano = String(r['Ano de Baixa'])
-        if (!byYear.has(ano)) byYear.set(ano, { label: ano, ativa: 0, inativa: 0 })
-        byYear.get(ano).inativa += r['Quantidade de Empresas'] || 0
-      })
-
-      chartData = Array.from(byYear.values()).sort((a, b) => +a.label - +b.label)
-    } else {
-      // "Mês" ignora o filtro de mês ('mes' já vem sem esse filtro aplicado) e mostra todos
-      // os meses do ano selecionado no filtro.
-      const dataAtivas = data?.['ativas']?.['mes'] || {}
-      const dataInativas = data?.['inativas']?.['mes'] || {}
-
-      const uniqueArrays = Array.from(new Set([...Object.keys(dataAtivas), ...Object.keys(dataInativas)]))
-
-      chartData = uniqueArrays.map((key: string) => {
-        const ativaNum = dataAtivas[key] || 0
-        const inativaNum = dataInativas[key] || 0
-
-        return { label: key, ativa: ativaNum, inativa: inativaNum }
-      }).sort((a, b) => +a['label'] - +b['label']).map((obj) => ({ ...obj, label: monthShortName(+obj.label) }))
-    }
+    const chartData = Array.from(byYearMonth.entries())
+      .sort((a, b) => (order.get(a[0]) ?? 0) - (order.get(b[0]) ?? 0))
+      .map(([, value]) => value)
 
     return (
       <div className="chart-wrapper">
@@ -83,7 +75,6 @@ const EmpresasMesAtivasInativas = ({
           <LineChart
             data={chartData}
             title={title + ` - (${municipio})`}
-            underTitle={<MesAnoToggle mode={mode} onChange={setMode} />}
             colors={colors}
             xKey="label"
             lines={[{ dataKey: "ativa", name: "Empresas Ativas", strokeWidth: 2 }, { dataKey: "inativa", name: "Empresas Inativas", strokeWidth: 2 }]}

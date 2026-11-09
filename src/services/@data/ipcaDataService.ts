@@ -5,6 +5,7 @@ import { DataWithFilters, Filters } from "@/@types/observatorio/shared";
 import { getRawData } from "@/utils/filters/@data/getRawData";
 import { applyGenericFilters } from "@/utils/filters/@features/applyGenericFilters";
 import { filterByYear } from "@/utils/filters/@features/filterByYear";
+import { computeAvailableYears } from "@/utils/filters/@features/computeAvailableYears";
 
 // IPCA anual por capital: pega, em cada (Ano, Capital), o valor de "Variação acumulado
 // no ano" no último mês disponível daquele ano — é a forma padrão de reportar a inflação
@@ -30,6 +31,26 @@ function buildIpcaPorAno(rows: IpcaGeralHeaders[]) {
     });
     return entry;
   });
+}
+
+// IPCA mensal por capital — série histórica completa (todos os anos), um ponto por
+// (ano, mês), usando "Variação mensal" diretamente (ao contrário do acumulado anual,
+// a taxa mensal não precisa de tratamento especial pra ser exibida mês a mês).
+function buildIpcaPorMes(rows: IpcaGeralHeaders[]) {
+  const byKey: Record<string, { ano: number; mes: number; valores: Record<string, number> }> = {};
+
+  rows.forEach((r) => {
+    const key = `${r.Ano}-${String(r["MÊS"]).padStart(2, "0")}`;
+    if (!byKey[key]) byKey[key] = { ano: r.Ano, mes: r["MÊS"], valores: {} };
+    byKey[key].valores[r.Capital] = r["IPCA - Variação mensal"];
+  });
+
+  return Object.values(byKey)
+    .sort((a, b) => a.ano - b.ano || a.mes - b.mes)
+    .map(({ ano, mes, valores }) => ({
+      mes: `${new Date(0, mes - 1).toLocaleString("pt-BR", { month: "short" })}/${ano}`,
+      ...valores,
+    }));
 }
 
 export class IpcaDataService {
@@ -64,12 +85,16 @@ export class IpcaDataService {
     const rawData = applyGenericFilters(geral, filters, ['Capital'])
     const geralFiltered = {...applyGenericFilters(geral, filters, ['MÊS']), rawData: rawData.filteredData};
 
-    // Mesmo recorte de geralFiltered, mas com a série histórica completa (todos os anos) —
-    // usada pelo modo "Ano" do toggle Mês/Ano (IpcaPorMeses/IpcaBrasilPorMeses).
+    // Mesmo recorte de geralFiltered, mas com a série histórica completa (todos os anos),
+    // por mês — usada pelos gráficos de linha (IpcaPorMeses/IpcaBrasilPorMeses), que sempre
+    // mostram a série mensal inteira, não só o ano selecionado.
     const geralPorAnoFiltered = applyGenericFilters(geralAllYears, filters, ['MÊS']);
     const porAno = buildIpcaPorAno(geralPorAnoFiltered.filteredData);
+    const porMes = buildIpcaPorMes(geralPorAnoFiltered.filteredData);
 
-    return { geral: { ...geralFiltered, porAno }, id: "ipca" };
+    const yearsOptions = computeAvailableYears(geralAllYears, (r) => r.Ano);
+
+    return { geral: { ...geralFiltered, porAno, porMes, yearsOptions }, id: "ipca" };
   }
 
   private async fetchIpcaGruposData(filters: Filters): Promise<{ id: "ipca-grupos"; grupos: IpcaGrupoData }> {
@@ -77,8 +102,9 @@ export class IpcaDataService {
     const gruposAllYears = await ipcaService.fetchProcessedGruposData();
     const grupos = filterByYear(gruposAllYears, this.currentYear, "ANO");
     const gruposFiltered = applyGenericFilters(grupos, filters);
+    const yearsOptions = computeAvailableYears(gruposAllYears, (r) => r.ANO);
 
-    return { grupos: gruposFiltered, id: "ipca-grupos" };
+    return { grupos: { ...gruposFiltered, yearsOptions }, id: "ipca-grupos" };
   }
 
   private async fetchIpcaTabelasData(filters: Filters): Promise<{ id: "ipca-tabelas"; tabelas: DataWithFilters<IpcaTabelaHeaders>; geral: IpcaGeralData }> {
@@ -93,8 +119,9 @@ export class IpcaDataService {
 
     const tabelasFiltered = applyGenericFilters(tabelas, filters);
     const geralFiltered = applyGenericFilters(geral, filters);
+    const yearsOptions = computeAvailableYears(tabelasAllYears, (r) => r.Ano);
 
-    return { tabelas: tabelasFiltered, geral: geralFiltered, id: "ipca-tabelas" };
+    return { tabelas: { ...tabelasFiltered, yearsOptions }, geral: { ...geralFiltered, yearsOptions }, id: "ipca-tabelas" };
   }
 
   public async fetchDataForTab(tab: string, filters: Filters) {

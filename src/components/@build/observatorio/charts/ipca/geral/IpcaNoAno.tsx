@@ -4,7 +4,7 @@ import React from "react";
 
 import { IpcaGeralHeaders } from "@/@types/observatorio/@fetch/ipca";
 import { ChartBuild } from "@/@types/observatorio/shared";
-import VerticalScrollableBarChart from "@/components/@global/charts/VerticalScrollableBarChart";
+import BarChart from "@/components/@global/charts/BarChart";
 import ChartGrabber from "@/components/@global/features/ChartGrabber";
 import { processIpcaNoAno } from "@/functions/process_data/observatorio/ipca/geral/charts/ipcaNoAno";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
@@ -22,13 +22,11 @@ const IpcaAcumuladoPorCapital = ({
   return (
     <div className="chart-wrapper">
       <ChartGrabber>
-        <VerticalScrollableBarChart
+        <BarChart
           data={chartData}
           title={title}
           colors={colors}
           xKey={nameKey}
-          widthY={100}
-          left={5}
           bars={[{ dataKey: "acumuladoAno", name: "Acumulado no Ano (%)", barWidth: 30 }]}
         />
       </ChartGrabber>

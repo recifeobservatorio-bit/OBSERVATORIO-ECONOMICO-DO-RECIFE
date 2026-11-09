@@ -4,14 +4,14 @@ const cards = [
   {
     Component: React.lazy(() =>
       import(
-        "@/components/@build/observatorio/cards/empregos/geral/SaldoGeral"
+        "@/components/@build/observatorio/cards/empregos/geral/EstoqueEmpregos"
       )
     ),
   },
   {
     Component: React.lazy(() =>
       import(
-        "@/components/@build/observatorio/cards/empregos/geral/EstoqueEmpregos"
+        "@/components/@build/observatorio/cards/empregos/geral/SaldoGeral"
       )
     ),
   },

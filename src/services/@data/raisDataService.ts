@@ -29,10 +29,11 @@ export class EmpregosDataService {
     const raisData = new RaisData(this.currentYear);
     // const pastYear = `${+this.currentYear - 1}`;
 
-    const fetchData = await raisData.fetchProcessedDataRais() 
+    const fetchData = await raisData.fetchProcessedDataRais()
+    const yearsOptions = await RaisData.probeAvailableYears();
 
-    const filteredDataAtiv = applyGenericFilters(fetchData.filter((data) => data['Vínculo Ativo 31/12'] == '1'), filters);
-    const filteredDataNoAtiv = applyGenericFilters(fetchData.filter((data) => data['Vínculo Ativo 31/12'] == '0'), filters);    
+    const filteredDataAtiv = { ...applyGenericFilters(fetchData.filter((data) => data['Vínculo Ativo 31/12'] == '1'), filters), yearsOptions };
+    const filteredDataNoAtiv = applyGenericFilters(fetchData.filter((data) => data['Vínculo Ativo 31/12'] == '0'), filters);
 
     return {
       rais: {

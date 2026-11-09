@@ -7,6 +7,7 @@ import BarChart from "@/components/@global/charts/BarChart";
 import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
+import { BalancaComercialIcon } from "./icons";
 import PanoramaCard from "./PanoramaCard";
 
 const BalancaComercialMovimentacao = ({ year }: { year: string }) => {
@@ -34,8 +35,11 @@ const BalancaComercialMovimentacao = ({ year }: { year: string }) => {
 
   return (
     <PanoramaCard
-      title="Balança Comercial (Importação / Exportação)"
-      subtitle={`Saldo: US$ ${saldo.toLocaleString("pt-BR")}`}
+      title="Balança Comercial"
+      icon={<BalancaComercialIcon />}
+      metricLabel="Saldo"
+      metric={`US$ ${saldo.toLocaleString("pt-BR")}`}
+      source="Fonte: Comex Stat"
     >
       {!hasData ? (
         <p className="text-center text-sm text-gray-500 dark:text-gray-400 py-8">
@@ -50,6 +54,7 @@ const BalancaComercialMovimentacao = ({ year }: { year: string }) => {
             { dataKey: "exportacao", name: "Exportação" },
             { dataKey: "importacao", name: "Importação" },
           ]}
+          height={340}
         />
       )}
     </PanoramaCard>

@@ -10,11 +10,13 @@ import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
 const DesligamentosAno = ({
   data = [],
-  colors = ColorPalette.default,
+  colors = [ColorPalette.status.badLine],
   title = "Desligamentos no ano",
 }: any) => {
 
   const chartData = getObjToArr<number>(data["Mês Desligamento"] || {}).sort((a, b) => +a.label - +b.label).map((item) => ({ ...item, label: monthShortName(+item.label) }))
+
+  const media = chartData.length ? chartData.reduce((acc, item) => acc + item.value, 0) / chartData.length : 0;
 
   return (
     <div className="chart-wrapper">
@@ -27,6 +29,7 @@ const DesligamentosAno = ({
           lines={[
             { dataKey: "value", name: "Desligamentos", strokeWidth: 2 },
           ]}
+          referenceLine={{ value: media, label: `Linha média: ${media.toFixed(0)}` }}
         />
       </ChartGrabber>
     </div>

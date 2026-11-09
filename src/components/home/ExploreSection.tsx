@@ -6,9 +6,10 @@ import { iconsExplore } from "./ExploreIconsObservatorio";
 
 interface ExploreSectionProps {
   searchTerm: string; // Recebe o termo de busca como prop
+  onSearch: (term: string) => void;
 }
 
-export const ExploreSection: React.FC<ExploreSectionProps> = ({ searchTerm }) => {
+export const ExploreSection: React.FC<ExploreSectionProps> = ({ searchTerm, onSearch }) => {
   // Calcula o número total de resultados encontrados
   const totalResults = iconsExplore.reduce(
     (count, section) =>
@@ -24,7 +25,16 @@ export const ExploreSection: React.FC<ExploreSectionProps> = ({ searchTerm }) =>
   return (
     <div className="w-full flex flex-col mt-[5em] items-center explore-content section-content relative">
       <div className="w-[75%] dark:text-white">
-        <p className="text-2xl sm:text-3xl lg:text-4xl lg:pr-[40%] font-bold __title">Resultados para consulta:</p>
+        <div className="flex flex-wrap items-center gap-4">
+          <p className="text-2xl sm:text-3xl lg:text-4xl font-bold __title">Resultados para consulta:</p>
+          <input
+            type="text"
+            placeholder="Pesquise por títulos, descrições..."
+            defaultValue={searchTerm}
+            onChange={(e) => onSearch(e.target.value)}
+            className="bg-white border border-[#959595] text-gray-800 placeholder-gray-400 rounded-full py-2 px-5 w-full sm:w-[320px] focus:outline-none focus:border-[#0155AE] focus:ring-1 focus:ring-[#0155AE] dark:bg-[#142b42] dark:text-white dark:placeholder-gray-400 dark:border-gray-600"
+          />
+        </div>
         <p className="text-gray-500 text-xl mt-1 dark:text-gray-400">
           {totalResults > 0
             ? `${totalResults} resultado${totalResults > 1 ? 's' : ''} encontrado${totalResults > 1 ? 's' : ''}.`

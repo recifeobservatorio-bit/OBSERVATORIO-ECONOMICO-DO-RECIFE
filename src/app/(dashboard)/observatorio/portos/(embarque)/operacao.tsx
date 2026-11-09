@@ -4,7 +4,10 @@ import React, { useRef, useState } from "react";
 
 import { PortoGeralData, PortoOperacaoData } from "@/@types/observatorio/@data/portoData";
 import { ChartBuild } from "@/@types/observatorio/shared";
+import SectionIconBadge from "@/components/@global/cards/SectionIconBadge";
+import FitToScreen from "@/components/@global/features/FitToScreen";
 import { SortableDiv } from "@/components/@global/features/SortableDiv";
+import { PortosIcon } from "@/components/@global/icons/sectionIcons";
 import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
@@ -24,6 +27,7 @@ const Operacao = ({
   const sortableContainerRef = useRef<HTMLDivElement>(null);
 
   return (
+    <FitToScreen>
     <div>
       <div className="flex flex-wrap gap-4 justify-center mb-8">
         {cards.slice(0, 1).map(({ Component }, index) => (
@@ -33,17 +37,18 @@ const Operacao = ({
         ))}
       </div>
 
-      <SortableDiv 
-        chartOrder={chartOrder} 
-        setChartOrder={setChartOrder} 
-        sortableContainerRef={sortableContainerRef} 
-        style="charts-items-wrapper"
+      <SortableDiv
+        chartOrder={chartOrder}
+        setChartOrder={setChartOrder}
+        sortableContainerRef={sortableContainerRef}
+        style="grid bi-grid-2x2 items-stretch grid-cols-1 sm:grid-cols-2 gap-6"
       >
         {chartOrder.map((index) => {
-          const { Component, col } = charts[index];
+          const { Component } = charts[index];
 
           return (
-            <div key={index} className={`chart-content-wrapper ${col === 'full' && 'col-span-full'}`}>
+            <div key={index} className="chart-content-wrapper relative">
+              <SectionIconBadge icon={<PortosIcon />} />
               <React.Suspense fallback={<GraphSkeleton />}>
                 <Component data={data} months={months} />
               </React.Suspense>
@@ -53,6 +58,7 @@ const Operacao = ({
       </SortableDiv>
 
     </div>
+    </FitToScreen>
   );
 };
 

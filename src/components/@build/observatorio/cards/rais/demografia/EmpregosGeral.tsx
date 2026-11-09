@@ -27,7 +27,7 @@ const EmpregosGeral = ({
     
     const chartData = {
       totalEmpregos: data.ativ.length,
-      remuneracaoMed: total / data.ativ.filter((item: any) => item['Vl Remun Dezembro Nom'] != '0').length, 
+      remuneracaoMed: total / data.ativ.filter((item: any) => item['Vl Remun Dezembro Nom'] != null && item['Vl Remun Dezembro Nom'] !== 0).length,
       remuneracaoMax: valMax
     }
 

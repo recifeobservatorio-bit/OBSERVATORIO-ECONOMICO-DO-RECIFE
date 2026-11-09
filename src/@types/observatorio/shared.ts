@@ -10,6 +10,8 @@ export interface Filters<T = unknown> {
 export interface AdditionalFilter {
     options: string[];
     label: string;
+    /** Nome amigável exibido na UI (dropdown e resumo de filtros). Se ausente, usa `label`. */
+    displayLabel?: string;
     selected: string[];
     allowMultiple?: boolean;
     fixed?: string[];
@@ -25,6 +27,9 @@ export interface DataWithFilters<T> {
     /** Same as filteredData but ignoring the month filter — for line charts, where
      * restricting to a single selected month would collapse the series to one point. */
     filteredDataSemMes?: T[];
+    /** Anos realmente presentes nos dados (computeAvailableYears), coletado por
+     * DashboardContext.fetchData pra substituir o `Filters.years` estático do dropdown. */
+    yearsOptions?: string[];
 }
 
 export interface Service<T> {

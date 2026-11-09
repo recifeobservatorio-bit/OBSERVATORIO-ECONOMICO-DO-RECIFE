@@ -32,7 +32,7 @@ const EmpresasInativasMesAnterior = ({
         local={local}
         title={`${title.replace('mês', curMonthName)}`}
         data={chartData}
-        year={year}
+        year={year ? String(Number(year) - 1) : year}
         color={color}
       />}
     </>

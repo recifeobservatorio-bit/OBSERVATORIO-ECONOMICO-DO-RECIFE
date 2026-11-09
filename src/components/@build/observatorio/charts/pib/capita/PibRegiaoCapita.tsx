@@ -2,7 +2,7 @@
 
 import React from "react";
 
-import ScrollableBarChart from "@/components/@global/charts/VerticalScrollableBarChart";
+import BarChart from "@/components/@global/charts/BarChart";
 import ChartGrabber from "@/components/@global/features/ChartGrabber";
 import { processPibGroup } from "@/functions/process_data/observatorio/pib/geral/pibGroup";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
@@ -17,13 +17,12 @@ const PibRegiaoCapita = ({
   return (
     <div className="chart-wrapper">
       <ChartGrabber>
-        <ScrollableBarChart
+        <BarChart
           data={chartData}
           title={title}
           xKey="group"
           bars={[{ dataKey: "pib", name: "PIB Região" }]}
           colors={[ColorPalette.default[1]]}
-          heightPerCategory={50}
         />
       </ChartGrabber>
     </div>

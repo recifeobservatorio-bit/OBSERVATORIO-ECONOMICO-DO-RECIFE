@@ -7,6 +7,7 @@ import BarChart from "@/components/@global/charts/BarChart";
 import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
+import { AeroportoIcon } from "./icons";
 import PanoramaCard from "./PanoramaCard";
 
 const AeroportoMovimentacao = ({ year }: { year: string }) => {
@@ -41,7 +42,13 @@ const AeroportoMovimentacao = ({ year }: { year: string }) => {
   const hasData = chartData.some((d) => d.passageiros > 0 || d.cargas > 0);
 
   return (
-    <PanoramaCard title="Movimentação Aeroportos" subtitle={`${voos.toLocaleString("pt-BR")} voos no período`}>
+    <PanoramaCard
+      title="Movimentação Aeroportos"
+      icon={<AeroportoIcon />}
+      metricLabel="Voos"
+      metric={voos.toLocaleString("pt-BR")}
+      source="Fonte: Anac"
+    >
       {!hasData ? (
         <p className="text-center text-sm text-gray-500 dark:text-gray-400 py-8">
           Sem dados de aeroportos para {year}.
@@ -55,6 +62,7 @@ const AeroportoMovimentacao = ({ year }: { year: string }) => {
             { dataKey: "passageiros", name: "Passageiros" },
             { dataKey: "cargas", name: "Cargas" },
           ]}
+          height={340}
         />
       )}
     </PanoramaCard>

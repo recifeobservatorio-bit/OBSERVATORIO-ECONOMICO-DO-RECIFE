@@ -26,6 +26,7 @@ const EmpresaGrupo = ({
           heightPerCategory={50}
           widthY={130}
           left={-15}
+          maxBarSize={20}
         />
       </ChartGrabber>
     </div>

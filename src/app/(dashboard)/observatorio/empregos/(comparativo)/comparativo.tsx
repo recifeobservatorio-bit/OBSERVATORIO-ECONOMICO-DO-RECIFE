@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 
+import SectionIconBadge from "@/components/@global/cards/SectionIconBadge";
+import FitToScreen from "@/components/@global/features/FitToScreen";
 import SelectCompare from "@/components/@global/features/SelectCompare";
 import SelectPrincipal from "@/components/@global/features/SelectPrincipal";
 import { SortableDiv } from "@/components/@global/features/SortableDiv";
+import { EmpregosIcon } from "@/components/@global/icons/sectionIcons";
 import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
 import { raisCboDicts } from "@/utils/dicts/rais/raisCboDicts";
 import { raisCodCboDicts } from "@/utils/dicts/rais/raisCodCboDicts";
@@ -47,6 +50,7 @@ const Comparativo = ({
   // const cboOption = toCompare.map((opt: string) => `${raisCboDicts[opt]}`)
 
   return (
+    <FitToScreen>
     <div>
          <SelectPrincipal
           options={toCompare}
@@ -85,8 +89,9 @@ const Comparativo = ({
           {tablesRender.map(({ Component }, index) => (
             <div
               key={index}
-              className="bg-white shadow-md rounded-lg flex flex-col items-center w-full "
+              className="bg-white shadow-md rounded-lg flex flex-col items-center w-full only:col-span-full relative"
             >
+              <SectionIconBadge icon={<EmpregosIcon />} />
               <React.Suspense fallback={<div>Carregando...</div>}>
                 <Component
                   municipio={[...tempFiltred][index]}
@@ -100,6 +105,7 @@ const Comparativo = ({
         </SortableDiv>
       </div>
     </div>
+    </FitToScreen>
   );
 };
 

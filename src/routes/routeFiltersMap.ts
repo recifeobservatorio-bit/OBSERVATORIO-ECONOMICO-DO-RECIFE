@@ -14,6 +14,9 @@ import { pibComparativoFilters } from "@/utils/filters/pib/pibComparativoFilters
 import { pibCapitaFilters } from "@/utils/filters/pib/pibCapitaFilters";
 import { empregosCagedFilters } from "@/utils/filters/empregos/empregosCagedFilters";
 import { raisGeralFilters } from "@/utils/filters/rais/raisGeralFilters";
+import { economiaCriativaGeralFilters } from "@/utils/filters/economia-criativa/economiaCriativaGeralFilters";
+import { cnaeHistoricoFilters } from "@/utils/filters/economia-criativa/cnaeHistoricoFilters";
+import { rfcFilters } from "@/utils/filters/economia-criativa/rfcFilters";
 import { Filters } from "@/@types/observatorio/shared";
 import { aenaFilters } from "@/utils/filters/aeroporto/aenaFilters";
 import { anacFilters } from "@/utils/filters/aeroporto/anacFilters";
@@ -117,6 +120,19 @@ export const routeFiltersMap: Record<string, TabFiltersMap> = {
     grupo: raisGeralFilters,
     estoque: raisGeralFilters,
     remuneracao: raisGeralFilters,
+  },
+
+  "/observatorio/economia-criativa": {
+    perfil: economiaCriativaGeralFilters,
+    movimentacao: economiaCriativaGeralFilters,
+    diversidade: economiaCriativaGeralFilters,
+    "empregos-setor": economiaCriativaGeralFilters,
+    "empregos-empresas": economiaCriativaGeralFilters,
+    salarios: economiaCriativaGeralFilters,
+    "negocios-criativos": cnaeHistoricoFilters,
+    "rfc-producoes": rfcFilters,
+    "rfc-locacoes": rfcFilters,
+    "rfc-painel": rfcFilters,
   },
 
   "/observatorio/micro-caged": {

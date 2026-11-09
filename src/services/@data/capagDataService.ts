@@ -1,6 +1,7 @@
 import { fetchCapagRaw } from "@/@api/http/to-charts/capag/CapagData";
 import { CapagHistoricoAno, CapagIndicador, CapagMunicipioData } from "@/@types/observatorio/@data/capagData";
 import { Filters } from "@/@types/observatorio/shared";
+import { computeAvailableYears } from "@/utils/filters/@features/computeAvailableYears";
 
 type CapagRawRow = {
   municipio: string;
@@ -157,6 +158,7 @@ export class CapagDataService {
         additionalFiltersOptions: [
           { label: "MUNICÍPIO", options: this.opcoesCache?.municipios ?? [], selected: [], allowMultiple: false },
         ],
+        yearsOptions: rawRows ? computeAvailableYears(rawRows, (r) => r.ano) : [],
       },
     };
 

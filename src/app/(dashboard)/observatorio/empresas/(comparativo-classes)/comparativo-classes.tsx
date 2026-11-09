@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 
+import SectionIconBadge from "@/components/@global/cards/SectionIconBadge";
+import FitToScreen from "@/components/@global/features/FitToScreen";
 import SelectCompare from "@/components/@global/features/SelectCompare";
 import SelectPrincipal from "@/components/@global/features/SelectPrincipal";
 import { SortableDiv } from "@/components/@global/features/SortableDiv";
+import { EmpresasIcon } from "@/components/@global/icons/sectionIcons";
 import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
 import { geralAccFieldFunction, geralAccFunction } from "@/functions/process_data/observatorio/rais/demografia/geralFuncition";
 import { getUniqueValues } from "@/utils/filters/@global/getUniqueValues";
@@ -10,7 +13,6 @@ import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
 import cards from "./@imports/cards";
 import charts from "./@imports/charts";
-import { rearrangeArray } from "@/functions/process_data/observatorio/porto/comparativo/charts/filteredPortoData";
 import ErrorBoundary from "@/utils/loader/errorBoundary";
 
 
@@ -29,7 +31,6 @@ const ComparativoClasses = ({
   const [pageCompare, setPageCompare] = useState(0);
   const [tempFiltred, setTempFiltred] = useState([]);
   const [selectCompare, setSelectCompare] = useState('')
-  const [tablesRender, setTablesRender] = useState([charts]);
   const [animationClass, setAnimationClass] = useState("card-enter");
 
   const [chartOrder, setChartOrder] = useState(charts.map((_, index) => index));
@@ -64,16 +65,6 @@ const ComparativoClasses = ({
   }, [data])
 
 
-  useEffect(() => {
-    const getNewTables = tempFiltred.map(() => charts) 
-
-    setTablesRender([...getNewTables])
-
-    console.log('[...getNewTables]', [...getNewTables])
-  }, [tempFiltred]);
-
-  console.log('TablesRender ->', tablesRender)
-
   const tempFiltredCard = tempFiltred.filter((municipio) => municipio !== selectCompare)
 
   const handlePageChange = (direction: "prev" | "next") => {
@@ -94,7 +85,11 @@ const ComparativoClasses = ({
 
 
   return (
+    <FitToScreen>
     <div>
+      {/* Busca e "Cards comparando com" lado a lado: empilhados tomavam a
+          altura que os gráficos usam no modo tela única. */}
+      <div className="lg:grid lg:grid-cols-[1fr_260px] lg:gap-4 lg:items-start">
       <SelectPrincipal
         options={toCompare}
         initialValue={['Recife']}
@@ -115,6 +110,7 @@ const ComparativoClasses = ({
           setFilters={setSelectCompare}
           label="Cards comparando com:"
         />
+      </div>
       </div>
 
       <div className="flex justify-between items-center gap-2">
@@ -185,7 +181,7 @@ const ComparativoClasses = ({
         )}
       </div>
 
-      <div className="flex items-center justify-center mb-6 gap-2">
+      <div className={`flex items-center justify-center gap-2 ${tempFiltredCard.length ? "mb-6" : ""}`}>
         {tempFiltredCard.map((_, i) => {
           return (
             <button
@@ -201,12 +197,15 @@ const ComparativoClasses = ({
 
       <div className="flex flex-col gap-6">
 
-      <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="charts-items-wrapper">
-        {tablesRender?.[0]?.slice(0, 1).map(({ Component }, index) => (
+      <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="flex flex-wrap items-center justify-center gap-8 pb-2">
+          {/* Gráfico de linha com metade da largura, na mesma grade dos demais —
+              sozinho numa linha ele ia de uma borda à outra. */}
+          {charts.slice(0, 1).map(({ Component }, index) => (
             <div
-              key={index}
-              className="chart-content-wrapper col-span-full"
+              key={`linha-${index}`}
+              className="chart-content-wrapper bi-half relative grow basis-full lg:basis-[calc(50%-1rem)]"
             >
+              <SectionIconBadge icon={<EmpresasIcon />} />
               <React.Suspense fallback={<div>Carregando...</div>}>
                 <Component
                   toCompare={[...tempFiltred]}
@@ -215,33 +214,37 @@ const ComparativoClasses = ({
                 />
               </React.Suspense>
             </div>
-        ))}
-      </SortableDiv>
-
-      <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="charts-items-wrapper 2xl:!grid-cols-4">
-          {(tablesRender.length > 1 ? (rearrangeArray(tablesRender)?.slice(2) || []) : (tablesRender[0]?.slice(1) || [])).map(({ Component }, index) => {
-              // isso é para escolher qual porto ele vai pegar no tempfitred
-              const virtuaIndex = tablesRender.length > 1 ? (index % 2 === 0 ? 0 : 1) : 0
+          ))}
+          {charts.slice(1).flatMap(({ Component }, chartIndex) => [0, 1].map((virtuaIndex) => {
+              // Sempre reserva os 2 espaços lado a lado (base + comparação) — enquanto a
+              // segunda cidade não é escolhida, mostra um aviso no lugar do gráfico em vez
+              // de esconder o espaço.
+              const municipio = [...tempFiltred][virtuaIndex]
 
               return (
-                <>
-                  <div className={`hidden 2xl:block ${index !== 4 && "!hidden"}`}></div>
-
-                  <div key={index} className={`chart-content-wrapper`}>
+                <div key={`${chartIndex}-${virtuaIndex}`} className="chart-content-wrapper relative grow basis-full sm:basis-[calc(50%-1rem)] lg:basis-[calc(25%-0.75rem)]">
+                  <SectionIconBadge icon={<EmpresasIcon />} />
+                  {municipio ? (
                     <React.Suspense fallback={<div>Carregando...</div>}>
                       <ErrorBoundary>
-                        <Component 
-                          color={ColorPalette.default[virtuaIndex]} 
-                          municipio={[...tempFiltred][virtuaIndex]} 
-                          data={chartData?.[[...tempFiltred][virtuaIndex]]?.['municipio']} />
-                      </ErrorBoundary>                      
+                        <Component
+                          color={ColorPalette.default[virtuaIndex]}
+                          municipio={municipio}
+                          data={chartData?.[municipio]?.['municipio']} />
+                      </ErrorBoundary>
                     </React.Suspense>
-                  </div>              
-                </>        
-            )})}
+                  ) : (
+                    <div className="bi-chart-box flex items-center justify-center h-full min-h-[300px] text-center text-gray-500 dark:text-gray-400">
+                      Escolha uma cidade para comparar
+                    </div>
+                  )}
+                </div>
+              )
+            }))}
         </SortableDiv>
       </div>
     </div>
+    </FitToScreen>
   );
 };
 

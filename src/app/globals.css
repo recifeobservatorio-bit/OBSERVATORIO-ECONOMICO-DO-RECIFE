@@ -95,8 +95,8 @@
 
 .menu-item-wrapper svg{
   flex-shrink: 0;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 
 .menu-item-wrapper svg path{
@@ -167,12 +167,19 @@
   @apply grid items-center grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-8 place-items-center pb-16;
 }
 
+/* Card de gráfico no estilo Power BI: borda fina azul-marinho, sem padding
+   no topo — o título do gráfico (.bi-chart-title) vira a faixa do cabeçalho. */
 .chart-content-wrapper{
-  @apply bg-white dark:bg-[#0C1B2B] h-full shadow-xl rounded-lg p-6 w-full flex flex-col items-center transition-all transform hover:shadow-2xl
+  @apply bg-white h-full rounded-md w-full min-w-0 flex flex-col items-center transition-all transform;
+  background-color: var(--bi-card-bg);
+  border: 1px solid var(--bi-card-border);
+  padding: 0 0.75rem 0.75rem;
+  box-shadow: 0 1px 2px rgba(18, 35, 158, 0.08);
 }
 
 .chart-wrapper{
   width: 100%;
+  min-width: 0;
 }
 
 .layer-ui__wrapper__footer{
@@ -252,4 +259,692 @@
 
 .dark .recharts-tooltip-cursor {
   fill: #233B53;
+}
+/* ===================== TEMA POWER BI (páginas do observatório) =====================
+   Espelha os relatórios Power BI do Observatório: coluna de filtros laranja,
+   abas em seta, cards com cabeçalho azul-marinho e fundo cinza claro. */
+:root {
+  --bi-navy: #12239E;
+  --bi-navy-dark: #0B1670;
+  --bi-orange: #E9834F;
+  --bi-tab: #FF8A5B;
+  --bi-tab-active: #12239E;
+  --bi-tab-hover: #EEF1FA;
+  --bi-tab-divider: #D5DAE6;
+  --bi-tab-text: #4A5683;
+  --bi-tab-idle: #FFFFFF;
+  --bi-tab-active-light: #2238C4;
+  --bi-tab-indicator: #FF9A63;
+  --bi-canvas: #E8EBF0;
+  --bi-card-border: #12239E;
+  --bi-title: #12239E;
+  --bi-card-bg: #FFFFFF;
+}
+
+/* Modo escuro: fundo mais fundo que o card (antes os dois tinham quase o mesmo
+   tom e os cards "sumiam"), faixa de título um pouco mais clara que o azul do
+   modo claro e laranja menos saturado pra não ofuscar ao lado do fundo escuro. */
+.dark {
+  --bi-label-color: #E5E7EB;
+  --bi-navy: #1F3A9E;
+  --bi-orange: #9C4E2A;
+  --bi-tab: #B85C35;
+  --bi-tab-active: #1F3A9E;
+  --bi-tab-hover: #16294A;
+  --bi-tab-divider: #1E3358;
+  --bi-tab-text: #9DADD6;
+  --bi-tab-idle: #0F1E31;
+  --bi-tab-active-light: #2F4FC4;
+  --bi-tab-indicator: #E9834F;
+  --bi-canvas: #060D17;
+  --bi-card-bg: #0F1E31;
+  --bi-card-border: #26407A;
+  --bi-title: #DCE4FF;
+}
+
+.bi-canvas {
+  background: var(--bi-canvas);
+}
+
+.bi-page {
+  padding: 0.75rem 1rem 1rem;
+  min-height: 100vh;
+}
+
+.bi-page-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--bi-title);
+  text-align: left;
+  margin-bottom: 0.35rem;
+  letter-spacing: 0.01em;
+}
+
+/* Abas como botões soltos sobre o fundo da página (sem faixa atrás):
+   quadrados (cantos de 3px), separados por 8px, inativos brancos com borda
+   e texto azul acinzentado; o ativo ganha azul-marinho com degradê, sombra e
+   um indicador laranja (mesma cor da coluna de filtros) centralizado na base. */
+.bi-tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  overflow-x: auto;
+  margin-bottom: 0.75rem;
+  /* Folga pra sombra dos botões não ser cortada pelo overflow. */
+  padding: 2px 2px 4px;
+  scrollbar-width: thin;
+}
+
+.bi-tab {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 104px;
+  min-height: 40px;
+  padding: 8px 14px;
+  background: var(--bi-tab-idle);
+  border: 1px solid var(--bi-tab-divider);
+  box-shadow: 0 1px 2px rgba(15, 30, 80, 0.08);
+  color: var(--bi-tab-text);
+  border-radius: 3px;
+  font-size: 11.5px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: center;
+  white-space: normal;
+  transition: background-color 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.bi-tab::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 4px;
+  width: 0;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--bi-orange);
+  transform: translateX(-50%);
+  transition: width 0.2s ease;
+}
+
+.bi-tab:hover {
+  background: var(--bi-tab-hover);
+  color: var(--bi-title);
+}
+
+.bi-tab:hover::after {
+  width: 18px;
+}
+
+/* Menus com muitas abas (Economia Criativa, Empresas): texto mais justo pra
+   palavras longas como "MOVIMENTAÇÃO" não estourarem a célula. */
+.bi-tabs:has(> .bi-tab:nth-child(8)) .bi-tab {
+  min-width: 0;
+  padding-left: 6px;
+  padding-right: 6px;
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+}
+
+.bi-tab:focus-visible {
+  outline: 2px solid var(--bi-orange);
+  outline-offset: 1px;
+}
+
+.bi-tab.bi-tab-active {
+  background: linear-gradient(180deg, var(--bi-tab-active-light) 0%, var(--bi-tab-active) 100%);
+  color: #fff;
+  border-color: var(--bi-tab-active);
+  box-shadow: 0 2px 6px rgba(18, 35, 158, 0.35);
+}
+
+.bi-tab.bi-tab-active::after {
+  width: 28px;
+  background: var(--bi-tab-indicator);
+}
+
+/* Título do gráfico vira a faixa azul-marinho do topo do card. As margens
+   negativas anulam o padding lateral do .chart-content-wrapper. */
+.chart-content-wrapper .bi-chart-title {
+  background: var(--bi-navy);
+  color: #fff !important;
+  width: calc(100% + 1.5rem) !important;
+  margin: 0 -0.75rem 0.5rem !important;
+  padding: 6px 36px;
+  border-radius: 5px 5px 0 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: center;
+}
+
+/* Tabelas (TableGeneric) com o mesmo cabeçalho. */
+/* Só o título da tabela fica azul — o corpo segue o fundo do card (com o
+   fundo todo azul, tabelas curtas ficavam com uma faixa azul sobrando embaixo). */
+.bi-table {
+  background-color: var(--bi-card-bg) !important;
+}
+
+.bi-table-title {
+  background: var(--bi-navy) !important;
+  padding: 6px 12px !important;
+  font-size: 15px !important;
+  text-align: center;
+  border-radius: 0 !important;
+}
+
+.chart-content-wrapper:has(.bi-table) {
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Menu "⋯" dos gráficos fica dentro da faixa do título, em branco. */
+.chart-content-wrapper .options-menu-anchor.bi-in-card {
+  top: 4px !important;
+}
+
+.chart-content-wrapper .options-menu-anchor.bi-in-card:not(.left-2) {
+  right: 0 !important;
+}
+
+.chart-content-wrapper .options-menu-anchor.bi-in-card > .options-button svg {
+  fill: #fff !important;
+}
+
+/* Coluna de filtros */
+.bi-filter-sidebar {
+  width: 190px;
+  flex-shrink: 0;
+  flex-direction: column;
+  background: var(--bi-orange);
+  height: 100vh;
+}
+
+.bi-filter-label {
+  display: block;
+  text-align: center;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.bi-filter-select {
+  width: 100%;
+  background: #fff;
+  color: var(--bi-navy);
+  font-size: 12px;
+  padding: 5px 8px;
+  border-radius: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.dark .bi-filter-select {
+  background: #0C1B2B;
+  color: #e5e7eb;
+  border-color: #3b4b63;
+}
+
+.bi-filter-fab {
+  background: var(--bi-orange);
+  color: #fff;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+/* Cards de KPI */
+.bi-kpi {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid var(--bi-card-border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.dark .bi-kpi {
+  background: var(--bi-card-bg);
+}
+
+.bi-kpi-title {
+  background: var(--bi-navy);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: center;
+  padding: 6px 10px;
+}
+
+/* Gráficos dentro de BiCard (Panorama) recebem título vazio — o BiCard já
+   desenha o cabeçalho, então a faixa vazia some. */
+.chart-content-wrapper .bi-chart-title:empty {
+  display: none;
+}
+
+/* ---------- Modo escuro: legibilidade dos gráficos ----------
+   O azul-marinho principal da paleta (#12239E) quase some sobre o fundo escuro.
+   Em vez de trocar a paleta em JS (ela também vale pros PNGs exportados e pro
+   modo claro), o modo escuro remapeia essa cor pra um azul mais claro direto nos
+   elementos SVG do Recharts e nas bolinhas das legendas (estilo inline). */
+.dark [fill="#12239E" i] {
+  fill: #6B8CFF;
+}
+
+.dark [stroke="#12239E" i] {
+  stroke: #6B8CFF;
+}
+
+.dark [style*="background-color: rgb(18, 35, 158)"]:not(.bi-table) {
+  background-color: #6B8CFF !important;
+}
+
+/* Textos coloridos com a cor da série (ex.: legenda do treemap). */
+.dark [style^="color: rgb(18, 35, 158)"],
+.dark [style*="; color: rgb(18, 35, 158)"] {
+  color: #8FA8FF !important;
+}
+
+/* Grade e eixos mais discretos — o tracejado claro competia com as séries. */
+.dark .recharts-cartesian-grid line {
+  stroke: #1F3049;
+}
+
+.dark .recharts-cartesian-axis-line,
+.dark .recharts-cartesian-axis-tick-line {
+  stroke: #3A4E6B;
+}
+
+/* Rótulos dentro das barras/fatias seguem legíveis. */
+.dark .recharts-label-list text,
+.dark .recharts-pie-label-text {
+  fill: #E5E7EB;
+}
+
+/* Tooltip escuro em vez da caixa branca padrão. */
+.dark .recharts-default-tooltip {
+  background-color: #0F1E31 !important;
+  border-color: #26407A !important;
+}
+
+/* Mapas: inverte só os tiles do mapa-base (as camadas de dados ficam com as
+   cores originais), assim o mapa acompanha o tema em vez de virar um bloco claro. */
+.dark .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9);
+}
+
+.dark .leaflet-container {
+  background: #0F1E31;
+}
+
+/* Barra de rolagem das abas e da página no tom do tema. */
+.dark .bi-canvas {
+  scrollbar-color: #26407A #060D17;
+}
+
+/* ===================== VISUALIZAÇÃO ÚNICA (estilo Power BI) =====================
+   Cada aba cabe inteira na tela, sem rolar. Vale só dentro do FitToScreen em
+   desktop (.bi-fit não existe no modo celular/tablet, que continua rolando).
+   A altura dos gráficos acompanha a altura da janela: o ResponsiveContainer do
+   Recharts mede o próprio tamanho e redesenha, então basta sobrescrever a
+   altura do .bi-chart-box. O FitToScreen escala o que ainda sobrar. */
+.bi-fit {
+  --bi-chart-h: clamp(150px, calc((100vh - 430px) / 2), 460px);
+}
+
+/* Os gráficos globais guardam a altura num .bi-chart-box com o
+   ResponsiveContainer em 100% dentro — com altura numérica o Recharts desenha
+   naquele tamanho fixo e ignora o CSS. */
+.bi-fit .bi-chart-box {
+  height: auto !important;
+  min-height: var(--bi-chart-h);
+  flex: 1 1 0;
+}
+
+/* O gráfico preenche o card. Antes tinha altura fixa: quando um vizinho de
+   linha era mais alto (pizza com botão + legenda), o card esticava e sobrava
+   um vão vazio de 40–150px embaixo do gráfico. Agora cada wrapper entre o
+   card e a caixa do gráfico vira coluna flex e a caixa cresce (flex 1, com a
+   altura padrão como mínimo). Wrappers que já são flex/grid em linha ficam
+   como estão pra não virar colunas. */
+.bi-fit .chart-content-wrapper div:has(.bi-chart-box, .bi-bar-window):not([class~="flex"]):not([class~="grid"]):not(.bi-chart-box) {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.bi-fit .chart-content-wrapper div[class~="flex-col"]:has(.bi-chart-box, .bi-bar-window) {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* Gráficos com rolagem interna: a janela visível segue a mesma altura, o
+   conteúdo de dentro continua do tamanho que precisa pra rolar. */
+.bi-fit .chart-content-wrapper .overflow-y-auto[style*="height"] {
+  height: auto !important;
+  min-height: var(--bi-chart-h);
+  flex: 1 1 0;
+  /* Sem isso, listas longas (ex.: 40 atividades econômicas) faziam a janela
+     crescer até o tamanho da lista inteira em vez de rolar — esticava a linha
+     e a aba não cabia. Com contain: size ela só ocupa o espaço que o card dá. */
+  contain: size;
+}
+
+/* Mapas e tabelas também seguem a altura do painel. */
+.bi-fit .leaflet-container {
+  height: calc(var(--bi-chart-h) + 40px) !important;
+}
+
+/* Mapa que ocupa uma coluna inteira do painel (Portos): a altura vem da
+   coluna (flex-1), não da altura padrão dos gráficos. */
+.bi-fit .leaflet-container.bi-map-fill {
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+.bi-fit .bi-table [style*="overflow-y: auto"] {
+  max-height: calc(var(--bi-chart-h) + 40px);
+}
+
+/* Abas só de tabelas (Balança › Analítico): sem gráficos, a altura padrão
+   (--bi-chart-h) deixava as tabelas na metade de cima da tela e o resto
+   vazio. Aqui a lista desce até o fim da tela. --bi-fill-offset = o que fica
+   acima e abaixo da lista (cabeçalho da página, busca, títulos, paginação);
+   410px é o da Balança › Analítico. */
+@media (min-width: 1024px) {
+  .bi-fit .bi-tables-fill-screen .bi-table [style*="overflow-y: auto"] {
+    height: max(250px, calc(100vh - var(--bi-fill-offset, 410px))) !important;
+    max-height: none !important;
+  }
+}
+
+/* Tabela que ocupa a altura toda da coluna ao lado dos gráficos (Ranking ›
+   Dados de Municípios): a altura vem da linha da grade (a coluna dos
+   gráficos), não da altura padrão — fica absoluta pra não esticar a linha, e
+   a lista rola por dentro. */
+@media (min-width: 1024px) {
+  .bi-fit .bi-table-fill {
+    position: relative;
+    min-height: 0;
+  }
+
+  .bi-fit .bi-table-fill > div {
+    position: absolute;
+    inset: 0;
+  }
+
+  .bi-fit .bi-table-fill .bg-none {
+    height: 100%;
+  }
+
+  .bi-fit .bi-table-fill .bi-table > div {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .bi-fit .bi-table-fill .bi-table-title {
+    flex: none;
+  }
+
+  .bi-fit .bi-table-fill .bi-table [style*="overflow-y: auto"] {
+    height: auto !important;
+    max-height: none !important;
+    flex: 1 1 0;
+    min-height: 0;
+  }
+}
+
+/* Espaçamentos mais enxutos, como no canvas do Power BI. */
+.bi-fit .chart-content-wrapper .bi-chart-title {
+  margin-bottom: 0.25rem !important;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  font-size: 14.5px;
+  line-height: 1.2;
+}
+
+/* Como no Power BI: gráfico de uma série só não mostra legenda ("Quantidade",
+   "Passageiros"...) — o título já diz o que é. O Recharts mede a legenda pra
+   reservar espaço, então escondida ela devolve essa altura ao gráfico. */
+.bi-fit .recharts-legend-wrapper:has(> div > div:only-child) {
+  display: none;
+}
+
+/* Rótulos dos eixos um pouco menores — mais área de plotagem. */
+.bi-fit .recharts-cartesian-axis-tick-value {
+  font-size: 11px;
+}
+
+.bi-fit .chart-content-wrapper {
+  padding-bottom: 0.4rem;
+}
+
+.bi-fit .mb-8,
+.bi-fit .mb-10 {
+  margin-bottom: 0.75rem;
+}
+
+.bi-fit .pb-16,
+.bi-fit .pb-4 {
+  padding-bottom: 0;
+}
+
+.bi-fit .gap-8 {
+  gap: 1rem;
+}
+
+/* KPIs compactos — a faixa de cards não pode comer a altura dos gráficos. */
+.bi-fit .bi-kpi .text-4xl {
+  font-size: 1.85rem;
+  line-height: 2.1rem;
+}
+
+.bi-fit .bi-kpi-title {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  font-size: 14px;
+}
+
+/* Linhas flex de gráficos (ex.: Micro CAGED): o h-full (100%) do card não é
+   "auto", então o flex não esticava — cards da mesma linha ficavam com alturas
+   diferentes. Com auto o items-stretch da linha iguala todos. */
+.bi-fit .flex-wrap > .chart-content-wrapper {
+  height: auto;
+}
+
+/* Cabeçalho de comparação (Compare Municípios + busca + "Cards comparando
+   com"): ocupava ~170px no topo de toda aba comparativa. Compacto na tela única. */
+.bi-fit .bi-compare-header {
+  margin-bottom: 0.4rem;
+}
+
+.bi-fit .bi-compare-header > :first-child {
+  font-size: 1rem;
+  line-height: 1.4rem;
+  margin-bottom: 0.25rem;
+}
+
+.bi-fit .bi-compare-header input {
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+  font-size: 0.8rem;
+}
+
+.bi-fit .bi-compare-header > p {
+  margin-top: 0.2rem;
+  font-size: 0.75rem;
+}
+
+.bi-fit .bi-compare-select label {
+  margin-bottom: 0.1rem;
+}
+
+.bi-fit .bi-compare-select > div:first-of-type,
+.bi-fit .bi-compare-select button {
+  padding-top: 0.2rem;
+  padding-bottom: 0.2rem;
+}
+
+/* Cards de tabela com altura mínima fixa enorme (min-h-[800px] no comparativo
+   de CBO/remuneração, 500px em outros): no modo tela única a altura vem do
+   conteúdo (a tabela já rola por dentro), senão a aba não cabe na tela. */
+.bi-fit [class~="min-h-[800px]"],
+.bi-fit [class~="min-h-[500px]"] {
+  min-height: 0;
+}
+
+/* Linhas flex com items-center (ex.: comparativos de Empresas) também esticam
+   os cards — senão cada card fica da altura do próprio conteúdo, com vãos. */
+.bi-fit [class~="flex-wrap"]:has(> .chart-content-wrapper) {
+  align-items: stretch;
+}
+
+/* Abas comparativas: cada bloco é um título (nome do município) + card. O card
+   tem h-full, então ocupava a altura inteira da célula MAIS o título e vazava
+   por cima do bloco de baixo. Em coluna flex o card só pega o que sobra. */
+.bi-fit div:has(> p + .chart-content-wrapper) {
+  display: flex;
+  flex-direction: column;
+}
+
+.bi-fit div:has(> p + .chart-content-wrapper) > .chart-content-wrapper {
+  height: auto;
+  flex: 1 1 auto;
+}
+
+/* KPIs divididos em duas fileiras (ex.: Desemprego, 3 + 2): na tela única
+   viram uma faixa só de 5, como no Power BI — economiza uma linha inteira. */
+@media (min-width: 1024px) {
+  .bi-fit [class~="flex-col"]:has(> [class~="flex-wrap"] > .bi-kpi):not(:has(> :not([class~="flex-wrap"]))) {
+    flex-direction: row;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .bi-fit [class~="flex-col"]:has(> [class~="flex-wrap"] > .bi-kpi):not(:has(> :not([class~="flex-wrap"]))) > [class~="flex-wrap"] {
+    display: contents;
+  }
+
+  .bi-fit [class~="flex-col"]:has(> [class~="flex-wrap"] > .bi-kpi):not(:has(> :not([class~="flex-wrap"]))) .bi-kpi {
+    flex: 1 1 0;
+    min-width: 0 !important;
+  }
+}
+
+/* Faixa de KPIs de ponta a ponta, como no Power BI: com 3 ou mais cards eles
+   dividem a largura do painel por igual (inclusive as faixas que eram w-[85%]).
+   Com 1 ou 2 continuam centralizados — esticar um card só deixa o número
+   perdido no meio. */
+@media (min-width: 1024px) {
+  .bi-fit .flex-wrap:has(> .bi-kpi:nth-child(3)) {
+    width: 100%;
+    flex-wrap: nowrap;
+  }
+
+  .bi-fit .flex-wrap:has(> .bi-kpi:nth-child(3)) > .bi-kpi {
+    flex: 1 1 0;
+    min-width: 0 !important;
+  }
+}
+
+/* Colunas da grade, como nas páginas do Power BI: 3 por linha; abas com 7 ou 8
+   gráficos usam 4 por linha (2 linhas em vez de 3 — cada gráfico fica mais
+   alto). Com 9+ continuam 3 (5 colunas deixava cada um estreito demais). As
+   grades auto-fit (minmax 220px) chegavam a 5 colunas: mínimo de 300px. */
+@media (min-width: 1024px) {
+  .bi-fit [class~="grid"][class*="auto-fit"][class*="minmax(220px"] {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+  }
+
+  /* Mesma regra (7–8 gráficos → 4 por linha) para linhas flex-wrap com basis
+     de 1/3 (ex.: Micro CAGED › Movimentações, 8 gráficos: 3+3+2 → 4+4, cada
+     gráfico ganha ~50% de altura). */
+  .bi-fit [class~="flex-wrap"]:has(> .chart-content-wrapper:nth-child(7)):not(:has(> .chart-content-wrapper:nth-child(9))) > .chart-content-wrapper {
+    flex-basis: calc(25% - 0.75rem) !important;
+  }
+
+  /* Card de meia largura nessas linhas (gráfico de linha em Empresas ›
+     Comparativo Ativas Geral NE): 2 colunas das 4, nunca de borda a borda. */
+  .bi-fit [class~="flex-wrap"] > .chart-content-wrapper.bi-half,
+  .bi-fit [class~="flex-wrap"]:has(> .chart-content-wrapper:nth-child(7)):not(:has(> .chart-content-wrapper:nth-child(9))) > .chart-content-wrapper.bi-half {
+    flex-basis: calc(50% - 0.75rem) !important;
+  }
+
+  /* Exatamente 4 gráficos (sem cards de largura/altura especial): 4 numa linha,
+     como no Power BI. Em 3 colunas o 4º ficava sozinho esticado na largura
+     toda (ex.: pizza de RFC Locações), desperdiçando espaço. */
+  .bi-fit [class~="grid"]:not(.bi-grid-2x2):has(> .chart-content-wrapper:nth-child(4)):not(:has(> .chart-content-wrapper:nth-child(5))):not(:has(> [class*="col-span"], > [class*="row-span"])),
+  .bi-fit .charts-items-wrapper:has(> .chart-content-wrapper:nth-child(4)):not(:has(> .chart-content-wrapper:nth-child(5))):not(:has(> [class*="col-span"], > [class*="row-span"])) {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+
+  /* Grades que forçam 2 colunas em telas largas (2xl:!grid-cols-2) com 4
+     gráficos (ex.: Empresas › Tempo Abertura): 4 numa linha, como no Power BI
+     — em 2×2 abaixo do cabeçalho de comparação a aba não cabia na tela. */
+  .bi-fit .charts-items-wrapper[class*="2xl:!grid-cols-2"]:has(> .chart-content-wrapper:nth-child(4)):not(:has(> .chart-content-wrapper:nth-child(5))) {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+
+  /* Exceção: abas que pediram 2 em cima e 2 embaixo (IPCA › Por Grupos). */
+  .bi-fit .bi-grid-2x2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .bi-fit [class~="grid"]:has(> .chart-content-wrapper:nth-child(7)):not(:has(> .chart-content-wrapper:nth-child(9))),
+  .bi-fit .charts-items-wrapper:has(> .chart-content-wrapper:nth-child(7)):not(:has(> .chart-content-wrapper:nth-child(9))) {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+
+  /* charts-items-wrapper usa 2 colunas por padrão até 2xl — no modo tela única
+     usa 3, que é o que cabe na largura de um notebook. */
+  .bi-fit .charts-items-wrapper {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    padding-bottom: 0;
+    /* O padrão (place-items-center) deixava cards da mesma linha com alturas
+       diferentes e vãos entre as linhas; no Power BI os visuais de uma linha
+       têm a mesma altura. */
+    align-items: stretch;
+    justify-items: stretch;
+  }
+}
+
+/* Legendas com muitas séries (ex.: 9 tipos de obra) ocupavam 4–5 linhas e
+   comiam a área do gráfico — na tela única ficam mais compactas. */
+.bi-fit .recharts-legend-wrapper .text-xs {
+  font-size: 11px;
+  line-height: 14px;
+}
+
+.bi-fit .recharts-legend-wrapper > div {
+  margin-top: 0;
+  margin-bottom: 0.4rem;
+  column-gap: 0.6rem;
+}
+
+/* Legenda limitada a ~3 linhas; o resto rola dentro dela. O Recharts mede a
+   caixa da legenda pra reservar espaço, então o gráfico ganha a altura que
+   sobra em vez de ser espremido por uma legenda de 5 linhas. */
+.bi-fit .recharts-legend-wrapper {
+  max-height: 52px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+/* Notebooks (até ~1440px): abas com texto menor pra nomes longos caberem. */
+@media (max-width: 1440px) {
+  .bi-tab {
+    min-width: 88px;
+    padding: 6px 8px;
+    letter-spacing: 0.04em;
+    font-size: 10.5px;
+    min-height: 38px;
+  }
 }

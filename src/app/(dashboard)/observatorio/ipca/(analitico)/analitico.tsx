@@ -2,7 +2,10 @@ import React, { useEffect, useState } from "react";
 
 import { IpcaGeralData } from "@/@types/observatorio/@data/ipcaData";
 import { IpcaGeralHeaders, IpcaTabelaHeaders } from "@/@types/observatorio/@fetch/ipca";
+import SectionIconBadge from "@/components/@global/cards/SectionIconBadge";
+import FitToScreen from "@/components/@global/features/FitToScreen";
 import SelectPrincipal from "@/components/@global/features/SelectPrincipal";
+import { IpcaIcon } from "@/components/@global/icons/sectionIcons";
 import { useDashboard } from "@/context/DashboardContext";
 import { getUniqueValues } from "@/utils/filters/@global/getUniqueValues";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
@@ -73,6 +76,7 @@ const Analitico = ({
   };
 
   return (
+    <FitToScreen>
     <div className="pb-4">
       <SelectPrincipal
         options={toCompare}
@@ -163,8 +167,9 @@ const Analitico = ({
               <React.Suspense fallback={<div>Carregando...</div>} key={index}>
                 <div
                   style={{ backgroundColor: ColorPalette.default[index] }}
-                  className="shadow-md rounded-lg w-100 flex flex-col items-center"
+                  className="shadow-md rounded-lg w-100 flex flex-col items-center relative"
                 >
+                  <SectionIconBadge icon={<IpcaIcon />} />
                   <Component
                     capital={[...tempFiltred][index]}
                     color={ColorPalette.default[index]}
@@ -179,6 +184,7 @@ const Analitico = ({
         </div>
       </div>
     </div>
+    </FitToScreen>
   );
 };
 

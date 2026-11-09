@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 
+import SectionIconBadge from "@/components/@global/cards/SectionIconBadge";
+import FitToScreen from "@/components/@global/features/FitToScreen";
 import SelectPrincipal from "@/components/@global/features/SelectPrincipal";
+import { PibIcon } from "@/components/@global/icons/sectionIcons";
 import { getUniqueValues } from "@/utils/filters/@global/getUniqueValues";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
@@ -54,6 +57,7 @@ const Analitico = ({
   };
 
   return (
+    <FitToScreen>
     <div>
       <SelectPrincipal
         options={toCompare}
@@ -75,8 +79,9 @@ const Analitico = ({
                 <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6">
                   <div
                     style={{ backgroundColor: ColorPalette.default[index] }}
-                    className="shadow-md rounded-lg w-100 flex flex-col items-center"
+                    className="shadow-md rounded-lg w-100 flex flex-col items-center relative"
                   >
+                    <SectionIconBadge icon={<PibIcon />} />
                     <Component
                       municipio={[...tempFiltred][index]}
                       color={ColorPalette.default[index]}
@@ -89,7 +94,8 @@ const Analitico = ({
                     />
                   </div>
 
-                  <div className="bg-white shadow-md rounded-lg w-100 flex flex-col items-center">
+                  <div className="bg-white shadow-md rounded-lg w-100 flex flex-col items-center relative">
+                    <SectionIconBadge icon={<PibIcon />} />
                     <Secundary
                       municipio={[...tempFiltred][index]}
                       color={ColorPalette.default[index]}
@@ -106,6 +112,7 @@ const Analitico = ({
         </div>
       </div>
     </div>
+    </FitToScreen>
   );
 };
 

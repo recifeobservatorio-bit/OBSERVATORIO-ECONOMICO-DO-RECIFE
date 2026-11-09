@@ -41,10 +41,10 @@ const PassageirosIntEmbarque = ({
           widthMultiply={130}
           heightToPass={285}
         />
-        <div className="w-full flex justify-center mt-4">
+        <div className="w-full flex justify-center mt-0.5">
           {subText && (
             <p
-              className="font-medium"
+              className="text-xs font-semibold leading-4"
               style={{ color: colors[1] }} // Aplica a cor dinamicamente
             >
               {subText}

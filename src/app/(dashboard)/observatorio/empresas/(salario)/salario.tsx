@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 
+import SectionIconBadge from "@/components/@global/cards/SectionIconBadge";
+import FitToScreen from "@/components/@global/features/FitToScreen";
 import SelectPrincipal from "@/components/@global/features/SelectPrincipal";
 import { SortableDiv } from "@/components/@global/features/SortableDiv";
+import { EmpresasIcon } from "@/components/@global/icons/sectionIcons";
 import { getSmFiltred } from "@/functions/process_data/observatorio/micro-caged/getSmFiltred";
 import { microCagedCboDicts } from "@/utils/dicts/micro-caged/microCagedCboDicts";
 import { getUniqueValues } from "@/utils/filters/@global/getUniqueValues";
@@ -64,6 +67,7 @@ const Salario = ({
   }, [data])
 
   return (
+    <FitToScreen>
     <div>
       <div className="">
         <SelectPrincipal
@@ -110,9 +114,9 @@ const Salario = ({
                   {selectCompare[index]}
                 </p>
                 <div
-                  className="bg-white shadow-md rounded-lg flex flex-col items-center w-full min-h-[800px]"
+                  className="bg-white shadow-md rounded-lg flex flex-col items-center w-full min-h-[800px] relative"
                 >
-          
+                    <SectionIconBadge icon={<EmpresasIcon />} />
                     <Component
                       profissao={[...tempFiltred, ...tempFiltredCBO.map((cbo) => microCagedCboDicts[cbo])]}
                       color={ColorPalette.default[index]}
@@ -136,9 +140,9 @@ const Salario = ({
                   {selectCompare[index]}
                 </p>
                 <div
-                  className="chart-content-wrapper"
+                  className="chart-content-wrapper relative"
                 >
-          
+                    <SectionIconBadge icon={<EmpresasIcon />} />
                     <Component
                       profissao={[...tempFiltred, ...tempFiltredCBO.map((cbo) => microCagedCboDicts[cbo])]}
                       color={ColorPalette.default[index]}
@@ -152,6 +156,7 @@ const Salario = ({
         </SortableDiv>
       </div>
     </div>
+    </FitToScreen>
   );
 };
 

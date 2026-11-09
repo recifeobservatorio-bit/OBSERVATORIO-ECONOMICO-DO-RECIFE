@@ -7,13 +7,15 @@ interface PanoramaFiltersProps {
 
 const PanoramaFilters = ({ year, onYearChange }: PanoramaFiltersProps) => {
   return (
-    <div className="flex flex-wrap justify-center items-end gap-4 mb-10">
-      <div className="flex flex-col">
-        <label className="text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">ANO</label>
+    // Mesmo visual da coluna de filtros (faixa laranja) — o Panorama não usa a
+    // coluna porque cada cartão busca a própria fonte com este ano local.
+    <div className="flex flex-wrap justify-center items-end gap-4 mb-6">
+      <div className="flex items-center gap-2 rounded px-3 py-1.5" style={{ background: "var(--bi-orange)" }}>
+        <label className="bi-filter-label !mb-0">Ano</label>
         <select
           value={year}
           onChange={(e) => onYearChange(e.target.value)}
-          className="px-3 py-2 border text-sm rounded-md bg-white dark:bg-[#182e46] dark:border-gray-600 dark:text-gray-300"
+          className="bi-filter-select !w-24"
         >
           {YEARS.map((yr) => (
             <option key={yr} value={yr}>

@@ -34,6 +34,7 @@ const DemitidosComparativo = ({
       data2={chartData2}
       comparative={comparative}
       compare={[toCompare, compare]}
+      lowerIsBetter
     />
   );
 };

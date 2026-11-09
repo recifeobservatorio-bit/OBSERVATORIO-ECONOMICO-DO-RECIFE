@@ -4,7 +4,16 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
 import { PortoCoordHeaders } from "@/@types/observatorio/@fetch/porto";
+import { useOptionalDashboard } from "@/context/DashboardContext";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
+import { observeMapResize } from "../../observeMapResize";
+
+// Enquadramento inicial: o território brasileiro (Roraima ao Chuí, Acre a
+// Pernambuco). O mapa ajusta o zoom pra ele caber inteiro no espaço do card.
+const BRASIL: L.LatLngBoundsExpression = [
+  [-33.8, -73.9],
+  [5.3, -34.8],
+];
 
 const LIMITES_BRASIL: L.LatLngBoundsExpression = [
   [-35, -75], // sudoeste
@@ -104,6 +113,10 @@ type PortoLocalizacaoProps = {
 export default function PortoLocalizacao({ data }: PortoLocalizacaoProps) {
 
   const mapRef = useRef<HTMLDivElement | null>(null);
+  // Ref pra o efeito do Leaflet (que só re-roda quando os dados mudam) enxergar sempre a versão atual.
+  const toggleFilterValue = useOptionalDashboard()?.toggleFilterValue;
+  const toggleFilterRef = useRef(toggleFilterValue);
+  toggleFilterRef.current = toggleFilterValue;
 
   useEffect(() => {
 
@@ -114,11 +127,23 @@ export default function PortoLocalizacao({ data }: PortoLocalizacaoProps) {
     const portoData = data[0];
     const selectedMonths = data[1];
 
+    // Zoom fracionado (zoomSnap) pra o Brasil preencher a altura do card em
+    // vez de pular entre níveis inteiros (4 cortava o Sul, 3 sobrava muito).
     const map = L.map(mapRef.current, {
-      minZoom: 4,
+      minZoom: 3,
+      zoomSnap: 0.25,
       maxBounds: LIMITES_BRASIL,
       maxBoundsViscosity: 1.0,
-    }).setView([-14.673, -51.260], 4); // Coordenadas iniciais e zoom
+    });
+    const fitBrasil = () => map.fitBounds(BRASIL, { padding: [8, 8], animate: false });
+    fitBrasil();
+
+    // Reenquadra quando o card muda de tamanho — até a pessoa mexer no mapa
+    // (aí respeita o zoom/posição que ela escolheu).
+    let userMoved = false;
+    const markUserMoved = () => { userMoved = true; };
+    mapRef.current.addEventListener("pointerdown", markUserMoved);
+    mapRef.current.addEventListener("wheel", markUserMoved, { passive: true });
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 18,
@@ -141,6 +166,12 @@ export default function PortoLocalizacao({ data }: PortoLocalizacaoProps) {
         </svg>
         Observatório Econômico do Recife`,
     }).addTo(map);
+    // Container muda de tamanho depois de criado (escala do painel, grade) —
+    // sem isso o mapa ficava metade cinza.
+    const stopResizeWatch = observeMapResize(map, mapRef.current, () => {
+      if (!userMoved) fitBrasil();
+    });
+    const mapEl = mapRef.current;
 
     const geoJsonData = convertToGeoJSON(portoData, selectedMonths);
 
@@ -161,6 +192,9 @@ export default function PortoLocalizacao({ data }: PortoLocalizacaoProps) {
           fillOpacity: 0.8,
         });
 
+        // Clicar no marcador escolhe esse porto no filtro da página.
+        circleMarker.on("click", () => toggleFilterRef.current?.(name));
+
         circleMarker.bindPopup(`
           <div>
             <h3 style="margin: 0; color: #0077cc; font-size: 17px;">⚓ ${name}</h3>
@@ -175,16 +209,21 @@ export default function PortoLocalizacao({ data }: PortoLocalizacaoProps) {
     }).addTo(map);
 
     return () => {
+      stopResizeWatch();
+      mapEl.removeEventListener("pointerdown", markUserMoved);
+      mapEl.removeEventListener("wheel", markUserMoved);
       map.remove();
     };
   }, [data?.[0], data?.[1]]);
 
   return (
-    <div className="w-full h-full dark:bg-[#0C1A28]">
+    <div className="w-full h-full flex flex-col dark:bg-[#0C1A28]">
       <div className="flex w-full justify-center mb-2 text-lg dark:text-gray-200">
         <strong>Carga dos portos por Localização</strong>
       </div>
-      <div ref={mapRef} style={{ height: "500px", width: "100%" }} />
+      {/* Preenche a altura da coluna do painel (bi-map-fill); fora do modo tela
+          única fica com no mínimo 420px. */}
+      <div ref={mapRef} className="bi-map-fill flex-1" style={{ minHeight: "420px", width: "100%" }} />
     </div>
   );
 }

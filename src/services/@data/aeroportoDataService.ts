@@ -3,6 +3,7 @@ import { AenaAeroportoData, AeroportoDataResult, AnacAeroportoData } from "@/@ty
 import { Filters, Service } from "@/@types/observatorio/shared";
 import { getRawData } from "@/utils/filters/@data/getRawData";
 import { applyGenericFilters } from "@/utils/filters/@features/applyGenericFilters";
+import { computeAvailableYears } from "@/utils/filters/@features/computeAvailableYears";
 
 export class AeroportoDataService implements Service<AeroportoDataResult> {
   private static instance: AeroportoDataService;
@@ -39,15 +40,22 @@ export class AeroportoDataService implements Service<AeroportoDataResult> {
       getRawData({applyGenericFilters, service: aeroportoService, nameFunc:'fetchProcessedAenaCargasData', currentYear: this.currentYear, years: filters.years, keyName: 'Aeroporto', filters, lengthIgnore: 1})
     ]);
 
+    const [passageirosAllYears, cargasAllYears] = await Promise.all([
+      aeroportoService.fetchAllYearsAenaPassageiros(),
+      aeroportoService.fetchAllYearsAenaCargas(),
+    ]);
+
     const passageirosFiltered = {
       ...applyGenericFilters(passageiros, filters),
       rawDataPassageiros,
       filteredDataSemMes: applyGenericFilters(passageiros, filters, ["Mês"]).filteredData,
+      yearsOptions: computeAvailableYears(passageirosAllYears, (r: any) => r.Ano),
     };
     const cargasFiltered = {
       ...applyGenericFilters(cargas, filters),
       rawDataCargas,
       filteredDataSemMes: applyGenericFilters(cargas, filters, ["Mês"]).filteredData,
+      yearsOptions: computeAvailableYears(cargasAllYears, (r: any) => r.Ano),
     };
 
     return {
@@ -61,10 +69,12 @@ export class AeroportoDataService implements Service<AeroportoDataResult> {
     const aeroportoService = new AeroportoData(this.currentYear);
     const geral = await aeroportoService.fetchProcessedData();
     const rawData = await getRawData({applyGenericFilters, service: aeroportoService, nameFunc:'fetchProcessedData', currentYear: this.currentYear, years: filters.years, keyName: 'AEROPORTO NOME', filters, lengthIgnore: 1})
+    const geralAllYears = await aeroportoService.fetchAllYearsAnac();
     const geralFiltered = {
       ...applyGenericFilters(geral, filters),
       rawData,
       filteredDataSemMes: applyGenericFilters(geral, filters, ["MÊS"]).filteredData,
+      yearsOptions: computeAvailableYears(geralAllYears, (r: any) => r.ANO),
     };
 
     console.log('FetchAeroporto', geralFiltered)

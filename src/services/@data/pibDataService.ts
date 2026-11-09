@@ -1,5 +1,6 @@
 import { PibData } from "@/@api/http/to-charts/pib/PibData";
 import { applyGenericFilters } from "@/utils/filters/@features/applyGenericFilters";
+import { computeAvailableYears } from "@/utils/filters/@features/computeAvailableYears";
 
 export class PibDataService {
   private static instance: PibDataService;
@@ -42,7 +43,7 @@ export class PibDataService {
 
     const filteredCurrentYearData = applyGenericFilters(current, filters);
     const filteredPastYearData = applyGenericFilters(past, filters);
-    const filtered = applyGenericFilters(fetchData, filters);
+    const filtered = { ...applyGenericFilters(fetchData, filters), yearsOptions: computeAvailableYears(fetchData, (r: any) => r['Ano']) };
 
     return {
         geral: filtered,

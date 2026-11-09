@@ -9,60 +9,46 @@ import EmpresasPorGrupo from "@/components/@build/observatorio/panorama/Empresas
 import IpcaMensal from "@/components/@build/observatorio/panorama/IpcaMensal";
 import PanoramaFilters from "@/components/@build/observatorio/panorama/PanoramaFilters";
 import TaxaSelic from "@/components/@build/observatorio/panorama/TaxaSelic";
+import FitToScreen from "@/components/@global/features/FitToScreen";
 import ErrorBoundary from "@/utils/loader/errorBoundary";
-
-const SectionTitle = ({ children }: { children: React.ReactNode }) => (
-  <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-4 mt-2">
-    {children}
-  </h2>
-);
 
 const PanoramaPage = () => {
   const [year, setYear] = useState("2025");
 
   return (
-    <div className="p-6 min-h-screen mt-48">
-      <h1 className="text-4xl font-bold text-gray-800 text-center mb-6 tracking-wide dark:text-gray-200">
+    <FitToScreen>
+    <div className="bi-page">
+      <h1 className="bi-page-title">
         Panorama Recife
       </h1>
 
       <PanoramaFilters year={year} onYearChange={setYear} />
-      <p className="text-center text-xs text-gray-500 dark:text-gray-400 -mt-6 mb-10">
+      <p className="text-center text-xs text-gray-500 dark:text-gray-400 -mt-4 mb-2">
         O filtro afeta Empregos, Balança Comercial, Empresas e Aeroportos. IPCA e Taxa Selic mostram a série histórica completa.
       </p>
 
-      <div className="max-w-[1600px] mx-auto">
-        <SectionTitle>Indicadores Econômicos</SectionTitle>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          <ErrorBoundary>
-            <IpcaMensal />
-          </ErrorBoundary>
-          <ErrorBoundary>
-            <TaxaSelic />
-          </ErrorBoundary>
-        </div>
-
-        <SectionTitle>Mercado de Trabalho e Empresas</SectionTitle>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          <ErrorBoundary>
-            <EmpregosMovimentacao year={year} />
-          </ErrorBoundary>
-          <ErrorBoundary>
-            <EmpresasPorGrupo year={year} />
-          </ErrorBoundary>
-        </div>
-
-        <SectionTitle>Comércio Exterior e Transporte</SectionTitle>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          <ErrorBoundary>
-            <BalancaComercialMovimentacao year={year} />
-          </ErrorBoundary>
-          <ErrorBoundary>
-            <AeroportoMovimentacao year={year} />
-          </ErrorBoundary>
-        </div>
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+        <ErrorBoundary>
+          <IpcaMensal />
+        </ErrorBoundary>
+        <ErrorBoundary>
+          <TaxaSelic />
+        </ErrorBoundary>
+        <ErrorBoundary>
+          <EmpregosMovimentacao year={year} />
+        </ErrorBoundary>
+        <ErrorBoundary>
+          <EmpresasPorGrupo year={year} />
+        </ErrorBoundary>
+        <ErrorBoundary>
+          <BalancaComercialMovimentacao year={year} />
+        </ErrorBoundary>
+        <ErrorBoundary>
+          <AeroportoMovimentacao year={year} />
+        </ErrorBoundary>
       </div>
     </div>
+    </FitToScreen>
   );
 };
 

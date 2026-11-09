@@ -9,7 +9,7 @@ import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
 const ImportacaoExportacaoContinente = ({
   data = [],
-  colors = ColorPalette.default,
+  colors = [ColorPalette.status.bad, ColorPalette.status.good],
   title="Produtos Comercializados"
 }: ChartBuild<BalancaHeaders[]>) => {
   const chartData = processComercializacaoPorProduto(data);
@@ -19,7 +19,7 @@ const ImportacaoExportacaoContinente = ({
       <ChartGrabber>
         <StackedBarChart
         data={chartData}
-        colors={colors.slice(1)}
+        colors={colors}
         title={title}
         xKey="descricao"
         bars={[
@@ -37,7 +37,7 @@ const ImportacaoExportacaoContinente = ({
           },
         ]}
         tooltipEntry=" dólares"
-        heightPerCategory={60}  // Define a altura de cada categoria (barra)
+        heightPerCategory={36}  // Define a altura de cada categoria (barra)
         visibleHeight={400}
         widthY={150}
         left={-8}

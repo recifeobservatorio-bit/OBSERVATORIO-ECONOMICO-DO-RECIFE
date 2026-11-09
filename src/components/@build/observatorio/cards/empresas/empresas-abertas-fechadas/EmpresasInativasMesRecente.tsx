@@ -35,6 +35,7 @@ const EmpresasInativasMesRecente = ({
       data2={chartData2}
       comparative={comparative}
       compare={[toCompare, compare]}
+      lowerIsBetter
     />
   )
 }

@@ -11,10 +11,10 @@ const EmpresasSecao = ({
   data,
   municipio,
   color,
-  title = "Empresas por Natureza Jurídica",
+  title = "Empresas por Seção",
   year,
 }: any) => {
-  const dataEmpresas = data 
+  const dataEmpresas = data
   // const dataEmpresas = data['empresas']
 
   const chartData = getObjToArr<number>(dataEmpresas?.['nome_secao'] || {}).sort((a, b) => b.value - a.value)
@@ -22,6 +22,8 @@ const EmpresasSecao = ({
   return (
     <div className="chart-wrapper">
       <ChartGrabber>
+        {/* Barras deitadas (uma seção por linha): ~20 colunas em pé num card
+            de 1/4 da largura deixavam os valores um por cima do outro. */}
         <ScrollableBarChart
           data={chartData}
           title={title + ` - (${municipio})`}
@@ -31,6 +33,7 @@ const EmpresasSecao = ({
           heightPerCategory={50}
           widthY={130}
           left={-15}
+          maxBarSize={20}
         />
       </ChartGrabber>
     </div>

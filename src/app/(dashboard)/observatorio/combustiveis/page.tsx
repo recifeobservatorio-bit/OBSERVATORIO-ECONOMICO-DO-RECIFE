@@ -68,21 +68,21 @@ const CombustiveisPage = () => {
   if (isLoading) return <LoadingScreen />;
 
   return (
-    <div className="p-6 min-h-screen mt-48">
-      <h1 className="text-4xl font-bold text-gray-800 text-center mb-8 tracking-wide dark:text-gray-200">
+    <div className="bi-page">
+      <h1 className="bi-page-title">
         Combustíveis — ANP
       </h1>
 
       {/* Abas */}
-      <div className="flex justify-center gap-4 mb-8 flex-wrap">
+      <div className="bi-tabs">
         {TABS.map(({ key, label, gradient }) => (
           <button
             key={key}
             onClick={() => handleNavigation(key)}
-            className={`px-6 py-3 rounded-lg flex-1 sm:flex-none min-w-[160px] max-w-[220px] text-sm font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg ${
+            className={`bi-tab ${
               activeTab === key
-                ? `bg-gradient-to-r ${gradient} text-white`
-                : "bg-gray-300 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+                ? "bi-tab-active"
+                : ""
             }`}
           >
             {label}

@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 
+import SectionIconBadge from "@/components/@global/cards/SectionIconBadge";
+import FitToScreen from "@/components/@global/features/FitToScreen";
 import SelectCompare from "@/components/@global/features/SelectCompare";
 import SelectPrincipal from "@/components/@global/features/SelectPrincipal";
 import { SortableDiv } from "@/components/@global/features/SortableDiv";
+import { EmpregosIcon } from "@/components/@global/icons/sectionIcons";
 import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
 import { geralAccFunction } from "@/functions/process_data/observatorio/rais/demografia/geralFuncition";
 import { getUniqueValues } from "@/utils/filters/@global/getUniqueValues";
@@ -114,6 +117,7 @@ const ComparativoMov = ({
   };
 
   return (
+    <FitToScreen>
     <div>
       <SelectPrincipal
         options={toCompare}
@@ -220,7 +224,7 @@ const ComparativoMov = ({
 
       <div className="flex flex-col gap-6">
 
-      <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="charts-items-wrapper">
+      <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="grid items-stretch grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {tablesRender.map(({ Component }, index) => (
           <div key={index} className="w-full">
             <p className="font-semibold text-2xl text-gray-700 mb-2">
@@ -228,8 +232,9 @@ const ComparativoMov = ({
             </p>
             <div
               key={index}
-              className="chart-content-wrapper"
+              className="chart-content-wrapper relative"
             >
+              <SectionIconBadge icon={<EmpregosIcon />} />
               <React.Suspense fallback={<div>Carregando...</div>}>
                 <Component
                   toCompare={[...tempFiltred][index]}
@@ -244,7 +249,7 @@ const ComparativoMov = ({
         ))}
       </SortableDiv>
 
-     <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="charts-items-wrapper">
+     <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="grid items-stretch grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {tablesRenderSecond.map(({ Component }, index) => (
           <div key={index} className="w-full">
             <p className="font-semibold text-2xl text-gray-700 mb-2">
@@ -252,8 +257,9 @@ const ComparativoMov = ({
             </p>
             <div
               key={index}
-              className="chart-content-wrapper"
+              className="chart-content-wrapper relative"
             >
+              <SectionIconBadge icon={<EmpregosIcon />} />
               <React.Suspense fallback={<div>Carregando...</div>}>
                 <Component
                   toCompare={[...tempFiltred][index]}
@@ -268,6 +274,7 @@ const ComparativoMov = ({
       </SortableDiv>
       </div>
     </div>
+    </FitToScreen>
   );
 };
 

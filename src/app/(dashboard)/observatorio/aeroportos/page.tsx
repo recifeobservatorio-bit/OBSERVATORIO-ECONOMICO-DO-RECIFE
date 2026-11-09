@@ -99,48 +99,48 @@ const AeroportosPage = () => {
   if (isLoading) return <LoadingScreen />;
 
   return (
-    <div className="p-6 min-h-screen mt-48">
-      <h1 className="text-4xl font-bold text-gray-800 text-center mb-8 tracking-wide dark:text-gray-200">
+    <div className="bi-page">
+      <h1 className="bi-page-title">
         Movimentação de Aeroportos
       </h1>
-      <div className="flex justify-center gap-6 mb-8 flex-wrap">
+      <div className="bi-tabs">
         {/* Botões de navegação */}
         <button
           onClick={() => handleNavigation("geral")}
-          className={`px-6 py-3 rounded-lg flex-1 sm:flex-0 min-w-[250px] max-w-[350px] text-lg font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg ${
+          className={`bi-tab ${
             activeTab === "geral"
-              ? "bg-gradient-to-r from-orange-500 to-orange-700 text-white"
-              : "bg-gray-300 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+              ? "bi-tab-active"
+              : ""
           }`}
         >
           Resumo Geral
         </button>
         <button
           onClick={() => handleNavigation("comparativo")}
-          className={`px-6 py-3 rounded-lg flex-1 sm:flex-0 min-w-[300px] max-w-[350px] text-lg font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg ${
+          className={`bi-tab ${
             activeTab === "comparativo"
-              ? "bg-gradient-to-r from-blue-500 to-blue-700 text-white"
-              : "bg-gray-300 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+              ? "bi-tab-active"
+              : ""
           }`}
         >
           Comparativo
         </button>
         <button
           onClick={() => handleNavigation("embarque")}
-          className={`px-6 py-3 rounded-lg flex-1 sm:flex-0 min-w-[250px] max-w-[350px] text-lg font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg ${
+          className={`bi-tab ${
             activeTab === "embarque"
-              ? "bg-gradient-to-r from-green-500 to-green-700 text-white"
-              : "bg-gray-300 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+              ? "bi-tab-active"
+              : ""
           }`}
         >
           Embarque/Desembarque
         </button>
         <button
           onClick={() => handleNavigation("aena")}
-          className={`px-6 py-3 rounded-lg flex-1 sm:flex-0 min-w-[250px] max-w-[350px] text-lg font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg ${
+          className={`bi-tab ${
             activeTab === "aena"
-              ? "bg-gradient-to-r from-purple-500 to-purple-700 text-white"
-              : "bg-gray-300 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+              ? "bi-tab-active"
+              : ""
           }`}
         >
           <i>AENA</i>

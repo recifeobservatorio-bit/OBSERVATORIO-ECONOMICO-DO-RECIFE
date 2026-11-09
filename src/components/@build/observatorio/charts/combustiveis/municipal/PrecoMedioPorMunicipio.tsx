@@ -1,7 +1,7 @@
 "use client";
 
-import VerticalScrollableBarChart from "@/components/@global/charts/VerticalScrollableBarChart";
 import ChartGrabber from "@/components/@global/features/ChartGrabber";
+import VerticalScrollableBarChart from "@/components/@global/charts/VerticalScrollableBarChart";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
 const PrecoMedioPorMunicipio = ({ data, title = "Preço Médio por Município", colors = ColorPalette.default }: any) => {
@@ -13,7 +13,7 @@ const PrecoMedioPorMunicipio = ({ data, title = "Preço Médio por Município", 
   return (
     <div className="chart-wrapper">
       <ChartGrabber>
-        <VerticalScrollableBarChart data={chartData} title={title} colors={colors}
+        <VerticalScrollableBarChart data={chartData} title={title} colors={[colors[0]]}
           xKey="municipio" bars={[{ dataKey: "preco", name: "Preço Médio (R$)" }]}
           heightPerCategory={40} visibleHeight={420} widthY={100}
           highlightValues={["Recife"]} highlightColor="#0155AE" />

@@ -4,7 +4,7 @@ import Card from "@/components/@global/cards/Card";
 
 const MovimentacaoTotal = ({
   data,
-  title = `Movimentacão de cargas`,
+  title = `Movimentação de cargas`,
   local = '',
   year,
   color,

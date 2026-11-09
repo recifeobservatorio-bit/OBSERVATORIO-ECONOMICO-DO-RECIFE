@@ -74,7 +74,7 @@ const SelectPrincipal = ({
 
 
   return (
-    <div className="mb-6 relative">
+    <div className="bi-compare-header mb-6 relative">
       <label
         htmlFor="municipio"
         className="flex items-center text-gray-700 dark:text-gray-200 gap-[4px] font-semibold mb-2 text-2xl"

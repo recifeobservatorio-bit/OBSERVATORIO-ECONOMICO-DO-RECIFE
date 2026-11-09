@@ -3,9 +3,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { PortoGeralData, PortoOperacaoData, RawDataPortos } from "@/@types/observatorio/@data/portoData";
 import { PortoAtracacaoHeaders, PortoCargaHeaders } from "@/@types/observatorio/@fetch/porto";
 import { ChartBuild } from "@/@types/observatorio/shared";
+import SectionIconBadge from "@/components/@global/cards/SectionIconBadge";
 import { CardsCarousel } from "@/components/@global/features/CardsCarousel";
+import FitToScreen from "@/components/@global/features/FitToScreen";
 import SelectPrincipal from "@/components/@global/features/SelectPrincipal";
 import { SortableDiv } from "@/components/@global/features/SortableDiv";
+import { PortosIcon } from "@/components/@global/icons/sectionIcons";
 import { getFilteredData, rearrangeArray } from "@/functions/process_data/observatorio/porto/comparativo/charts/filteredPortoData";
 import { getUniqueValues } from "@/utils/filters/@global/getUniqueValues";
 import ErrorBoundary from "@/utils/loader/errorBoundary";
@@ -68,7 +71,10 @@ useEffect(() => {
 
   const absoluteDivRef = useRef<HTMLDivElement>(null);
 
+  const singlePorto = tablesRender.length === 1;
+
   return (
+    <FitToScreen>
     <div>
       <SelectPrincipal
         options={toCompare}
@@ -92,7 +98,7 @@ useEffect(() => {
                     toCompare === attTempFiltred[pageCompare]
                      ? ''
                      : 'translate-x-[100%]'
-                    } flex-1 absolute`}
+                    } absolute inset-x-0`}
                  >
                  <ErrorBoundary>
                     <Component local={attTempFiltred[pageCompare]} 
@@ -109,14 +115,18 @@ useEffect(() => {
                     })}
        </CardsCarousel>
 
-      <div className="flex flex-col gap-6">
+      {/* Só Recife (sem porto comparado): linha + 3 gráficos numa grade 2×2 —
+          antes a linha ocupava a largura toda e os outros 3 iam pra baixo. Os
+          dois blocos viram "contents" pra seus cards entrarem na mesma grade. */}
+      <div className={singlePorto ? "grid bi-grid-2x2 grid-cols-1 lg:grid-cols-2 gap-6 pb-4" : "flex flex-col gap-6"}>
        
-      <SortableDiv chartOrder={tableOrder} setChartOrder={setTableOrder} sortableContainerRef={sortableContainerTableRef} style="charts-items-wrapper 2xl:!grid-cols-2">
+      <SortableDiv chartOrder={tableOrder} setChartOrder={setTableOrder} sortableContainerRef={sortableContainerTableRef} style={singlePorto ? "contents" : "charts-items-wrapper 2xl:!grid-cols-2"}>
         {tablesRender.map((arrChart, index) => {
 
-        return arrChart.slice(0, 1).map(({ Component, col }) => {
+        return arrChart.slice(0, 1).map(({ Component }) => {
             return (
-              <div key={index} className={`chart-content-wrapper ${col === 'full' && tablesRender.length === 1 && 'col-span-full'}`}>
+              <div key={index} className="chart-content-wrapper relative">
+              <SectionIconBadge icon={<PortosIcon />} />
               <React.Suspense fallback={<div>Carregando...</div>}>
                 <Component
                   porto={["Recife", ...tempFiltred][index]}
@@ -135,16 +145,15 @@ useEffect(() => {
           )})})}
       </SortableDiv> 
 
-      <SortableDiv chartOrder={tableOrder} setChartOrder={setTableOrder} sortableContainerRef={sortableContainerTableRef} style="charts-items-wrapper 2xl:!grid-cols-4">
+      <SortableDiv chartOrder={tableOrder} setChartOrder={setTableOrder} sortableContainerRef={sortableContainerTableRef} style={singlePorto ? "contents" : "flex flex-wrap items-stretch gap-6 pb-16"}>
           {(tablesRender.length > 1 ? rearrangeArray(tablesRender).slice(2) : tablesRender[0].slice(1)).map(({ Component }, index) => {
               // isso é para escolher qual porto ele vai pegar no tempfitred
               const virtuaIndex = tablesRender.length > 1 ? (index % 2 === 0 ? 0 : 1) : 0
-      
-              return (
-                <>
-                  <div className={`hidden 2xl:block ${index !== 4 && "!hidden"}`}></div>
 
-                  <div key={index} className={`chart-content-wrapper`}>
+              return (
+                <React.Fragment key={index}>
+                  <div key={index} className={`chart-content-wrapper relative grow basis-full sm:basis-[calc(50%-0.75rem)] xl:basis-[calc(33.333%-1rem)]`}>
+                    <SectionIconBadge icon={<PortosIcon />} />
                     <React.Suspense fallback={<div>Carregando...</div>}>
                       <Component
                         porto={["Recife", ...tempFiltred][virtuaIndex]}
@@ -157,12 +166,13 @@ useEffect(() => {
                         year={year}
                       />
                     </React.Suspense>
-                  </div>              
-                </>        
+                  </div>
+                </React.Fragment>
             )})}
         </SortableDiv>
       </div>
     </div>
+    </FitToScreen>
   );
 };
 

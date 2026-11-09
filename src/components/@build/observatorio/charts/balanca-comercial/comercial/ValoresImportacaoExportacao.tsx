@@ -18,7 +18,8 @@ import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
 const CargasAnoComparativo = ({
   data = [],
-  colors = ColorPalette.default,
+  dataSemMes,
+  colors = [ColorPalette.status.badLine, ColorPalette.status.good],
   title = "Valores Importação e Exportação",
   months
 }: ChartBuild<BalancaHeaders[]>) => {
@@ -46,7 +47,9 @@ const CargasAnoComparativo = ({
     );
   }
 
-  const mesChartData = updatedMonthChartData(processValoresImportacaoExportacao(data), months ?? 1);
+  // Usa dataSemMes (ignora o filtro de Mês) — um gráfico de linha nunca deve obedecer ao
+  // filtro de mês, senão a série colapsa num ponto só quando um mês é selecionado.
+  const mesChartData = updatedMonthChartData(processValoresImportacaoExportacao(dataSemMes ?? data), months ?? 1);
   const chartData = mode === "ano" ? anoData : mesChartData;
   const xKey = mode === "ano" ? "ano" : "mes";
 
@@ -57,7 +60,7 @@ const CargasAnoComparativo = ({
       data={chartData}
       title={title}
       underTitle={<MesAnoToggle mode={mode} onChange={setMode} />}
-      colors={[colors[0], colors[1]]}
+      colors={colors}
       xKey={xKey}
       lines={[
         { dataKey: "importacao", name: "Importação" },

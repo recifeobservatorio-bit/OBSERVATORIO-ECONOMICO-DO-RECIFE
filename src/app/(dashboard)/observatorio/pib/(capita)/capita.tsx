@@ -1,7 +1,10 @@
 import React, { useRef, useEffect, useState } from "react";
 import Sortable from "sortablejs";
 
+import SectionIconBadge from "@/components/@global/cards/SectionIconBadge";
+import FitToScreen from "@/components/@global/features/FitToScreen";
 import { SortableDiv } from "@/components/@global/features/SortableDiv";
+import { PibIcon } from "@/components/@global/icons/sectionIcons";
 import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
@@ -19,8 +22,11 @@ const Capita = ({ toCompare, data, year, months }: { toCompare?: string[]; data:
   const sortableContainerTableRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div>
-      <div className="flex flex-wrap gap-4 justify-center mb-8">
+    <FitToScreen>
+    {/* Tela única: gráficos e tabela numa grade só de 3 colunas (5 gráficos +
+        tabela = 2 linhas). Antes a tabela ocupava uma linha inteira sozinha. */}
+    <div className="lg:grid lg:grid-cols-3 lg:gap-4">
+      <div className="flex flex-wrap gap-4 justify-center mb-8 lg:col-span-3 lg:mb-0">
         {cards.map(({ Component }, index) => (
           <React.Suspense fallback={<div>Carregando...</div>} key={index}>
             <Component
@@ -33,32 +39,34 @@ const Capita = ({ toCompare, data, year, months }: { toCompare?: string[]; data:
         ))}
       </div>
 
-      <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="charts-items-wrapper">
+      <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="flex flex-wrap items-stretch gap-4 lg:contents">
         {chartOrder.map((index) => {
           const { Component } = charts[index];
           return (
             <div
               key={index}
-              className={`chart-content-wrapper`}
+              className={`chart-content-wrapper grow basis-full sm:basis-[calc(50%-0.5rem)] lg:basis-[calc(33.333%-0.667rem)] relative`}
             >
+              <SectionIconBadge icon={<PibIcon />} />
               <React.Suspense fallback={<GraphSkeleton />}>
                 <Component data={data} months={months} />
               </React.Suspense>
             </div>
           );
         })}
-        
+
       </SortableDiv>
 
-      <SortableDiv chartOrder={tableOrder} setChartOrder={setTableOrder} sortableContainerRef={sortableContainerTableRef} style="charts-items-wrapper">
+      <SortableDiv chartOrder={tableOrder} setChartOrder={setTableOrder} sortableContainerRef={sortableContainerTableRef} style="grid items-stretch grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4 lg:contents">
           {tableOrder.map((index) => {
           const { Component } = tables[index];
-         
-          return ( 
+
+          return (
             <div
               key={index}
-              className="bg-white shadow-md rounded-lg flex flex-col items-center w-full"
+              className="bg-white shadow-md rounded-lg flex flex-col items-center w-full relative"
             >
+              <SectionIconBadge icon={<PibIcon />} />
               <React.Suspense fallback={<div>Carregando...</div>}>
                 <Component
                   color={ColorPalette.default[index]}
@@ -69,6 +77,7 @@ const Capita = ({ toCompare, data, year, months }: { toCompare?: string[]; data:
           )})}
         </SortableDiv>
     </div>
+    </FitToScreen>
   );
 };
 

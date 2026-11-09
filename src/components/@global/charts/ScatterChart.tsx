@@ -61,13 +61,14 @@ const ScatterChart = ({
   };
 
   return (
-    <div className="relative bg-white w-full h-full dark:bg-[#0C1B2B]">
+    <div className="relative bg-transparent w-full h-full">
       <div className="flex flex-col items-center justify-center">
-        <h3 className="text-center font-semibold w-[90%] text-gray-800 dark:text-gray-100">
+        <h3 className="bi-chart-title text-center font-semibold w-[90%] text-gray-800 dark:text-gray-100">
           {title}
         </h3>
       </div>
-      <ResponsiveContainer width="100%" height={340}>
+      <div className="bi-chart-box" style={{ height: 340 }}>
+<ResponsiveContainer width="100%" height="100%">
         <RechartsScatterChart margin={{ top: 10, right: 30, left: 30, bottom: 40 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--grid-color, #e5e7eb)" />
           <XAxis
@@ -110,11 +111,12 @@ const ScatterChart = ({
           />
           {series
             ? series.map((s: any, i: number) => (
-                <Scatter key={i} name={s.name} data={s.data} fill={colors[i] || "#EC6625"} />
+                <Scatter key={i} name={s.name} data={s.data} fill={colors[i] || "#EC6625"} isAnimationActive={false} />
               ))
-            : <Scatter name={tooltipEntry || "Dados"} data={data} fill={colors[0] || "#EC6625"} />}
+            : <Scatter name={tooltipEntry || "Dados"} data={data} fill={colors[0] || "#EC6625"} isAnimationActive={false} />}
         </RechartsScatterChart>
       </ResponsiveContainer>
+</div>
     </div>
   );
 };

@@ -1,6 +1,8 @@
 import { fetchItbiRaw } from "@/@api/http/to-charts/tributos/ItbiData";
 import { fetchIptuResumo, fetchIptuAmostra } from "@/@api/http/to-charts/tributos/IptuData";
 import { Filters } from "@/@types/observatorio/shared";
+import { computeAvailableYears } from "@/utils/filters/@features/computeAvailableYears";
+import { formatBairroLabel } from "@/utils/formatters/@global/formatBairroLabel";
 
 const MESES = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
@@ -105,7 +107,7 @@ function processItbiContribuintes(rows: any[], prevYearRows: any[], year: string
   });
 
   const porBairro = Object.entries(groupBy(rows, (r) => r.bairro))
-    .map(([bairro, rs]) => ({ bairro, quantidade: rs.length }))
+    .map(([bairro, rs]) => ({ bairro: formatBairroLabel(bairro), quantidade: rs.length }))
     .sort((a, b) => b.quantidade - a.quantidade);
 
   const porZona = Object.entries(groupBy(rows, (r) => r.zona))
@@ -163,7 +165,7 @@ function processItbiAvaliacoes(rows: any[], rowsSemMes: any[] = rows, rowsPorAno
 
   const medianaPorBairro = Object.entries(groupBy(rows, (r) => r.bairro))
     .map(([bairro, rs]) => ({
-      bairro,
+      bairro: formatBairroLabel(bairro),
       mediana: parseFloat(median((rs as any[]).map((r: any) => parseDecimal(r.valor_avaliacao))).toFixed(2)),
     }))
     .sort((a, b) => b.mediana - a.mediana);
@@ -256,7 +258,7 @@ function processIptuContribuintes(rows: any[], prevYearRows: any[], allRows: any
   });
 
   const porBairro = Object.entries(groupBy(rows, (r) => r.bairro))
-    .map(([bairro, rs]) => ({ bairro, quantidade: rs.reduce((s, r) => s + r.quantidade, 0) }))
+    .map(([bairro, rs]) => ({ bairro: formatBairroLabel(bairro), quantidade: rs.reduce((s, r) => s + r.quantidade, 0) }))
     .sort((a, b) => b.quantidade - a.quantidade);
 
   const porRPA = Object.entries(groupBy(rows, (r) => r.rpa))
@@ -306,7 +308,7 @@ function processIptuValores(rows: any[], prevYearRows: any[], allRows: any[]) {
   }));
 
   const porBairro = Object.entries(groupBy(rows, (r) => r.bairro))
-    .map(([bairro, rs]) => ({ bairro, valor: parseFloat(somaValor(rs).toFixed(2)) }))
+    .map(([bairro, rs]) => ({ bairro: formatBairroLabel(bairro), valor: parseFloat(somaValor(rs).toFixed(2)) }))
     .sort((a, b) => b.valor - a.valor);
 
   const porRPA = Object.entries(groupBy(rows, (r) => r.rpa))
@@ -379,19 +381,20 @@ export class TributosDataService {
         { label: "USO DO IMÓVEL", options: Array.from(new Set(allRows.map((r) => r.tipo_ocupacao).filter((v) => v != null))).sort() },
         { label: "LOGRADOURO", options: Array.from(new Set(allRows.map((r) => r.logradouro).filter((v) => v != null))).sort() },
       ];
+      const yearsOptions = computeAvailableYears(allRows, (r) => r.ano);
 
       switch (tab) {
         case "mercado-imobiliario-avaliacoes":
-          processed = { id: "tributos", itbiAvaliacoes: { ...processItbiAvaliacoes(rows, rowsSemMes, rowsPorAno), additionalFiltersOptions } };
+          processed = { id: "tributos", itbiAvaliacoes: { ...processItbiAvaliacoes(rows, rowsSemMes, rowsPorAno), additionalFiltersOptions, yearsOptions } };
           break;
         case "mercado-imobiliario-pesquisa":
-          processed = { id: "tributos", itbiPesquisa: { ...processItbiPesquisa(rows), additionalFiltersOptions } };
+          processed = { id: "tributos", itbiPesquisa: { ...processItbiPesquisa(rows), additionalFiltersOptions, yearsOptions } };
           break;
         default: {
           const prevYearRows = applyItbiFilters(allRows, f, String(Number(this.currentYear) - 1));
           processed = {
             id: "tributos",
-            itbiContribuintes: { ...processItbiContribuintes(rows, prevYearRows, this.currentYear, rowsSemMes, rowsPorAno), additionalFiltersOptions },
+            itbiContribuintes: { ...processItbiContribuintes(rows, prevYearRows, this.currentYear, rowsSemMes, rowsPorAno), additionalFiltersOptions, yearsOptions },
           };
         }
       }
@@ -404,8 +407,9 @@ export class TributosDataService {
         { label: "BAIRRO", options: Array.from(new Set(allRows.map((r) => r.bairro).filter((v) => v != null))).sort() },
         { label: "LOGRADOURO", options: Array.from(new Set(allRows.map((r) => r.logradouro).filter((v) => v != null))).sort() },
       ];
+      const yearsOptions = computeAvailableYears(allRows, (r) => r.ano);
 
-      processed = { id: "tributos", iptuPesquisa: { ...processIptuPesquisa(rows), additionalFiltersOptions } };
+      processed = { id: "tributos", iptuPesquisa: { ...processIptuPesquisa(rows), additionalFiltersOptions, yearsOptions } };
     } else {
       const allRows = await fetchIptuResumo();
       const f = getIptuFilters({ ...filters, year: this.currentYear });
@@ -416,13 +420,14 @@ export class TributosDataService {
         { label: "BAIRRO", options: Array.from(new Set(allRows.map((r) => r.bairro).filter((v) => v != null))).sort() },
         { label: "USO DO IMÓVEL", options: Array.from(new Set(allRows.map((r) => r.uso).filter((v) => v != null))).sort() },
       ];
+      const yearsOptions = computeAvailableYears(allRows, (r) => r.ano);
 
       switch (tab) {
         case "iptu-valores":
-          processed = { id: "tributos", iptuValores: { ...processIptuValores(rows, prevYearRows, allRows), additionalFiltersOptions } };
+          processed = { id: "tributos", iptuValores: { ...processIptuValores(rows, prevYearRows, allRows), additionalFiltersOptions, yearsOptions } };
           break;
         default:
-          processed = { id: "tributos", iptuContribuintes: { ...processIptuContribuintes(rows, prevYearRows, allRows), additionalFiltersOptions } };
+          processed = { id: "tributos", iptuContribuintes: { ...processIptuContribuintes(rows, prevYearRows, allRows), additionalFiltersOptions, yearsOptions } };
       }
     }
 

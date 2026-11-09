@@ -8,7 +8,7 @@ import StackedBarChart from "@/components/@global/charts/StackedVerticalBarChart
 
 const EmpresasDescricaoAtivasInativas = ({
   data,
-  colors = ColorPalette.default,
+  colors = [ColorPalette.status.good, ColorPalette.status.bad],
   title = "Empresas por Descrição",
   year,
 }: any) => {
@@ -27,7 +27,7 @@ const EmpresasDescricaoAtivasInativas = ({
         <StackedBarChart
         data={chartData}
         title={title}
-        colors={colors.slice(1)}
+        colors={colors}
         xKey="label"
         bars={[
           { 
@@ -40,8 +40,15 @@ const EmpresasDescricaoAtivasInativas = ({
           },
         ]}
         tooltipEntry=""
-        heightPerCategory={80} // Define a altura de cada barra
-        visibleHeight={400} // Define a altura visível para scroll
+        heightPerCategory={30} // Barra mais fina — cabem várias categorias sem ficar grossa
+        // Esse card agora ocupa 2 linhas do grid (Mes + Bairro empilhados ao
+        // lado) — sem isso o gráfico ficava pequeno, sobrando espaço vazio.
+        visibleHeight={900}
+        // Reduz a área das barras pra dar mais espaço ao nome da categoria.
+        widthY={220}
+        // Nome maior e mais legível — a área do gráfico encolhe pra caber.
+        yFontSize={14}
+        barSize={16}
       />
       </ChartGrabber>
     </div>

@@ -13,7 +13,7 @@ import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
 const PaisesImportados = ({
   data,
-  color = ColorPalette.default,
+  color = ColorPalette.status.bad,
   porto,
   title = "Países Importados"  + ` - ${porto}`,
 }: ChartBuild<PortoGeralData>) => {

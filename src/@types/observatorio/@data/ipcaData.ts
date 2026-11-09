@@ -4,6 +4,8 @@ import { DataWithFilters } from "../shared";
 export interface IpcaGeralData extends DataWithFilters<IpcaGeralHeaders> {
   /** IPCA anual por capital (série histórica completa) — usada pelo modo "Ano" do toggle Mês/Ano. */
   porAno?: any[];
+  /** IPCA mensal por capital (série histórica completa) — usada pelo modo "Mês" do toggle Mês/Ano. */
+  porMes?: any[];
 }
 
 export interface IpcaGrupoData extends DataWithFilters<IpcaGrupoHeaders> {}

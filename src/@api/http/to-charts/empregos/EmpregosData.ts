@@ -59,6 +59,10 @@ export class EmpregosData {
     return filterByYear(await desempregoFetcher.fetchAll(), this.year);
   }
 
+  async fetchAllYearsCagedDesemprego(): Promise<any[]> {
+    return desempregoFetcher.fetchAll();
+  }
+
   clearCache(): void {
     cagedFetcher.clearCache();
     desempregoFetcher.clearCache();

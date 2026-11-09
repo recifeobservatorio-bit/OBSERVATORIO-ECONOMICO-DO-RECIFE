@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 
+import SectionIconBadge from "@/components/@global/cards/SectionIconBadge";
+import FitToScreen from "@/components/@global/features/FitToScreen";
 import SelectCompare from "@/components/@global/features/SelectCompare";
 import SelectPrincipal from "@/components/@global/features/SelectPrincipal";
 import { SortableDiv } from "@/components/@global/features/SortableDiv";
+import { EmpresasIcon } from "@/components/@global/icons/sectionIcons";
 import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
 import { getMunicipiosMonthData } from "@/functions/process_data/observatorio/micro-caged/comparativo-med/getMonthsValues";
 import { getSmFiltred } from "@/functions/process_data/observatorio/micro-caged/getSmFiltred";
@@ -61,6 +64,7 @@ const ComparativoMed = ({
   };
 
   return (
+    <FitToScreen>
     <div>
       <SelectPrincipal
         options={toCompare}
@@ -173,8 +177,9 @@ const ComparativoMed = ({
           return (
             <div
               key={index}
-              className={`chart-content-wrapper ${col === 'full' && 'col-span-full'}`}
+              className={`chart-content-wrapper relative ${col === 'full' && 'col-span-full'}`}
             >
+              <SectionIconBadge icon={<EmpresasIcon />} />
               <React.Suspense fallback={<GraphSkeleton />}>
                 <Component
                   data={chartData}
@@ -187,6 +192,7 @@ const ComparativoMed = ({
       </SortableDiv>
       </div>
     </div>
+    </FitToScreen>
   );
 };
 

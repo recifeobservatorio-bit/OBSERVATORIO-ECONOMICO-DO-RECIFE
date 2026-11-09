@@ -25,11 +25,9 @@ const PrincipaisProdutos = ({
           data={chartData}
           title={title}
           xKey="CDMercadoria"
-          bars={[{ dataKey: "totalVLPesoCargaBruta", name: "Produto" }]}
+          bars={[{ dataKey: "totalVLPesoCargaBruta", name: "Carga (Ton)" }]}
           colors={ColorPalette.default}
-          heightPerCategory={50}
-          widthY={130}
-          left={-15}
+          heightPerCategory={40}
         />
       </ChartGrabber>
     </div>

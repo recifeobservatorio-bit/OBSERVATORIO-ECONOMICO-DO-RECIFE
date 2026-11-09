@@ -34,6 +34,7 @@ const PibPosicaoComparativo = ({
       data2={chartData2}
       comparative={comparative}
       compare={[toCompare, compare]}
+      position
     />
   );
 };

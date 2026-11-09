@@ -11,28 +11,15 @@ const charts = [
   {
     Component: React.lazy(() =>
       import(
-        "@/components/@build/observatorio/charts/empresas/empresas-ativas-inativas/EmpresasBairroAtivasInativas"
-      )
-    ),
-  },
-  {
-    Component: React.lazy(() =>
-      import(
-        "@/components/@build/observatorio/charts/empresas/empresas-ativas-inativas/EmpresasRPAAtivasInativas"
-      )
-    ),
-  },
-  {
-    Component: React.lazy(() =>
-      import(
-        "@/components/@build/observatorio/charts/empresas/empresas-ativas-inativas/EmpresasZonaAtivasInativas"
-      )
-    ),
-  },
-  {
-    Component: React.lazy(() =>
-      import(
         "@/components/@build/observatorio/charts/empresas/empresas-ativas-inativas/EmpresasDescricaoAtivasInativas"
+      )
+    ),
+    rowSpan: 2,
+  },
+  {
+    Component: React.lazy(() =>
+      import(
+        "@/components/@build/observatorio/charts/empresas/empresas-ativas-inativas/EmpresasBairroAtivasInativas"
       )
     ),
   },

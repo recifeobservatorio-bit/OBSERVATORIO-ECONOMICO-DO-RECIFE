@@ -7,7 +7,7 @@ import { resolveCrossFilterFill, useChartCrossFilter } from './crossFilterFill';
 import CustomLegend from '../features/CustomLegend';
 import CustomTooltip from '../features/CustomTooltip';
 
-const CustomizedContent = ({ root, depth, x, y, width, height, index, label, colors, highlightValues = [], highlightColor, crossFilterActive, onSelect }: any) => {
+const CustomizedContent = ({ root, depth, x, y, width, height, index, label, colors, highlightValues = [], highlightColor, crossFilterActive, onSelect, opacityOf }: any) => {
     const MIN_SIZE = 70;
 
     const adjustedWidth = Math.max(width, MIN_SIZE);
@@ -15,7 +15,9 @@ const CustomizedContent = ({ root, depth, x, y, width, height, index, label, col
 
     const shouldDisplayText = adjustedWidth > MIN_SIZE && adjustedHeight > MIN_SIZE;
 
-    const defaultFill = colors[Math.floor((index / (root?.children?.length || 1)) * 6)];
+    // Mesma cor que a legenda usa pra esse item (colors[index]) — antes saltava
+    // posições da paleta e o bloco não batia com a bolinha da legenda.
+    const defaultFill = colors[index % colors.length];
     const fill = depth < 2
         ? resolveCrossFilterFill({
             crossFilterActive,
@@ -36,6 +38,7 @@ const CustomizedContent = ({ root, depth, x, y, width, height, index, label, col
                 onClick={depth < 2 ? () => onSelect(String(label)) : undefined}
                 style={{
                     fill,
+                    fillOpacity: depth < 2 && opacityOf ? opacityOf(String(label)) : 1,
                     strokeOpacity: 0,
                 }}
             />
@@ -61,10 +64,12 @@ const TreeMapChart = ({
     highlightColor,
 }: any) => {
     const chartId = useId();
-    const { crossFilterActive, visibleData, select } = useChartCrossFilter(
+    const { crossFilterActive, visibleData, select, emphasisOpacity } = useChartCrossFilter(
         chartId,
         data,
-        (entry: any) => entry.label
+        (entry: any) => entry.label,
+    title,
+    { emphasis: true }
     );
     const [percent, setPercent] = useState(false)
 
@@ -89,7 +94,7 @@ const TreeMapChart = ({
     return (
         <div className="w-full h-full">
             <div className="flex flex-col items-center justify-center">
-                <h3 className="text-center mb-4 font-semibold w-[90%] text-gray-800 dark:text-gray-100">{title}</h3>
+                <h3 className="bi-chart-title text-center mb-4 font-semibold w-[90%] text-gray-800 dark:text-gray-100">{title}</h3>
             </div>
             
             <div className='relative'>
@@ -103,7 +108,7 @@ const TreeMapChart = ({
                     </svg>
                 </button>
 
-                <div className={`flex flex-wrap gap-2 justify-center space-x-4 border -mt-2 mb-4 rounded-md pt-6 pb-3 px-2  `}>
+                <div className={`flex flex-wrap gap-x-3 gap-y-1 justify-center -mt-1 mb-3 pt-6 px-2`}>
                     {visibleData?.map((entry: any, index: number) => {
                         const percentage = calculatePercentage(entry.value);
                         const legendColor = resolveCrossFilterFill({
@@ -136,7 +141,8 @@ const TreeMapChart = ({
 
 
             <div className='rounded-md overflow-hidden w-full'>
-                <ResponsiveContainer width="100%" height={400}>
+                <div className="bi-chart-box" style={{ height: 400 }}>
+<ResponsiveContainer width="100%" height="100%">
                     <Treemap
                         // dataKey={'displayValue'}
                         dataKey={dataKey}
@@ -148,14 +154,16 @@ const TreeMapChart = ({
                                 highlightColor={highlightColor}
                                 crossFilterActive={crossFilterActive}
                                 onSelect={(label: string) => select(chartId, label)}
+                                opacityOf={(label: string) => emphasisOpacity({ label })}
                             />
                         }
                         width={400}
                         height={200}
                         data={dataProcessed}
-                        aspectRatio={4 / 3} 
-                        stroke="#fff" 
+                        aspectRatio={4 / 3}
+                        stroke="#fff"
                         fill="#8884d8"
+                        isAnimationActive={false}
                     >
                         <Tooltip
                             content={(e) => {
@@ -177,6 +185,7 @@ const TreeMapChart = ({
                         />
                     </Treemap>
                 </ResponsiveContainer>
+</div>
             </div>
 
         </div>

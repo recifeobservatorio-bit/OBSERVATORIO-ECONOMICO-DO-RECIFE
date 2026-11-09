@@ -12,6 +12,7 @@ import {
 
 import { tooltipFormatter, yAxisFormatter } from "@/utils/formatters/@global/graphFormatter";
 
+import { formatDataLabel } from "./biLabels";
 import { useChartCrossFilter } from "./crossFilterFill";
 import CustomLegend from "../features/CustomLegend";
 import CustomTooltip from "../features/CustomTooltip";
@@ -26,7 +27,13 @@ const LineAreaChart = ({
   tooltipEntry
 }: any) => {
   const chartId = useId();
-  const { visibleData } = useChartCrossFilter(chartId, data, (entry: any) => entry[xKey]);
+  const { visibleData, pickFilter } = useChartCrossFilter(chartId, data, (entry: any) => entry[xKey], title);
+
+  // Clicar num ponto (mês, ano ou outra categoria do eixo X) escolhe esse valor no filtro da página.
+  const handleChartClick = (state: any) => {
+    if (state?.activeLabel == null || !state.activePayload?.length) return;
+    pickFilter(String(state.activeLabel));
+  };
 
   const gradientOffset = (dataKey: string) => {
     const dataMax = Math.max(...visibleData.map((i: any) => i[dataKey]));
@@ -43,18 +50,22 @@ const LineAreaChart = ({
   };
 
   return (
-    <div className="relative bg-white dark:bg-[#0C1B2B] w-full h-full">
+    <div className="relative bg-transparent w-full h-full">
       <div className="flex flex-col items-center justify-center">
-        <h3 className="text-center font-semibold w-[90%] text-gray-800 dark:text-gray-200">{title}</h3>
+        <h3 className="bi-chart-title text-center font-semibold w-[90%] text-gray-800 dark:text-gray-200">{title}</h3>
       </div>
-      <ResponsiveContainer width="100%" height={400}>
+      <div className="bi-chart-box" style={{ height: 400 }}>
+<ResponsiveContainer width="100%" height="100%">
         <RechartsAreaChart
           data={visibleData}
-          margin={{ top: 20, right: 20, left: 23, bottom: 5 }}
+          onClick={handleChartClick}
+          style={{ cursor: "pointer" }}
+          margin={{ top: 20, right: 20, left: 4, bottom: 5 }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey={xKey} tick={{ fontSize: 12, fill: "var(--yaxis-tick-color)" }}/>
-          <YAxis tick={{ fontSize: 11, fill: "var(--yaxis-tick-color)" }} />
+          <XAxis dataKey={xKey} tick={{ fontSize: 11, fill: "var(--yaxis-tick-color)" }} padding={{ left: 16, right: 16 }} minTickGap={10} />
+          {/* Eixo Y partindo do 0 (abaixo dele só se houver valores negativos). */}
+          <YAxis domain={[(dataMin: number) => Math.min(0, dataMin), "auto"]} tick={{ fontSize: 11, fill: "var(--yaxis-tick-color)" }} width={60} tickFormatter={(v: any) => (Math.abs(Number(v)) >= 1e4 ? formatDataLabel(v) : yAxisFormatter(v))} />
           <Tooltip
             content={(e) => CustomTooltip({...e, customTooltipFormatter})}
           />
@@ -84,12 +95,14 @@ const LineAreaChart = ({
                     stroke={color}
                     fill={`url(#splitColor-${key})`}
                     name={key}
+                    isAnimationActive={false}
                 />
                 </React.Fragment>
             );
             })}
         </RechartsAreaChart>
       </ResponsiveContainer>
+</div>
     </div>
   );
 };

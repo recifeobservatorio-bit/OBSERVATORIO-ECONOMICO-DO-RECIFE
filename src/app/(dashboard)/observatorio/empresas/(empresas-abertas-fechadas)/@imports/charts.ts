@@ -15,6 +15,7 @@ const charts = [
         "@/components/@build/observatorio/charts/empresas/empresas-abertas-fechadas/EmpresasNaturezaAtivasInativas"
       )
     ),
+    col: 'full',
   },
   {
     Component: React.lazy(() =>
@@ -22,6 +23,7 @@ const charts = [
         "@/components/@build/observatorio/charts/empresas/empresas-abertas-fechadas/EmpresasPorteAtivasInativas"
       )
     ),
+    col: 'full',
   },
 ];
 

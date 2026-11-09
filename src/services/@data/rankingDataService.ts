@@ -1,5 +1,6 @@
 import { RankingData } from "@/@api/http/to-charts/ranking/RankingData";
 import { applyGenericFilters } from "@/utils/filters/@features/applyGenericFilters";
+import { computeAvailableYears } from "@/utils/filters/@features/computeAvailableYears";
 
 export class RankingDataService {
   private static instance: RankingDataService;
@@ -56,12 +57,18 @@ export class RankingDataService {
       filters
     ).additionalFiltersOptions;
   
+    const yearsOptions = computeAvailableYears(
+      await new RankingData(this.currentYear).fetchProcessedGeralAllYears(),
+      (r: any) => r.Ano
+    );
+
     const geral = {
       filteredData,
       rawData,
       additionalFiltersOptions,
+      yearsOptions,
     };
-  
+
     return { geral, id: 'ranking' }; // Retorna os dados no formato especificado
   }
   
@@ -110,11 +117,17 @@ export class RankingDataService {
       filters
     ).additionalFiltersOptions;
   
+    const yearsOptions = computeAvailableYears(
+      await new RankingData(this.currentYear).fetchProcessedDimensaoAllYears(),
+      (r: any) => r.Ano
+    );
+
     // Estruturando o objeto final
     const dimensao = {
       filteredData, // Dados filtrados por ano
       rawData, // Dados brutos com base na "Dimensão"
       additionalFiltersOptions, // Opções de filtros adicionais
+      yearsOptions,
     };
   
     
@@ -173,11 +186,17 @@ export class RankingDataService {
     // Aplicando filtros adicionais
     const additionalFiltersOptions = applyGenericFilters(indicadorDataByYear[this.currentYear], filters).additionalFiltersOptions;
 
+    const yearsOptions = computeAvailableYears(
+      await new RankingData(this.currentYear).fetchProcessedIndicadorAllYears(),
+      (r: any) => r.Ano
+    );
+
     // Estruturando o objeto final
     const indicador = {
       filteredData,  // Certifique-se de que filteredData esteja definido corretamente antes
       rawData,
-      additionalFiltersOptions
+      additionalFiltersOptions,
+      yearsOptions,
     };
 
     
@@ -229,11 +248,17 @@ export class RankingDataService {
     // Aplicando filtros adicionais
     const additionalFiltersOptions = applyGenericFilters(pilarDataByYear[this.currentYear], filters).additionalFiltersOptions;
 
+    const yearsOptions = computeAvailableYears(
+      await new RankingData(this.currentYear).fetchProcessedPilaresAllYears(),
+      (r: any) => r.Ano
+    );
+
     // Estruturando o objeto final
     const pilar = {
       filteredData,  // Certifique-se de que filteredData esteja definido corretamente antes
       rawData,
-      additionalFiltersOptions
+      additionalFiltersOptions,
+      yearsOptions,
     };
 
     

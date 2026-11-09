@@ -26,6 +26,15 @@ export interface DashboardContextProps<T> {
   isLoading: boolean;
   applyFilters: (newFilters: Filters) => Promise<void>;
   resetFilters: () => void;
+  /**
+   * Liga/desliga no filtro da página o valor de categoria clicado num gráfico (limite de
+   * MAX_CHART_PICKS_PER_TAB por aba). Também troca o ano quando o valor é um dos anos disponíveis.
+   * Retorna true se o valor pertence a algum filtro e foi tratado, false se o chamador deve
+   * cair no comportamento antigo (cross-filter local).
+   * - `filterLabel`: força o filtro alvo (desambigua).
+   * - `hint`: texto (ex.: título do gráfico) usado só para desempatar quando o valor bate em mais de um filtro.
+   */
+  toggleFilterValue: (value: string, opts?: { filterLabel?: string; hint?: string }) => boolean;
   hiddenCharts: HiddenChart[];
   addHiddenChart: (chart: HiddenChart) => void;
   removeHiddenChart: (id: string) => void;

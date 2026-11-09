@@ -15,7 +15,7 @@ const TotalPassageirosPortoAnterior = ({
       local={''}
       title={`${title}`}
       data={chartData}
-      year={year}
+      year={year ? String(Number(year) - 1) : year}
       color={color}
     />
   );
