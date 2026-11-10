@@ -190,7 +190,7 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
           ...baseFilters,
           additionalFilters: baseFilters.additionalFilters.map((f: AdditionalFilter) => ({
             ...f,
-            selected: [], // Limpa as seleções
+            selected: f.keepOnReset ? f.selected : [], // Limpa as seleções (menos as de keepOnReset)
           })),
         };
       }

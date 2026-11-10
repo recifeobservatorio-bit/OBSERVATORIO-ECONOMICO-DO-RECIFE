@@ -4,7 +4,10 @@ export const combustiveisMunicipalFilters = {
     {
       label: "PRODUTO",
       options: ["Etanol Hidratado", "Gasolina Aditivada", "Gasolina Comum", "Glp", "Gnv", "Oleo Diesel", "Oleo Diesel S10"],
-      selected: [],
+      selected: ["Gasolina Comum"],
+      // Volta pra Gasolina Comum no "Limpar Filtros" (o serviço já usa ela quando
+      // nada está marcado, então mostrar "Tudo" seria enganoso).
+      keepOnReset: true,
     },
     {
       label: "ESTADO",

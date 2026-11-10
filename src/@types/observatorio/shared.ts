@@ -18,6 +18,8 @@ export interface AdditionalFilter {
     blocked?: boolean
     temp?: boolean
     hash?: { [key: string]: number | string }
+    /** "Limpar Filtros" restaura o `selected` padrão deste filtro em vez de esvaziar. */
+    keepOnReset?: boolean
 }
 
 export interface DataWithFilters<T> {
