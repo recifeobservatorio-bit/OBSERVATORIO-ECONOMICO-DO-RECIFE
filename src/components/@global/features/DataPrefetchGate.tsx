@@ -78,9 +78,44 @@ function buildWarmers(): Array<() => Promise<unknown>> {
 // there's nothing that actually needs the cache pre-warmed before rendering.
 const DataPrefetchGate = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
-    buildWarmers().forEach((warm) => {
-      warm().catch(() => {});
-    });
+    // Disparar os ~33 downloads de uma vez competia com os dados da página
+    // aberta e travava o navegador ao processar tudo junto — a página ficava
+    // ~30s em "Construindo gráficos..." no computador, e no celular (pouca
+    // memória) podia nem terminar. Agora: celular/tablet, aparelhos com pouca
+    // memória ou em economia de dados não pré-carregam nada (cada página baixa
+    // o seu); no computador o pré-carregamento só começa depois que a página
+    // atual teve tempo de carregar, um arquivo por vez, nos momentos ociosos.
+    const nav = navigator as Navigator & {
+      deviceMemory?: number;
+      connection?: { saveData?: boolean };
+    };
+    const smallScreen = window.matchMedia("(max-width: 1023px)").matches;
+    const lowMemory = typeof nav.deviceMemory === "number" && nav.deviceMemory < 4;
+    if (smallScreen || lowMemory || nav.connection?.saveData) return;
+
+    let cancelled = false;
+    const idle = () =>
+      new Promise<void>((resolve) => {
+        const ric = (window as any).requestIdleCallback as
+          | ((cb: () => void, opts?: { timeout: number }) => number)
+          | undefined;
+        if (ric) ric(() => resolve(), { timeout: 3000 });
+        else setTimeout(resolve, 300);
+      });
+
+    const startTimer = window.setTimeout(async () => {
+      for (const warm of buildWarmers()) {
+        if (cancelled) return;
+        await idle();
+        if (cancelled) return;
+        await warm().catch(() => {});
+      }
+    }, 10000);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(startTimer);
+    };
   }, []);
 
   return <>{children}</>;
