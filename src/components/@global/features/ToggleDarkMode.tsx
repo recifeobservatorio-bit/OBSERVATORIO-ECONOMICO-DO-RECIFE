@@ -34,7 +34,7 @@ const ToggleDarkMode: React.FC = () => {
 
   return (
     <div 
-      className="fixed bottom-36 right-4 z-50 cursor-pointer" 
+      className="fixed bottom-[7.5rem] md:bottom-36 right-3 md:right-4 z-50 cursor-pointer" 
       onClick={toggleDarkMode} 
       aria-label={isDarkMode ? "Mudar para modo claro" : "Mudar para modo escuro"} 
       tabIndex={0} 
@@ -42,7 +42,7 @@ const ToggleDarkMode: React.FC = () => {
         if (e.key === "Enter" || e.key === " ") toggleDarkMode();
         }}
     >
-        <div className="flex items-center justify-center bg-blue-500 text-white w-12 aspect-square rounded-full shadow-lg hover:bg-blue-600 transition-all">
+        <div className="flex items-center justify-center bg-blue-500 text-white w-10 md:w-12 aspect-square rounded-full shadow-lg hover:bg-blue-600 transition-all">
             <div
             onClick={toggleDarkMode}
             className="cursor-pointer flex items-center space-x-2 pl-[2px]"

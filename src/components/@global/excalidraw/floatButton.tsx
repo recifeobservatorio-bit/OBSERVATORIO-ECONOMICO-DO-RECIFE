@@ -345,7 +345,7 @@ const FloatingExcalidrawButton: React.FC = () => {
           setIsOpen((prev) => !prev);
           setShouldGlow(false);
         }} 
-        className={`fixed overflow-hidden bottom-5 right-4 z-50 w-32 h-[3em] text-white rounded-full shadow-lg transition 
+        className={`fixed overflow-hidden bottom-4 md:bottom-5 right-3 md:right-4 z-50 w-28 md:w-32 h-10 md:h-[3em] text-sm md:text-base text-white rounded-full shadow-lg transition 
           ${shouldGlow ? "animate-glow shadow-yellow-500/60" : "bg-blue-500 hover:bg-blue-600"}`}
       >
         <div className="z-20 absolute flex w-full h-full justify-center items-center bottom-0">

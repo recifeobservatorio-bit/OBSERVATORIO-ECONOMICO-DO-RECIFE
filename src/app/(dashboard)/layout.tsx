@@ -2,6 +2,7 @@
 import { usePathname } from "next/navigation";
 import { Suspense, useEffect } from "react";
 
+import ActiveTabIntoView from "@/components/@global/features/ActiveTabIntoView";
 import { DrawingStoreProvider } from "@/components/@global/excalidraw/context/drawingStoreContext";
 import { ExcalidrawProvider } from "@/components/@global/excalidraw/context/useContext";
 import FloatingExcalidrawButton from "@/components/@global/excalidraw/floatButton";
@@ -37,7 +38,8 @@ export default function DashboardLayout({
       <DashboardProvider>
         <ChartSelectionProvider>
           <ChartSelectionResetOnNavigate />
-          <div className="h-screen flex flex-col overflow-hidden">
+          <ActiveTabIntoView />
+          <div className="h-screen h-[100dvh] flex flex-col overflow-hidden">
             <Sidebar />
             <div className="flex-1 min-h-0 flex overflow-hidden">
               <FilterSidebar />

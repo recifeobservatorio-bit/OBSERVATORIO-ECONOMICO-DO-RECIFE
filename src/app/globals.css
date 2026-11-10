@@ -388,6 +388,49 @@
   letter-spacing: 0.02em;
 }
 
+/* Celular e tablet: as abas não encolhem nem quebram linha (espremidas viravam
+   "MOV", "DIVE"...). Ficam no tamanho do texto, numa faixa que rola de lado;
+   o ResponsiveTabs (layout do dashboard) rola a aba ativa pra dentro da tela. */
+@media (max-width: 1023px) {
+  .bi-tabs {
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .bi-tabs .bi-tab,
+  .bi-tabs:has(> .bi-tab:nth-child(8)) .bi-tab {
+    flex: 0 0 auto;
+    min-width: 0;
+    min-height: 38px;
+    padding: 8px 12px;
+    font-size: 11px;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    scroll-snap-align: start;
+  }
+
+  /* Espaço no fim da página pra rolar o último gráfico acima dos botões
+     flutuantes (Filtros, tema, gráficos ocultos, Abrir Quadro). */
+  .bi-page {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    padding-bottom: 9rem;
+  }
+
+  .bi-page-title {
+    font-size: 1.2rem;
+  }
+}
+
+/* Barra de atalhos do topo: rola de lado sem mostrar a barra de rolagem. */
+.bi-topnav {
+  scrollbar-width: none;
+}
+
+.bi-topnav::-webkit-scrollbar {
+  display: none;
+}
+
 .bi-tab:focus-visible {
   outline: 2px solid var(--bi-orange);
   outline-offset: 1px;
@@ -460,6 +503,7 @@
   flex-direction: column;
   background: var(--bi-orange);
   height: 100vh;
+  height: 100dvh;
 }
 
 .bi-filter-label {

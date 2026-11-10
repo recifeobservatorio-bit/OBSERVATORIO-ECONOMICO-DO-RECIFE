@@ -139,7 +139,7 @@ const FilterSidebar = () => {
       {/* Telas estreitas: a coluna vira gaveta, aberta por este botão. */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="lg:hidden fixed bottom-5 left-5 z-40 bi-filter-fab"
+        className="lg:hidden fixed bottom-4 left-3 md:bottom-5 md:left-5 z-40 bi-filter-fab"
       >
         Filtros
       </button>

@@ -97,7 +97,7 @@ export const Sidebar = () => {
         {/* Atalhos: os mesmos ícones que a coluna lateral mostrava fechada,
             centralizados na barra (o espaçador à direita equilibra o bloco
             do hamburger + logo). */}
-        <nav className="hidden md:flex flex-1 min-w-0 overflow-x-auto">
+        <nav className="hidden xl:flex flex-1 min-w-0 overflow-x-auto bi-topnav">
           <div className="flex items-center gap-0.5 w-max mx-auto">
             {menuItems.map((section) => (
               <div key={section.title} className="flex items-center gap-1">
@@ -126,7 +126,7 @@ export const Sidebar = () => {
             ))}
           </div>
         </nav>
-        <div className="hidden md:block w-20 shrink-0" />
+        <div className="hidden xl:block w-20 shrink-0" />
       </header>
 
       {menuOpen && <div className="fixed inset-0 z-40 bg-black/30" />}
