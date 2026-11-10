@@ -54,7 +54,29 @@ const FilterSidebar = () => {
   const [openLabel, setOpenLabel] = useState<string | null>(null);
   const [searchTerms, setSearchTerms] = useState<Record<string, string>>({});
   const [mobileOpen, setMobileOpen] = useState(false);
+  // Computador: a coluna fica aberta por padrão, mas pode ser recolhida pra dar
+  // a largura toda aos gráficos (fica lembrado neste navegador).
+  const [desktopCollapsed, setDesktopCollapsed] = useState(false);
   const [showInitialMessage, setShowInitialMessage] = useState(true);
+
+  useEffect(() => {
+    try {
+      setDesktopCollapsed(localStorage.getItem("filtersCollapsed") === "1");
+    } catch {
+      /* sem localStorage: fica aberta */
+    }
+  }, []);
+
+  const setCollapsed = (value: boolean) => {
+    setDesktopCollapsed(value);
+    try {
+      localStorage.setItem("filtersCollapsed", value ? "1" : "0");
+    } catch {
+      /* ignora */
+    }
+    // Os gráficos e o ajuste de tela única medem a largura disponível.
+    requestAnimationFrame(() => window.dispatchEvent(new Event("resize")));
+  };
   // FocusHidden registra o "clique fora" uma vez por abertura — lê o estado
   // mais recente por ref, senão aplicaria as marcações de quando abriu.
   const tempRef = useRef(tempFilters);
@@ -136,10 +158,14 @@ const FilterSidebar = () => {
 
   return (
     <>
-      {/* Telas estreitas: a coluna vira gaveta, aberta por este botão. */}
+      {/* Telas estreitas: a coluna vira gaveta, aberta por este botão. No
+          computador ele só aparece quando a coluna foi recolhida. */}
       <button
-        onClick={() => setMobileOpen(true)}
-        className="lg:hidden fixed bottom-4 left-3 md:bottom-5 md:left-5 z-40 bi-filter-fab"
+        onClick={() => {
+          if (window.matchMedia("(min-width: 1024px)").matches) setCollapsed(false);
+          else setMobileOpen(true);
+        }}
+        className={`${desktopCollapsed ? "" : "lg:hidden"} fixed bottom-4 left-3 md:bottom-5 md:left-5 z-40 bi-filter-fab`}
       >
         Filtros
       </button>
@@ -149,7 +175,7 @@ const FilterSidebar = () => {
 
       <aside
         className={`bi-filter-sidebar ${
-          mobileOpen ? "fixed inset-y-0 left-0 z-50 flex" : "hidden lg:flex"
+          mobileOpen ? "fixed inset-y-0 left-0 z-50 flex" : desktopCollapsed ? "hidden" : "hidden lg:flex"
         }`}
       >
         <div className="flex-1 overflow-y-auto px-3 pt-5 pb-3 flex flex-col gap-4">
@@ -252,11 +278,12 @@ const FilterSidebar = () => {
             alt="Prefeitura do Recife"
             className="w-[92px] h-auto"
           />
-          {mobileOpen && (
-            <button onClick={() => setMobileOpen(false)} className="lg:hidden text-white text-xs underline">
-              Fechar
-            </button>
-          )}
+          <button
+            onClick={() => (mobileOpen ? setMobileOpen(false) : setCollapsed(true))}
+            className="text-white text-xs underline hover:opacity-80"
+          >
+            Fechar filtros
+          </button>
         </div>
       </aside>
     </>

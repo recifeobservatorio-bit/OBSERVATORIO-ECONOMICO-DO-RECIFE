@@ -29,6 +29,15 @@ const SCROLL_ALLOWANCE = 0.15;
 // só fica esticado sem mostrar nada a mais.
 const MIN_CHART_H = 150;
 const MAX_CHART_H = 460;
+
+// Tela em pé larga o bastante pro modo "tela única" (ex.: painel/TV vertical
+// 1080×1920): com o teto de 460px os gráficos ocupavam só ~40% da altura e o
+// resto do painel ficava vazio. Nessa orientação o teto acompanha a altura da
+// tela, e não há folga de rolagem — num painel ninguém rola a página.
+const isPortrait = () => window.innerHeight > window.innerWidth;
+const maxChartHeight = () =>
+  isPortrait() ? Math.max(MAX_CHART_H, Math.round(window.innerHeight * 0.4)) : MAX_CHART_H;
+const scrollAllowance = () => (isPortrait() ? 0 : SCROLL_ALLOWANCE);
 // Trava de segurança contra ajustes em loop (cada ajuste muda o layout e
 // dispara uma nova medição).
 const MAX_FILL_PASSES = 12;
@@ -165,7 +174,7 @@ const FitToScreen = ({
       }
 
       const top = Math.max(0, intrinsicTop);
-      const availableHeight = window.innerHeight * (1 + SCROLL_ALLOWANCE) - top - bottomOffset;
+      const availableHeight = window.innerHeight * (1 + scrollAllowance()) - top - bottomOffset;
 
       // Como no Power BI, a página preenche a tela: a sobra (ou a falta) de
       // altura é dividida entre as linhas de gráficos, ajustando a variável
@@ -188,7 +197,7 @@ const FitToScreen = ({
         // convergência ficava lenta no fim.
         const diff = (availableHeight - contentHeight) / rows;
         const step = Math.abs(diff) > 24 ? diff * FILL_DAMPING : diff;
-        const nextH = Math.min(MAX_CHART_H, Math.max(MIN_CHART_H, currentH + step));
+        const nextH = Math.min(maxChartHeight(), Math.max(MIN_CHART_H, currentH + step));
         // Travado (oscilação): só deixa a altura DIMINUIR — sempre termina e
         // prefere gráficos mais baixos a reduzir a página inteira (que deixava
         // tudo miúdo e "espremido").

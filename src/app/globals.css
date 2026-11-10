@@ -502,8 +502,10 @@
   flex-shrink: 0;
   flex-direction: column;
   background: var(--bi-orange);
-  height: 100vh;
-  height: 100dvh;
+  /* Sem altura fixa: no computador estica até o fim da área abaixo da barra do
+     topo (com 100vh passava 56px da tela e cortava o rodapé da coluna); no
+     celular a gaveta é fixed com inset-y-0. */
+  min-height: 0;
 }
 
 .bi-filter-label {
