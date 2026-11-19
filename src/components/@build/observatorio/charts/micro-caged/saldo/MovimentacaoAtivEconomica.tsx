@@ -4,7 +4,7 @@ import React, { MutableRefObject, useEffect, useRef, useState } from "react";
 
 import ScrollableBarChart from "@/components/@global/charts/VerticalScrollableBarChart";
 import ChartGrabber from "@/components/@global/features/ChartGrabber";
-import { resizeDiv } from "@/components/@global/features/resizeDiv";
+import { useResizeDiv } from "@/components/@global/features/resizeDiv";
 import { microCagedAtivEconomicaDicts } from "@/utils/dicts/micro-caged/microCagedAtivEconomicaDicts";
 import { getObjToArr } from "@/utils/formatters/getObjToArr";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
@@ -17,7 +17,7 @@ const MovimentacaoAtivEconomica = ({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [width, setWidth] = useState<number | null>(null);
 
-  resizeDiv(containerRef, width, setWidth)
+  useResizeDiv(containerRef, width, setWidth)
 
   const chartData = getObjToArr<number>(data['seção'] || {}).map((obj) => ({ ...obj, label: microCagedAtivEconomicaDicts[obj.label] })).sort((a, b) => b.value - a.value)
 

@@ -18,7 +18,7 @@ import { DATA_LABEL_STYLE, formatDataLabel } from "./biLabels";
 import { resolveCrossFilterFill, useChartCrossFilter } from "./crossFilterFill";
 import CustomLegend from "../features/CustomLegend";
 import CustomTooltip from "../features/CustomTooltip";
-import { resizeDiv } from "../features/resizeDiv";
+import { useResizeDiv } from "../features/resizeDiv";
 
 const splitDataInBlocks = (data: any[], blockSize: number = 100) => {
   const blocks: any[][] = [];
@@ -77,7 +77,7 @@ const VerticalScrollableBarChart = ({
   const [dataRead, setDataRead] = useState<any[]>([]);
   const [blocksCount, setBlocksCount] = useState(1);
 
-  resizeDiv(containerRef, width, setWidth)
+  useResizeDiv(containerRef, width, setWidth)
 
   // Altura da janela visível — no modo tela única (.bi-fit) ela vem do CSS
   // (--bi-chart-h), não da prop visibleHeight, então medimos de verdade.

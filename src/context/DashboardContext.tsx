@@ -38,10 +38,14 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
   const prevFiltersRef = useRef<Filters | null>(null); // armazenar os filtros anteriores
   // Valores de filtro escolhidos clicando em gráficos nesta aba, do mais antigo pro mais novo.
   const chartPicksRef = useRef<ChartPick[]>([]);
+  // Número da busca mais recente. Uma resposta que chega depois de outra busca ter começado
+  // (troca rápida de aba/filtro) é descartada, senão os dados da aba antiga sobrescrevem os da nova.
+  const requestIdRef = useRef(0);
 
   // Função para buscar os dados com base nos filtros
-  const fetchData = async (filtersToUse: Filters) => {
-    console.log("🔄 Chamando fetchData..."); // QUE LINDO
+  const fetchData = async (filtersToUse: Filters, allowYearFix = true): Promise<void> => {
+    const requestId = ++requestIdRef.current;
+    const isStale = () => requestId !== requestIdRef.current;
     setIsLoading(true);
 
     try {
@@ -62,9 +66,31 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
 
       const fetched: any = await service.fetchDataForTab(tab, filtersToUse); // Aqui era DashboardData tipado
 
-      if (process.env.NODE_ENV === 'development') {
-        console.log("✅ Dados carregados:", fetched);
-      } // REMOVER ISSO AQUI DEPOIS
+      if (isStale()) return;
+
+      // Anos realmente disponíveis nos dados, calculados pelo service (mesmo padrão do
+      // additionalFiltersOptions abaixo) — substitui a lista estática do config assim que
+      // os dados chegam, sem exigir editar código quando um ano novo é publicado.
+      const dynamicYears: string[] | undefined = Object.keys(fetched)
+        .filter((key) => key !== "id")
+        .map((key) => {
+          if (fetched?.[key]?.yearsOptions) return fetched[key].yearsOptions;
+          if (fetched?.[key] && typeof fetched[key] === "object") {
+            return Object.keys(fetched[key]).map((keyInter) => fetched[key][keyInter]?.yearsOptions);
+          }
+          return undefined;
+        })
+        .flat(Infinity)
+        .filter((val): val is string[] => Array.isArray(val) && val.length > 0)[0];
+
+      // Ano pedido não existe nos dados: busca de novo já com o último ano disponível,
+      // senão o filtro mostraria um ano e os gráficos seriam de outro.
+      if (allowYearFix && year && dynamicYears?.length && !dynamicYears.includes(year)) {
+        const fixedYear = dynamicYears[dynamicYears.length - 1];
+        const corrected = { ...filtersToUse, years: dynamicYears, year: fixedYear };
+        setFilters((prev) => ({ ...prev, years: dynamicYears, year: fixedYear }));
+        return fetchData(corrected, false);
+      }
 
       setData(fetched);
 
@@ -126,21 +152,6 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
         });
       }
 
-      // Anos realmente disponíveis nos dados, calculados pelo service (mesmo padrão do
-      // additionalFiltersOptions acima) — substitui a lista estática do config assim que
-      // os dados chegam, sem exigir editar código quando um ano novo é publicado.
-      const dynamicYears: string[] | undefined = Object.keys(fetched)
-        .filter((key) => key !== "id")
-        .map((key) => {
-          if (fetched?.[key]?.yearsOptions) return fetched[key].yearsOptions;
-          if (fetched?.[key] && typeof fetched[key] === "object") {
-            return Object.keys(fetched[key]).map((keyInter) => fetched[key][keyInter]?.yearsOptions);
-          }
-          return undefined;
-        })
-        .flat(Infinity)
-        .filter((val): val is string[] => Array.isArray(val) && val.length > 0)[0];
-
       if (dynamicYears?.length) {
         setFilters((prev) => {
           const currentYear = prev.year ?? prev.years?.[prev.years.length - 1];
@@ -153,10 +164,12 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
         });
       }
     } catch (error) {
+      if (isStale()) return;
       console.error("Erro ao carregar dados:", error);
       setData(null);
     } finally {
-      setIsLoading(false);
+      // Só a busca mais recente desliga o "carregando".
+      if (!isStale()) setIsLoading(false);
     }
   };
 

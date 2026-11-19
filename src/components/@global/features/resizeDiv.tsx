@@ -2,23 +2,20 @@
 
 import { MutableRefObject, useEffect } from "react";
 
-export const resizeDiv = (containerRef: MutableRefObject<HTMLDivElement | null>, width: number | null, setWidth: (val: number | null) => void) => {
-    useEffect(() => {
+/** Acompanha a largura do elemento de `containerRef` e repassa para `setWidth`. */
+export const useResizeDiv = (containerRef: MutableRefObject<HTMLDivElement | null>, _width: number | null, setWidth: (val: number | null) => void) => {
+  useEffect(() => {
+    const element = containerRef.current;
+    if (!element) return;
+
     const observer = new ResizeObserver((entries) => {
       for (const entry of entries) {
-        const newWidth = entry.contentRect.width;
-        setWidth(newWidth);
+        setWidth(entry.contentRect.width);
       }
     });
+    observer.observe(element);
 
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
-    }
-
-    return () => {
-      if (containerRef.current) {
-        observer.unobserve(containerRef.current);
-      }
-    };
+    return () => observer.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 }

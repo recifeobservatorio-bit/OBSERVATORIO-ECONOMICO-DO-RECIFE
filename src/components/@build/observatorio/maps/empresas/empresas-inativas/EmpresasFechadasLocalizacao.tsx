@@ -154,7 +154,7 @@ export default function EmpresasFechadas({ data }: CapitaisLocalizacaoProps) {
         <strong>Localização de Empresas Inativas</strong>
       </div>
       <div className="rounded-md border flex flex-wrap items-center justify-center px-2 py-1 gap-x-3 gap-y-1 mb-2 text-xs">
-        {['Agropecuária', 'Comércio', 'Construção Civil', 'Indústria', 'Serviços'].map((group) => <div className="flex items-center gap-2">
+        {['Agropecuária', 'Comércio', 'Construção Civil', 'Indústria', 'Serviços'].map((group) => <div key={group} className="flex items-center gap-2">
           <div style={{ backgroundColor: colorGroupHash[group as GroupType] ?? ColorPalette.default[1] }} className="h-3 w-3 rounded-full"></div>
           <p style={{ color: colorGroupHash[group as GroupType] ?? ColorPalette.default[1] }}>{group}</p>
         </div>)}

@@ -4,7 +4,7 @@ import React, { MutableRefObject, useEffect, useRef, useState } from "react";
 
 import ScrollableBarChart from "@/components/@global/charts/VerticalScrollableBarChart";
 import ChartGrabber from "@/components/@global/features/ChartGrabber";
-import { resizeDiv } from "@/components/@global/features/resizeDiv";
+import { useResizeDiv } from "@/components/@global/features/resizeDiv";
 import { getAvarageGroups } from "@/functions/process_data/observatorio/micro-caged/getAvarageGroups";
 import { microCagedAtivEconomicaDicts } from "@/utils/dicts/micro-caged/microCagedAtivEconomicaDicts";
 import { getObjToArr } from "@/utils/formatters/getObjToArr";
@@ -18,7 +18,7 @@ const MediaAtivEconomica = ({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [width, setWidth] = useState<number | null>(null);
 
-  resizeDiv(containerRef, width, setWidth)
+  useResizeDiv(containerRef, width, setWidth)
 
   const quantity = data?.['quantity'] || {}
   const values = data?.['values'] || {}

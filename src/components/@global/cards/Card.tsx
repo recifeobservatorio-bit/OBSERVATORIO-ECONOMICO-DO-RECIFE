@@ -25,13 +25,19 @@ const Card = ({
 }) => {
   // Card de KPI no estilo Power BI: título na faixa azul-marinho, número
   // grande no corpo (emoji ao lado), local/ano discretos embaixo.
+  // Sem valor numérico (ex.: "—" quando nada foi selecionado) mostra "—" em vez de "NaN".
+  const numeric = data === null || data === undefined || data === "" ? NaN : +data;
+  const display = !Number.isFinite(numeric)
+    ? "—"
+    : percent ? `${tooltipFormatter(numeric)}%` : (position ? `${tooltipFormatter(numeric)}°` : tooltipFormatter(numeric));
+
   return (
     <div className="bi-kpi shrink-0 w-full sm:w-auto" style={{ minWidth: `${minWidth}px` }}>
       <h2 className="bi-kpi-title">{title}</h2>
 
       <div className="flex-1 flex justify-between items-center gap-3 px-4 pt-3 pb-1">
         <p className="text-4xl font-semibold text-gray-900 dark:text-gray-100 w-fit">
-          {percent ? `${tooltipFormatter(+data)}%` : ( position ? `${tooltipFormatter(+data)}°` : tooltipFormatter(+data))}
+          {display}
         </p>
         <CardEmojiBadge title={title} icon={icon} color={color} />
       </div>

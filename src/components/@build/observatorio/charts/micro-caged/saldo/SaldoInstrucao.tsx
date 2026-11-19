@@ -4,7 +4,7 @@ import React, { useRef, useState } from "react";
 
 import BarChart from "@/components/@global/charts/BarChart";
 import ChartGrabber from "@/components/@global/features/ChartGrabber";
-import { resizeDiv } from "@/components/@global/features/resizeDiv";
+import { useResizeDiv } from "@/components/@global/features/resizeDiv";
 import { getObjToArr } from "@/utils/formatters/getObjToArr";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
@@ -16,7 +16,7 @@ const SaldoInstrucao = ({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [width, setWidth] = useState<number | null>(null);
 
-  resizeDiv(containerRef, width, setWidth)
+  useResizeDiv(containerRef, width, setWidth)
 
   const chartData = getObjToArr<number>(data['graudeinstrução'] || {}).sort((a, b) => b.value - a.value)
 

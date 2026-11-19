@@ -22,8 +22,6 @@ export async function performAutoLogin(): Promise<boolean> {
     password: API_PASSWORD,
   };
 
-  console.log("Tentando login automático com o payload:", loginPayload);
-
   try {
     const response = await fetch(API_LOGIN_URL, {
       method: 'POST',

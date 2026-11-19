@@ -1,7 +1,8 @@
 "use client";
 
 import { createContext, useState, useEffect, useContext, ReactNode } from 'react';
-import { getToken, saveToken } from '@/services/tokenService';
+
+import { getAuthToken, performAutoLogin } from '@/@api/config/authService';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -19,35 +20,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const initializeAuth = async () => {
-      let token = getToken();
-
-      if (!token) {
-        try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_LOGIN}/auth/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              username: process.env.NEXT_PUBLIC_API_USERNAME,
-              password: process.env.NEXT_PUBLIC_API_PASSWORD,
-            }),
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            if (data.token) {
-              saveToken(data.token);
-              token = data.token;
-            }
-          }
-        } catch (error) {
-          console.error("Falha no login automático", error);
-        }
-      }
-
-      if (token) {
-        setIsAuthenticated(true);
-      }
-      
+      // Mesmo login (e mesmo endereço /api/auth/login) usado pelo resto do site.
+      const ok = getAuthToken() !== null || (await performAutoLogin());
+      setIsAuthenticated(ok);
       setIsLoading(false);
     };
 
