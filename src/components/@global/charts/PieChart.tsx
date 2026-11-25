@@ -29,6 +29,7 @@ const PieSlices = ({
   showPercentages = true,
   highlightValues = [],
   highlightColor,
+  donut = false,
 }: {
   data: any;
   title: string;
@@ -40,6 +41,8 @@ const PieSlices = ({
   tooltipEntry: string;
   highlightValues?: string[];
   highlightColor?: string;
+  // donut: rosca (estilo Power BI), com o miolo vazado.
+  donut?: boolean;
 }) => {
   const chartId = useId();
   const { crossFilterActive, visibleData, select, emphasisOpacity } = useChartCrossFilter(
@@ -102,6 +105,7 @@ const PieSlices = ({
             cx="50%"
             cy="50%"
             outerRadius={outerRadius}
+            innerRadius={donut ? "42%" : 0}
             label={showPercentages ? renderCustomizedLabel : undefined}
             labelLine={false}
             isAnimationActive={false}

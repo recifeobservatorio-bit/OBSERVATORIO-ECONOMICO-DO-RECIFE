@@ -32,7 +32,8 @@ const LineChart = ({
   tooltipEntry,
   height = 340,
   referenceLine,
-
+  // area: gráfico de área (estilo Power BI) — todas as séries ganham preenchimento forte.
+  area = false,
 }: any) => {
   const chartId = useId();
   const gradientId = `line-fill-${chartId.replace(/:/g, "")}`;
@@ -59,7 +60,7 @@ const LineChart = ({
   const DENSE_POINTS = 24;
   const dense = visibleData.length > DENSE_POINTS;
   const sparse = visibleData.length <= 12;
-  const filled = lines.length <= 2;
+  const filled = area || lines.length <= 2;
   const hasNegative = visibleData.some((d: any) => lineKeys.some((key: string) => Number(d?.[key]) < 0));
 
   // Série longa ganha uma barra deslizante (LineRangeBar) embaixo pra recortar
@@ -134,8 +135,8 @@ const LineChart = ({
           <defs>
             {lines.map((line: any, lineIndex: number) => (
               <linearGradient key={line.dataKey} id={`${gradientId}-${lineIndex}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={colors[lineIndex] || "#000"} stopOpacity={lines.length === 1 ? 0.22 : 0.12} />
-                <stop offset="100%" stopColor={colors[lineIndex] || "#000"} stopOpacity={0.01} />
+                <stop offset="0%" stopColor={colors[lineIndex] || "#000"} stopOpacity={area ? 0.45 : lines.length === 1 ? 0.22 : 0.12} />
+                <stop offset="100%" stopColor={colors[lineIndex] || "#000"} stopOpacity={area ? 0.08 : 0.01} />
               </linearGradient>
             ))}
           </defs>

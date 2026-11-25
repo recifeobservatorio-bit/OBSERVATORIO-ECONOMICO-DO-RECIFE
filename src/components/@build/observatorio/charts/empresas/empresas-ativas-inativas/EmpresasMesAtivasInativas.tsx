@@ -74,6 +74,7 @@ const EmpresasMesAtivasInativas = ({
       <div className="chart-wrapper">
         <ChartGrabber>
           <LineChart
+            area
             data={chartData}
             title={title}
             colors={colors}

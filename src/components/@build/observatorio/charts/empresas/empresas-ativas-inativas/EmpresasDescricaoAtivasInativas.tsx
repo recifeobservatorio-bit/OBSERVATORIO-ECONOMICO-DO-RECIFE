@@ -39,6 +39,8 @@ const EmpresasDescricaoAtivasInativas = ({
             name: "Inativas",
           },
         ]}
+        // 100% empilhada, como no Power BI.
+        percent
         tooltipEntry=""
         heightPerCategory={30} // Barra mais fina — cabem várias categorias sem ficar grossa
         // Esse card agora ocupa 2 linhas do grid (Mes + Bairro empilhados ao

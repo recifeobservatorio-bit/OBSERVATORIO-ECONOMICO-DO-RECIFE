@@ -22,6 +22,7 @@ const OperacaoCargasAno = ({
     <div className="chart-wrapper">
       <ChartGrabber>
         <LineChart
+          area
           data={updatedData}
           title={title}
           colors={colors}

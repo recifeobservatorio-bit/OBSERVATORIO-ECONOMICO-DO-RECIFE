@@ -36,6 +36,13 @@ const charts = [
       )
     )
   },
+  {
+    Component: React.lazy(() =>
+      import(
+        "@/components/@build/observatorio/charts/pib/geral/PibCapitais"
+      )
+    )
+  },
 ];
 
 export default charts;

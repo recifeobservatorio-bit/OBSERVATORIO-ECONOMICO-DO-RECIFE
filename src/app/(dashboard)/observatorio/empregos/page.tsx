@@ -43,6 +43,7 @@ const EmpregosPage = () => {
           caged: data.caged.filteredData,
           municipios: data.municipios.filteredData,
           municipiosPorMes: data.municipiosPorMes ?? [],
+          allYears: data.allYears ?? [],
         })
 
         clearInterval(intervalId)

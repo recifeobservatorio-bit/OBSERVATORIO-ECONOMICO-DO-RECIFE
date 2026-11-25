@@ -51,6 +51,13 @@ const charts = [
       )
     ),
   },
+  {
+    Component: React.lazy(() =>
+      import(
+        "@/components/@build/observatorio/charts/aeroporto/geral/CargasPorNatureza"
+      )
+    ),
+  },
 ];
 
 export default charts;

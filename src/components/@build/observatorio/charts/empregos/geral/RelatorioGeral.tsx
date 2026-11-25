@@ -1,20 +1,18 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 
-import PieChart from "@/components/@global/charts/PieChart";
+import FunnelChart from "@/components/@global/charts/FunnelChart";
 import ChartGrabber from "@/components/@global/features/ChartGrabber";
-import { ShowPercentages } from "@/components/@global/features/ShowPercentages";
 import { processAccValues } from "@/functions/process_data/observatorio/empregos/caged/cagedAccValues";
-import { getObjToArr } from "@/utils/formatters/getObjToArr";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
+// Funil como no Power BI ("Evolução de empregos"): Admissões, Demissões e Saldo.
 const RelatorioGeral = ({
   data,
   title = "Evolução de Empregos",
   year,
 }: any) => {
-  const [showPercentage, setShowPercentage] = useState(true);
   const chartData = processAccValues(data['caged'])
 
   // processAccValues ordena por valor, então a cor precisa seguir o rótulo, não o índice.
@@ -28,20 +26,13 @@ const RelatorioGeral = ({
   return (
     <div className="chart-wrapper">
       <ChartGrabber>
-        <PieChart
+        <FunnelChart
           data={chartData}
           title={title}
-          underTitle={
-            <ShowPercentages
-              showPercentage={showPercentage}
-              setShowPercentage={setShowPercentage}
-            />
-          }
           dataKey="value"
           nameKey="label"
           colors={colors}
-          showPercentages={showPercentage}
-          tooltipEntry=""
+          sort={false}
         />
       </ChartGrabber>
     </div>

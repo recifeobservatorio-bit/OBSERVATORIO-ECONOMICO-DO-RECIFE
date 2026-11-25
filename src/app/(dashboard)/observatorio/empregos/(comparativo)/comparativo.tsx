@@ -12,6 +12,7 @@ import { raisCodCboDicts } from "@/utils/dicts/rais/raisCodCboDicts";
 import { getUniqueValues } from "@/utils/filters/@global/getUniqueValues";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
+import VariacaoSaldoComparativo from "@/components/@build/observatorio/charts/empregos/comparativo/VariacaoSaldoComparativo";
 import cards from "./@imports/cards";
 import charts from "./@imports/charts";
 import tables from "./@imports/tables";
@@ -84,6 +85,14 @@ const Comparativo = ({
             </div>
           )})}
         </SortableDiv> */}
+
+        {/* Linha de saldo mensal dos municípios escolhidos, como no Power BI. */}
+        {tempFiltred.length > 0 && (
+          <div className="chart-content-wrapper relative">
+            <SectionIconBadge icon={<EmpregosIcon />} />
+            <VariacaoSaldoComparativo data={data["caged"]} municipios={[...tempFiltred]} year={year} />
+          </div>
+        )}
 
         <SortableDiv chartOrder={tableOrder} setChartOrder={setTableOrder} sortableContainerRef={sortableContainerTableRef} style="charts-items-wrapper">
           {tablesRender.map(({ Component }, index) => (

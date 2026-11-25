@@ -1,6 +1,6 @@
 "use client";
 
-import VerticalScrollableBarChart from "@/components/@global/charts/VerticalScrollableBarChart";
+import BarChart from "@/components/@global/charts/BarChart";
 import ChartGrabber from "@/components/@global/features/ChartGrabber";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
@@ -13,8 +13,8 @@ const PrecoMinimoPorRegiao = ({ data, title = "Preço Mínimo por Região", colo
   return (
     <div className="chart-wrapper">
       <ChartGrabber>
-        <VerticalScrollableBarChart data={chartData} title={title} colors={[colors[2]]} xKey="regiao"
-          bars={[{ dataKey: "preco", name: "Preço Mínimo (R$)" }]}
+        <BarChart data={chartData} title={title} colors={[colors[2]]} xKey="regiao"
+          bars={[{ dataKey: "preco", name: "Preço Mínimo (R$)" }]} tooltipEntry="R$"
           highlightValues={["Nordeste"]} highlightColor="#EC6625" />
       </ChartGrabber>
     </div>

@@ -2,7 +2,7 @@
 
 import React from "react";
 
-import HorizontalScrollableBarChart from "@/components/@global/charts/HorizontalScrollableBarChart";
+import StackedBarChart from "@/components/@global/charts/StackedVerticalBarChart";
 import ChartGrabber from "@/components/@global/features/ChartGrabber";
 import { formatBairroLabel } from "@/utils/formatters/@global/formatBairroLabel";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
@@ -25,27 +25,23 @@ const EmpresasBairroAtivasInativas = ({
   return (
     <div className="chart-wrapper">
       <ChartGrabber>
-        <HorizontalScrollableBarChart
-        data={chartData}
-        title={title}
-        colors={colors}
-        xKey="label"
-        bars={[
-          {
-            dataKey: "ativa",
-            name: "Ativas",
-            stackId: "empresas",
-          },
-          {
-            dataKey: "inativa",
-            name: "Inativas",
-            stackId: "empresas",
-          },
-        ]}
-        widthMultiply={110}
-        heightToPass={362}
-        maxBarSize={28}
-      />
+        <StackedBarChart
+          data={chartData}
+          title={title}
+          colors={colors}
+          xKey="label"
+          bars={[
+            { dataKey: "ativa", name: "Ativas" },
+            { dataKey: "inativa", name: "Inativas" },
+          ]}
+          // 100% empilhada, como no Power BI: proporção de ativas x inativas em cada bairro.
+          percent
+          maxCategories={100}
+          heightPerCategory={30}
+          visibleHeight={320}
+          widthY={150}
+          barSize={16}
+        />
       </ChartGrabber>
     </div>
   );

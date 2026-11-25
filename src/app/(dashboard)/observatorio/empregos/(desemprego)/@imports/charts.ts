@@ -15,6 +15,13 @@ const charts = [
       )
     ),
   },
+  {
+    Component: React.lazy(() =>
+      import(
+        "@/components/@build/observatorio/charts/empregos/desemprego/TaxaDesempregoComparativo"
+      )
+    ),
+  },
 ];
 
 export default charts;

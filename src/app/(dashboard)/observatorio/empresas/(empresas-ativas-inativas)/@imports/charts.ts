@@ -51,6 +51,14 @@ const charts = [
   //     )
   //   ),
   // },
+  // Tabela por período, como no Power BI.
+  {
+    Component: React.lazy(() =>
+      import(
+        "@/components/@build/observatorio/tables/empresas/periodo/EmpresasAtivasInativasPeriodo"
+      )
+    ),
+  },
 ];
 
 export default charts;

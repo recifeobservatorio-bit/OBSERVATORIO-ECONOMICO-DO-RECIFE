@@ -36,6 +36,9 @@ const StackerBarChartVertical = ({
   minPercentageLabelWidth = 37, // mínimo % visual da barra para exibir label <- ajeitar isso aqui
   barSize,
   maxCategories = 50,
+  // percent: barras 100% empilhadas (estilo Power BI) — cada linha soma 100%
+  // e o tooltip mostra a participação de cada série na categoria.
+  percent = false,
 }: any) => {
   const chartId = useId();
   const { crossFilterActive, visibleData, select, emphasisOpacity } = useChartCrossFilter(
@@ -64,13 +67,23 @@ const StackerBarChartVertical = ({
   // Produtos tinha ~670 linhas (SVG de 40.000px) — cada redimensionamento
   // redesenhava tudo, demorava e o ajuste de tela única entrava em loop. As
   // porcentagens continuam sobre o total de todas as categorias.
-  const chartData = [...visibleData]
+  const sortedData = [...visibleData]
     .sort((a: any, b: any) => rowTotal(b) - rowTotal(a))
     .slice(0, maxCategories);
+  const chartData = percent
+    ? sortedData.map((entry: any) => {
+        const total = rowTotal(entry);
+        const row: any = { ...entry };
+        bars.forEach((bar: any) => {
+          row[bar.dataKey] = total ? Math.round(((Number(entry[bar.dataKey]) || 0) / total) * 10000) / 100 : 0;
+        });
+        return row;
+      })
+    : sortedData;
 
   const totalHeight = Math.max(chartData.length * heightPerCategory, 150);
 
-  const customTooltipFormatter = (value: any) => tooltipFormatter(value, tooltipEntry || "");
+  const customTooltipFormatter = (value: any) => tooltipFormatter(value, percent ? "%" : tooltipEntry || "");
 
   // Trunca em UMA linha com reticência com base na largura real do eixo —
   // um limite fixo de caracteres (ex.: 50) ficava largo demais pra um eixo
@@ -125,7 +138,10 @@ const StackerBarChartVertical = ({
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis 
               type="number" 
-              tickFormatter={yAxisFormatter} 
+              tickFormatter={percent ? (v: any) => `${Math.round(Number(v))}%` : yAxisFormatter}
+              domain={percent ? [0, 100] : undefined}
+              ticks={percent ? [0, 25, 50, 75, 100] : undefined}
+              allowDataOverflow={percent}
               tick={{ fontSize: 12, fill: "var(--yaxis-tick-color)" }} 
               orientation="top" 
             />
@@ -175,7 +191,19 @@ const StackerBarChartVertical = ({
                   />
                 ))}
 
-                {bar.showPercentage && showPercentage && (
+                {percent && (
+                  <LabelList
+                    dataKey={bar.dataKey}
+                    content={({ x = 0 as any, y = 0 as any, width = 0 as any, height = 0 as any, value }: any) =>
+                      Number(width) >= 34 && value ? (
+                        <text x={Number(x) + Number(width) / 2} y={Number(y) + Number(height) / 2} textAnchor="middle" dominantBaseline="middle" fill="#fff" fontSize={11} fontWeight={600}>
+                          {`${Number(value).toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%`}
+                        </text>
+                      ) : null
+                    }
+                  />
+                )}
+                {!percent && bar.showPercentage && showPercentage && (
                   <LabelList
                   content={({ x = 0 as number, y = 0 as any, width = 0 as any, height = 0 as any, index }) => {
                     const entry = chartData[index!];

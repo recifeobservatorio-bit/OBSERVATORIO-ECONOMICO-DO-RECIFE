@@ -13,6 +13,7 @@ import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 import cards from "./@imports/cards";
 import charts from "./@imports/charts";
 import ErrorBoundary from "@/utils/loader/errorBoundary";
+import EmpresasVariacaoAberturaFechamento from "@/components/@build/observatorio/charts/empresas/empresas-abertas-fechadas/EmpresasVariacaoAberturaFechamento";
 import { dataFormat } from "@/functions/process_data/observatorio/empresas/empresas-abertas-fechadas/empresasDataFormat";
 
 
@@ -226,6 +227,14 @@ const ComparativoClasses = ({
               </div>
           )})}
       </SortableDiv>
+
+      {/* Saldo (abertas − fechadas) dos municípios escolhidos lado a lado, como no Power BI. */}
+      <div className="chart-content-wrapper relative">
+        <SectionIconBadge icon={<EmpresasIcon />} />
+        <ErrorBoundary>
+          <EmpresasVariacaoAberturaFechamento municipios={[...tempFiltred].slice(0, 2)} />
+        </ErrorBoundary>
+      </div>
 
       <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="flex flex-wrap items-center justify-center gap-8 pb-16">
           {charts.slice(1).flatMap(({ Component }, chartIndex) => [0, 1].map((virtuaIndex) => {

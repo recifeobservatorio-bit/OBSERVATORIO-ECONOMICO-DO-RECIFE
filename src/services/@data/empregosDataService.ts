@@ -67,6 +67,8 @@ export class EmpregosDataService {
     return {
         municipios: { ...filteredMunicipioData, yearsOptions },
         municipiosPorMes,
+        // Série completa sem filtro (só referência, sem cópia) — gráfico de comparação com outro município.
+        allYears: allYearsData,
         caged: filteredCagedData,
         id: "empregos-caged"
     };
@@ -104,7 +106,8 @@ export class EmpregosDataService {
 
     return {
         municipios: { ...filteredMunicipioData, yearsOptions },
-        historico: { capital: historicoCapital, brasil: historicoBrasil },
+        // todas: série completa de todas as capitais — gráfico de comparação com outra capital.
+        historico: { capital: historicoCapital, brasil: historicoBrasil, todas: allYearsDesemprego },
         desemprego: filteredDesempregoData,
         trimestre: {
           municipiosTrimestre: filteredMunicipioTrimestreData,

@@ -82,7 +82,8 @@ const Analitico = ({
         options={toCompare}
         filters={tempFiltred}
         setFilters={setTempFiltred}
-        initialValue={["Recife"]}
+        // Recife e Brasil lado a lado, como as duas tabelas do Power BI.
+        initialValue={["Recife", "Brasil"]}
         noRecife={false}
       />
 

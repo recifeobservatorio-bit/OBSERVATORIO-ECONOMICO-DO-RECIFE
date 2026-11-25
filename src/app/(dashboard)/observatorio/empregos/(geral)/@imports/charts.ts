@@ -43,6 +43,13 @@ const charts = [
       )
     ),
   },
+  {
+    Component: React.lazy(() =>
+      import(
+        "@/components/@build/observatorio/charts/empregos/geral/SaldoComparativo"
+      )
+    ),
+  },
 ];
 
 export default charts;

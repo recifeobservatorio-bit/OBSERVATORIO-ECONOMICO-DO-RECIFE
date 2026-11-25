@@ -8,6 +8,7 @@ import { BalancaComercialIcon } from "@/components/@global/icons/sectionIcons";
 import { getUniqueValues } from "@/utils/filters/@global/getUniqueValues";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
+import NegociadoPeriodoMes from "@/components/@build/observatorio/charts/balanca-comercial/comercial/NegociadoPeriodoMes";
 import tables from "./@imports/tables";
 
 const Analitico = ({
@@ -69,6 +70,12 @@ const Analitico = ({
         noRecife={false}
       />
 
+      {/* Rosca do período + pizza do mês, como no topo do Balança Analítico do Power BI. */}
+      {tempFiltred[0] && (
+        <div className="mb-4">
+          <NegociadoPeriodoMes data={data} municipio={tempFiltred[0]} year={year} />
+        </div>
+      )}
       <div className="flex justify-between items-center gap-2 h-full">
         {/* Tela única: com um município só, as seções Negociações e Grupos de
             Produtos ficam lado a lado (empilhadas a aba não cabia na tela). Com

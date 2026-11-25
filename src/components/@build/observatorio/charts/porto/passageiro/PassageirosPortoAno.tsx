@@ -21,6 +21,7 @@ const PassageirosPortoAno = ({
     <div className="chart-wrapper col-span-full">
       <ChartGrabber>
         <LineChart
+          area
           data={updatedData}
           title={title}
           colors={colors}

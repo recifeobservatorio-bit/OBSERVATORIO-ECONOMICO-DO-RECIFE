@@ -55,6 +55,14 @@ const charts = [
   //     )
   //   ),
   // },
+  // Grupamento (Serviços/Comércio/...) como no Power BI.
+  {
+    Component: React.lazy(() =>
+      import(
+        "@/components/@build/observatorio/charts/empresas/empresas-naturezas/EmpresasGrupamento"
+      )
+    ),
+  },
 ];
 
 export default charts;
