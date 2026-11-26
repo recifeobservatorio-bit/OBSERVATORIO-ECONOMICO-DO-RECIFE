@@ -127,9 +127,10 @@ const FitToScreen = ({
         lockCount += 1;
         if (lockCount === 1) {
           unlockTimer = window.setTimeout(() => {
+            // Solta só a 1ª trava. NÃO zera lockCount aqui: zerando, toda trava
+            // virava "a 1ª" e o ajuste recomeçava a cada 6s — em telas menores
+            // (1366×768, 1280×720) os gráficos ficavam mexendo sem parar.
             locked = false;
-      lockCount = 0;
-      if (unlockTimer) window.clearTimeout(unlockTimer);
             changeTimes = [];
             fillPasses = 0;
             compute();
@@ -298,6 +299,8 @@ const FitToScreen = ({
     const onResize = () => {
       fillPasses = 0;
       locked = false;
+      lockCount = 0;
+      if (unlockTimer) window.clearTimeout(unlockTimer);
       changeTimes = [];
       scheduleCompute();
     };

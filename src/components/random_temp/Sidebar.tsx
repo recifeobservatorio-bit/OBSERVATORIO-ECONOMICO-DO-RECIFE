@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 
+import { FILTERS_STATE_EVENT, FILTERS_TOGGLE_EVENT, FiltersState } from "./FilterSidebar";
 import Menu from "./Menu";
 import { menuItems } from "./menuIcons";
 
@@ -48,6 +49,12 @@ const HamburgerIcon = () => (
   </svg>
 );
 
+const FunnelIcon = () => (
+  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth={2} strokeLinejoin="round">
+    <path d="M3 5h18l-7 8v6l-4 2v-8L3 5z" />
+  </svg>
+);
+
 // Menu de navegação no topo: o hamburger fica numa barra fina acima da página
 // e o menu abre como gaveta sobreposta. Antes era uma coluna fixa de ícones à
 // esquerda, que tirava ~96px de largura dos gráficos o tempo todo.
@@ -55,6 +62,14 @@ export const Sidebar = () => {
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const drawerRef = useRef<HTMLDivElement | null>(null);
   const pathname = usePathname();
+  // Estado da coluna de filtros (FilterSidebar avisa por evento).
+  const [filtersState, setFiltersState] = useState<FiltersState>({ available: false, open: false });
+
+  useEffect(() => {
+    const onState = (e: Event) => setFiltersState((e as CustomEvent<FiltersState>).detail);
+    window.addEventListener(FILTERS_STATE_EVENT, onState);
+    return () => window.removeEventListener(FILTERS_STATE_EVENT, onState);
+  }, []);
 
   useEffect(() => {
     setMenuOpen(false);
@@ -81,7 +96,7 @@ export const Sidebar = () => {
   return (
     <>
       <header className="flex items-center gap-3 h-14 shrink-0 px-3 bg-white dark:bg-[#0C1B2B] border-b border-gray-200 dark:border-[#15273b]">
-        <div className="flex items-center gap-3 w-20 shrink-0">
+        <div className="flex items-center gap-3 shrink-0 xl:w-[200px]">
           <button
             onClick={() => setMenuOpen(true)}
             aria-label="Abrir menu"
@@ -92,6 +107,22 @@ export const Sidebar = () => {
           <Link href="/" title="Observatório Econômico do Recife" className="flex items-center shrink-0">
             <Image src="/images/logos/logo-obs-economico.svg" alt="logo" width={28} height={28} />
           </Link>
+          {/* Abre/fecha a coluna laranja de filtros (gaveta no celular). */}
+          {filtersState.available && (
+            <button
+              onClick={() => window.dispatchEvent(new Event(FILTERS_TOGGLE_EVENT))}
+              aria-pressed={filtersState.open}
+              title={filtersState.open ? "Fechar filtros" : "Abrir filtros"}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-base font-semibold border transition-colors ${
+                filtersState.open
+                  ? "bg-[#E66C37] border-[#E66C37] text-white hover:bg-[#d25e2c]"
+                  : "bg-white dark:bg-transparent border-[#E66C37] text-[#E66C37] hover:bg-orange-50 dark:hover:bg-[#15273b]"
+              }`}
+            >
+              <FunnelIcon />
+              Filtros
+            </button>
+          )}
         </div>
 
         {/* Atalhos: os mesmos ícones que a coluna lateral mostrava fechada,
@@ -126,7 +157,8 @@ export const Sidebar = () => {
             ))}
           </div>
         </nav>
-        <div className="hidden xl:block w-20 shrink-0" />
+        {/* Espaçador do mesmo tamanho do bloco da esquerda: mantém os atalhos centralizados. */}
+        <div className="hidden xl:block w-[200px] shrink-0" />
       </header>
 
       {menuOpen && <div className="fixed inset-0 z-40 bg-black/30" />}

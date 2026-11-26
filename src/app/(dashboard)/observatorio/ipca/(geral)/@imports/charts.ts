@@ -9,15 +9,9 @@ const charts = [
         )
     ),
     title: "Ipca Anual de Selecionados",
-  },
-  {
-    Component: React.lazy(
-      () =>
-        import(
-          "@/components/@build/observatorio/charts/ipca/geral/IpcaBrasilPorMeses"
-        )
-    ),
-    title: "Ipca Anual do Brasil",
+    // Recife x Brasil num gráfico só (o "Variação Mensal do IPCA no Brasil" saiu daqui);
+    // ocupa 2 colunas para a grade de 3 fechar em 2 linhas.
+    wide: true,
   },
   {
     Component: React.lazy(

@@ -46,6 +46,13 @@ const ClearFilterIcon = () => (
 // usa os filtros do DashboardContext — a coluna mostraria valores de outra página.
 const ROUTES_WITHOUT_SIDEBAR = ["/observatorio/panorama"];
 
+// Botão "Filtros" da barra do topo (Sidebar.tsx) conversa com esta coluna por
+// eventos da janela: ele pede para abrir/fechar e a coluna avisa se existe
+// nesta página e se está aberta (para o botão mostrar o estado certo).
+export const FILTERS_TOGGLE_EVENT = "bi-filters-toggle";
+export const FILTERS_STATE_EVENT = "bi-filters-state";
+export type FiltersState = { available: boolean; open: boolean };
+
 const FilterSidebar = () => {
   const { filters, applyFilters, resetFilters } = useDashboard();
   const pathname = usePathname();
@@ -83,6 +90,32 @@ const FilterSidebar = () => {
   tempRef.current = tempFilters;
   const filtersRef = useRef(filters);
   filtersRef.current = filters;
+  const desktopCollapsedRef = useRef(desktopCollapsed);
+  desktopCollapsedRef.current = desktopCollapsed;
+
+  const hasYearFilter = !filters.hideYearFilter && !!filters.years?.length;
+  const available = !ROUTES_WITHOUT_SIDEBAR.includes(pathname) && (hasYearFilter || !!filters.additionalFilters?.length);
+
+  // Avisa a barra do topo e atende ao clique no botão "Filtros" de lá.
+  useEffect(() => {
+    const isDesktop = () => window.matchMedia("(min-width: 1024px)").matches;
+    const open = isDesktop() ? !desktopCollapsed : mobileOpen;
+    window.dispatchEvent(new CustomEvent<FiltersState>(FILTERS_STATE_EVENT, { detail: { available, open } }));
+  }, [available, desktopCollapsed, mobileOpen]);
+
+  useEffect(() => {
+    const onToggle = () => {
+      if (window.matchMedia("(min-width: 1024px)").matches) setCollapsed(!desktopCollapsedRef.current);
+      else setMobileOpen((v) => !v);
+    };
+    window.addEventListener(FILTERS_TOGGLE_EVENT, onToggle);
+    return () => {
+      window.removeEventListener(FILTERS_TOGGLE_EVENT, onToggle);
+      // Saiu das páginas de dados: o botão do topo some.
+      window.dispatchEvent(new CustomEvent<FiltersState>(FILTERS_STATE_EVENT, { detail: { available: false, open: false } }));
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     setTempFilters(filters);
@@ -158,17 +191,7 @@ const FilterSidebar = () => {
 
   return (
     <>
-      {/* Telas estreitas: a coluna vira gaveta, aberta por este botão. No
-          computador ele só aparece quando a coluna foi recolhida. */}
-      <button
-        onClick={() => {
-          if (window.matchMedia("(min-width: 1024px)").matches) setCollapsed(false);
-          else setMobileOpen(true);
-        }}
-        className={`${desktopCollapsed ? "" : "lg:hidden"} fixed bottom-4 left-3 md:bottom-5 md:left-5 z-40 bi-filter-fab`}
-      >
-        Filtros
-      </button>
+      {/* Abrir/fechar fica no botão "Filtros" da barra do topo (Sidebar.tsx). */}
       {mobileOpen && (
         <div className="lg:hidden fixed inset-0 z-40 bg-black/40" onClick={() => setMobileOpen(false)} />
       )}

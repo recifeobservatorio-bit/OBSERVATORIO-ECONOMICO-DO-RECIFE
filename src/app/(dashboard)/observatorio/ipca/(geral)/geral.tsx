@@ -26,9 +26,10 @@ const Geral = ({
     <div className="pb-4">
       <SortableDiv chartOrder={chartOrder} setChartOrder={setChartOrder} sortableContainerRef={sortableContainerRef} style="grid items-stretch grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-4">
       {chartOrder.map((index) => {
-          const { Component } = charts[index];
+          // Cada gráfico usa só parte das props (porAno/porMes/rawData...).
+          const { Component, wide } = charts[index] as { Component: React.ComponentType<any>; wide?: boolean };
           return (
-            <div key={index} className={`chart-content-wrapper relative`}>
+            <div key={index} className={`chart-content-wrapper relative ${wide ? "sm:col-span-2" : ""}`}>
               <SectionIconBadge icon={<IpcaIcon />} />
               <React.Suspense fallback={<GraphSkeleton />}>
                 <ErrorBoundary>

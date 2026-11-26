@@ -24,10 +24,10 @@ const Geral = ({ toCompare, data, year, months }: { toCompare?: string[]; data: 
 
   return (
     <FitToScreen>
-    {/* Tela única: gráficos e tabela numa grade só de 3 colunas (5 gráficos +
-        tabela = 2 linhas). Antes a tabela ocupava uma linha inteira sozinha. */}
-    <div className="lg:grid lg:grid-cols-3 lg:gap-4">
-      <div className="flex flex-wrap gap-4 justify-center mb-8 lg:col-span-3 lg:mb-0">
+    {/* 4 colunas: 6 gráficos em 2 linhas de 3 e a tabela numa coluna à direita
+        ocupando as duas linhas — com o gráfico das capitais a tabela ficava sozinha embaixo. */}
+    <div className="lg:grid lg:grid-cols-4 lg:gap-4">
+      <div className="flex flex-wrap gap-4 justify-center mb-8 lg:col-span-4 lg:mb-0">
         {cards.map(({ Component }, index) => (
           <React.Suspense fallback={<div>Carregando...</div>} key={index}>
             <ErrorBoundary>
@@ -68,7 +68,7 @@ const Geral = ({ toCompare, data, year, months }: { toCompare?: string[]; data: 
           return ( 
             <div
               key={index}
-              className="bg-white shadow-md rounded-lg flex flex-col items-center w-full relative"
+              className="bg-white shadow-md rounded-lg flex flex-col items-center w-full relative mt-4 lg:mt-0 lg:col-start-4 lg:row-start-2 lg:row-span-2 lg:overflow-hidden"
             >
               <SectionIconBadge icon={<PibIcon />} />
               <React.Suspense fallback={<div>Carregando...</div>}>

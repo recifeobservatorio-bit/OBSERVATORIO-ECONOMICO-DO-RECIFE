@@ -12,19 +12,20 @@ import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 const IpcaPorMeses = ({
   porMes = [],
   colors = ColorPalette.default,
-  title = "Variação Mensal do IPCA",
+  title = "Variação Mensal do IPCA - Recife x Brasil",
   nameKey = "mes",
 }: ChartBuild<IpcaGeralHeaders[]> & { porMes?: any[] }) => {
-  // Exclui Brasil — quem quiser comparar com o Brasil usa o gráfico dedicado
-  // (IpcaBrasilPorMeses). Série histórica completa (todos os anos), por mês.
-  const chartData = porMes.map((row: any) => {
-    const { Brasil, ...capitais } = row;
-    return capitais;
-  });
+  // Capital(is) do filtro + Brasil no mesmo gráfico (pedido: juntar "Variação
+  // mensal Brasil" e "Variação mensal IPCA Recife"). Série histórica completa, por mês.
+  const chartData = porMes;
   const xKey = nameKey;
-  const categorias = Object.keys(chartData[0] || {}).filter((key) => key !== "mes" && key !== "ano");
+  const categorias = Object.keys(chartData[0] || {}).filter((key) => key !== "mes" && key !== "ano" && key !== "Brasil");
+  const hasBrasil = chartData.some((row: any) => row?.Brasil != null);
 
-  const selectedColors = categorias.map((_, index) => colors[index % colors.length]);
+  const selectedColors = [
+    ...categorias.map((_, index) => colors[index % colors.length]),
+    ...(hasBrasil ? [ColorPalette.status.neutral] : []),
+  ];
 
   return (
     <div className="chart-wrapper">
@@ -34,11 +35,11 @@ const IpcaPorMeses = ({
           title={title}
           colors={selectedColors}
           xKey={xKey}
-          lines={categorias.map((categoria) => ({
-            dataKey: categoria,
-            name: categoria,
-            strokeWidth: 2,
-          }))}
+          lines={[
+            ...categorias.map((categoria) => ({ dataKey: categoria, name: categoria, strokeWidth: 2 })),
+            // Brasil tracejado, como referência.
+            ...(hasBrasil ? [{ dataKey: "Brasil", name: "Brasil", strokeWidth: 2, dashed: true }] : []),
+          ]}
         />
       </ChartGrabber>
     </div>
