@@ -3,8 +3,6 @@ import { getFromIndexedDB, listIndexedDBKeys, saveToIndexedDB } from "@/@api/cac
 import { readParquetFromBuffer } from "./parquetReader";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
-const API_USERNAME = process.env.NEXT_PUBLIC_API_USERNAME!;
-const API_PASSWORD = process.env.NEXT_PUBLIC_API_PASSWORD!;
 
 export async function fetchData<T>(
   endpoint: string,
@@ -26,14 +24,8 @@ export async function fetchData<T>(
     data = await readParquetFromBuffer(cachedBuffer);  // Usando o parquetReader
   } else {
     console.log("Fetch remoto para:", endpoint);
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Basic ${btoa(`${API_USERNAME}:${API_PASSWORD}`)}`,
-      },
-      credentials: "include",
-    });
+    // /api/data/** é público no back-end (SecurityConfig: permitAll) — sem login/senha.
+    const response = await fetch(`${BASE_URL}${endpoint}`, { method: "GET" });
 
     if (!response.ok) {
       throw new Error(`Erro ao buscar: ${endpoint}`);

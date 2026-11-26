@@ -1,4 +1,4 @@
-import { fetchDataJwt } from "@/@api/config/fetchDataJwt";
+import { fetchJson } from "@/@api/config/fetchJson";
 
 export interface NewsItem {
   id: number;
@@ -14,7 +14,7 @@ export class NewsData {
 
   public static async fetchNews(): Promise<NewsItem[]> {
     const endpoint = "/news/newsData";
-    return fetchDataJwt<NewsItem[]>(endpoint, this.cache);
+    return fetchJson<NewsItem[]>(endpoint, this.cache);
   }
 
   public static clearCache(): void {

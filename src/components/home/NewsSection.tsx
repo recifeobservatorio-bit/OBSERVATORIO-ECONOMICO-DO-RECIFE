@@ -3,8 +3,6 @@
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
 
-import { getAuthToken } from "@/@api/config/authService";
-import { performAutoLogin } from "@/@api/config/authService";
 import { NewsData, NewsItem } from "@/@api/http/news/NewsData";
 
 function NewsSection() {
@@ -15,31 +13,16 @@ function NewsSection() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Notícias vêm de /api/data/** (público no back-end) — não precisa mais de login.
     const initializeAndFetch = async () => {
       setLoading(true);
-      let token = getAuthToken();
-
-      if (!token) {
-        console.log("Token não encontrado. Tentando login automático...");
-        const loginSuccess = await performAutoLogin();
-        if (loginSuccess) {
-          token = getAuthToken(); // Pega o token recém-criado
-          console.log("Login automático bem-sucedido. Token obtido.");
-        }
+      try {
+        const data = await NewsData.fetchNews();
+        const sortedNews = data.sort((a, b) => b.id - a.id);
+        setNews(sortedNews);
+      } catch (err) {
+        setError("Erro ao buscar notícias.");
       }
-
-      if (token) {
-        try {
-          const data = await NewsData.fetchNews();
-          const sortedNews = data.sort((a, b) => b.id - a.id);
-          setNews(sortedNews);
-        } catch (err) {
-          setError("Erro ao buscar notícias.");
-        }
-      } else {
-        setError("Falha na autenticação da aplicação.");
-      }
-      
       setLoading(false);
     };
 

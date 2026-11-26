@@ -3,7 +3,6 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import DataPrefetchGate from "@/components/@global/features/DataPrefetchGate";
 import { WithLoading } from "@/components/home/WithLoading";
-import { AuthProvider } from "@/context/AuthContext";
 import { LoadingProvider } from "@/context/LoadingContext";
 
 // Layout raiz fica no servidor: com "use client" aqui o next/font gerava uma classe
@@ -18,13 +17,11 @@ export default function RootLayout({
   return (
     <html lang="pt-br">
       <body className={poppins.className}>
-        <AuthProvider>
-          <LoadingProvider>
-            <WithLoading>
-              <DataPrefetchGate>{children}</DataPrefetchGate>
-            </WithLoading>
-          </LoadingProvider>
-        </AuthProvider>
+        <LoadingProvider>
+          <WithLoading>
+            <DataPrefetchGate>{children}</DataPrefetchGate>
+          </WithLoading>
+        </LoadingProvider>
       </body>
     </html>
   );
