@@ -41,3 +41,24 @@ export const processDesempregoTaxaAno = (capitalRows: any[] = [], brasilRows: an
       brasil: mean(brasil.get(`${entry.ano}-${entry.tri}`)),
     }));
 };
+
+// Liga as pontas de cada vão sem dado (null) da série `key` numa série
+// auxiliar `bridgeKey` (desenhar com connectNulls: false), tracejada: a linha não fica quebrada, mas
+// fica claro que ali não há dado (taxa por capital sem divulgação na base).
+export const withGapBridge = <T extends Record<string, any>>(rows: T[], key: string, bridgeKey: string): T[] => {
+  const out = rows.map((r) => ({ ...r, [bridgeKey]: null })) as any[];
+  let lastIdx = -1;
+  for (let i = 0; i < out.length; i++) {
+    if (out[i][key] == null) continue;
+    if (lastIdx >= 0 && i - lastIdx > 1) {
+      // Reta entre as pontas (só para desenhar; o tooltip não mostra a ponte).
+      const a = Number(out[lastIdx][key]);
+      const b = Number(out[i][key]);
+      for (let j = lastIdx; j <= i; j++) {
+        out[j][bridgeKey] = Math.round((a + ((b - a) * (j - lastIdx)) / (i - lastIdx)) * 10) / 10;
+      }
+    }
+    lastIdx = i;
+  }
+  return out;
+};

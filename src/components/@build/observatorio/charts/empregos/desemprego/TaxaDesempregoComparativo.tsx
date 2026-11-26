@@ -4,7 +4,7 @@ import React, { useMemo, useState } from "react";
 
 import LineChart from "@/components/@global/charts/LineChart";
 import ChartGrabber from "@/components/@global/features/ChartGrabber";
-import { processDesempregoTaxaAno } from "@/functions/process_data/observatorio/empregos/desemprego/desempregoTaxaAno";
+import { processDesempregoTaxaAno, withGapBridge } from "@/functions/process_data/observatorio/empregos/desemprego/desempregoTaxaAno";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
 const capitalName = (value: string) => String(value).replace(/-[A-Z]{2}$/, "");
@@ -33,10 +33,13 @@ const TaxaDesempregoComparativo = ({
   const [chosen, setChosen] = useState<string>("");
   const compare = options.includes(chosen) ? chosen : options.find((c) => /^Fortaleza/.test(c)) ?? options[0] ?? "";
 
-  const chartData = processDesempregoTaxaAno(
-    baseRows,
-    allRows.filter((r) => r.Capital === compare)
+  // Vão 2º tri/2020–1º tri/2022 (taxa 0 na base = sem dado): ponte tracejada em cada capital.
+  const chartData = withGapBridge(
+    withGapBridge(processDesempregoTaxaAno(baseRows, allRows.filter((r) => r.Capital === compare)), "value", "semDadoBase"),
+    "brasil",
+    "semDadoOutra"
   );
+  const hasGap = chartData.some((d: any) => d.semDadoBase != null || d.semDadoOutra != null);
 
   return (
     <div className="chart-wrapper">
@@ -58,11 +61,17 @@ const TaxaDesempregoComparativo = ({
               </select>
             </label>
           }
-          colors={colors}
+          colors={hasGap ? [colors[0], colors[1], colors[0], colors[1]] : colors}
           xKey="label"
           lines={[
             { dataKey: "value", name: baseLabel, connectNulls: false },
             { dataKey: "brasil", name: capitalName(compare), connectNulls: false },
+            ...(hasGap
+              ? [
+                  { dataKey: "semDadoBase", name: "Sem dado na base", dashed: true, connectNulls: false, hideInTooltip: true },
+                  { dataKey: "semDadoOutra", name: "Sem dado na base", dashed: true, connectNulls: false, hideInTooltip: true, hideInLegend: true },
+                ]
+              : []),
           ]}
           tooltipEntry="%"
           yAxis={{ tickFormatter: (value: any) => `${value}%` }}

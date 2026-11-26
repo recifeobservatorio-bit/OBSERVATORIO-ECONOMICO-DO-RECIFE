@@ -214,6 +214,9 @@ const LineChart = ({
               dot={sparse ? { r: 3.5, strokeWidth: 2, stroke: colors[lineIndex] || "#000", fill: "#fff" } : false}
               activeDot={{ r: 5, strokeWidth: 2, stroke: "#fff" }}
               name={line.name}
+              // hideInTooltip: série auxiliar (ex.: ponte tracejada sobre um vão sem dado) fora do tooltip.
+              tooltipType={line.hideInTooltip ? "none" : undefined}
+              legendType={line.hideInLegend ? "none" : undefined}
               connectNulls={line.connectNulls ?? true}
               isAnimationActive={false}
             >

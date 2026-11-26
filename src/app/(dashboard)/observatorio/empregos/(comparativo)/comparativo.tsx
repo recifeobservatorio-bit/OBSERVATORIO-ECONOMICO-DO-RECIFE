@@ -59,8 +59,8 @@ const Comparativo = ({
           noRecife={false}
           filters={tempFiltred}
           setFilters={setTempFiltred}
-          label="Buscar por Município"
-          placeholder="Digite para buscar um município"
+          label="Compare Municípios"
+          placeholder="Digite para buscar um município e comparar com o Recife"
           notFoundMessage="Nenhuma município encontrado"
         />
 
@@ -85,6 +85,13 @@ const Comparativo = ({
             </div>
           )})}
         </SortableDiv> */}
+
+        {/* Sem um 2º município escolhido não havia nada indicando que dá pra comparar. */}
+        {tempFiltred.length < 2 && (
+          <p className="text-center w-full text-gray-700 dark:text-gray-300">
+            Selecione um município para as informações serem comparadas
+          </p>
+        )}
 
         {/* Linha de saldo mensal dos municípios escolhidos, como no Power BI. */}
         {tempFiltred.length > 0 && (
@@ -111,6 +118,12 @@ const Comparativo = ({
               </React.Suspense>
             </div>
           ))}
+          {/* Reserva o lugar da 2ª tabela enquanto nenhuma cidade foi escolhida. */}
+          {tempFiltred.length === 1 && (
+            <div className="chart-content-wrapper relative flex items-center justify-center min-h-[300px] text-center text-gray-500 dark:text-gray-400">
+              Escolha uma cidade para comparar
+            </div>
+          )}
         </SortableDiv>
       </div>
     </div>
