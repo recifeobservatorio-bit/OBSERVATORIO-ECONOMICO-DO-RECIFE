@@ -37,6 +37,7 @@ const TaxaSelic = () => {
       source="Fonte: Banco Central do Brasil"
     >
       <LineChart
+        showPointLabels
         data={chartData}
         xKey="data"
         colors={ColorPalette.default}

@@ -11,6 +11,7 @@ import { getYearSelected } from "@/utils/filters/@global/getYearSelected";
 
 import ComparativoMed from "./(comparativo-med)/comparativo-med";
 import EmpresasAtivas from "./(empresas-ativas)/empresas-ativas";
+import EmpresasAtivasRecife from "./(empresas-ativas-recife)/empresas-ativas-recife";
 import EmpresasInativas from "./(empresas-inativas)/empresas-inativas";
 import Salario from "./(salario)/salario";
 import EmpresasAtivasInativas from "./(empresas-ativas-inativas)/empresas-ativas-inativas";
@@ -29,7 +30,7 @@ const EmpresasPage = () => {
   const [dataObj, setDataObj] = useState<any>({});
   const [dataTest, setDataTest] = useState<any>({});
   const [dataTestTwo, setDataTestTwo] = useState<any>({});
-  const [activeTab, setActiveTab] = useState("empresas-ativas");
+  const [activeTab, setActiveTab] = useState("geral");
 
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -40,8 +41,9 @@ const EmpresasPage = () => {
       if (tab && tab !== activeTab) {
         setActiveTab(tab);
       } else if (!tab) {
-        setActiveTab('empresas-ativas');
-        router.replace(`?tab=empresas-ativas`);
+        // 1ª aba de Empresas no Power BI: Panorama das Empresas Ativas no Recife.
+        setActiveTab('geral');
+        router.replace(`?tab=geral`);
       }
     }, [searchParams, activeTab, router]);
 
@@ -156,6 +158,13 @@ const EmpresasPage = () => {
     }
 
     switch (activeTab) {
+      case "geral":
+        return <EmpresasAtivasRecife
+        data={dataArr}
+        dataSemMes={dataArrSemMes}
+        dataSemMesPast={dataArrSemMesPast}
+        year={getYearSelected(filters)}
+        />
       case "empresas-ativas":
         return <EmpresasAtivas
         data={dataArr}
@@ -240,87 +249,27 @@ const EmpresasPage = () => {
         Empresas
       </h1>
 
+      {/* Abas na ordem e com os nomes do Power BI. */}
       <div className="bi-tabs">
-        <button
-          onClick={() => handleNavigation("empresas-ativas")}
-          className={`bi-tab ${
-            activeTab === "empresas-ativas"
-              ? "bi-tab-active"
-              : ""
-          }`}
-        >
-          Empresas Ativas  
-        </button>
-        <button
-          onClick={() => handleNavigation("empresas-inativas")}
-          className={`bi-tab ${
-            activeTab === "empresas-inativas"
-              ? "bi-tab-active"
-              : ""
-          }`}
-        >
-          Empresas Inativas  
-        </button>
-        <button
-          onClick={() => handleNavigation("empresas-ativas-inativas")}
-          className={`bi-tab ${
-            activeTab === "empresas-ativas-inativas"
-              ? "bi-tab-active"
-              : ""
-          }`}
-        >
-          Empresas Inativas X Ativas 
-        </button>
-        <button
-          onClick={() => handleNavigation("empresas-naturezas")}
-          className={`bi-tab ${
-            activeTab === "empresas-naturezas"
-              ? "bi-tab-active"
-              : ""
-          }`}
-        >
-          Empresas Naturezas
-        </button>
-        <button
-          onClick={() => handleNavigation("empresas-classes")}
-          className={`bi-tab ${
-            activeTab === "empresas-classes"
-              ? "bi-tab-active"
-              : ""
-          }`}
-        >
-          Ativas Geral NE
-        </button>
-        <button
-          onClick={() => handleNavigation("comparativo-empresas-classes")}
-          className={`bi-tab ${
-            activeTab === "comparativo-empresas-classes"
-              ? "bi-tab-active"
-              : ""
-          }`}
-        >
-          Compartivo Ativas Geral NE
-        </button>
-        <button
-          onClick={() => handleNavigation("empresas-abertas-fechadas")}
-          className={`bi-tab ${
-            activeTab === "empresas-abertas-fechadas"
-              ? "bi-tab-active"
-              : ""
-          }`}
-        >
-          Empresas Abertas e Fechadas  
-        </button>
-        <button
-          onClick={() => handleNavigation("empresas-tempo-abertura")}
-          className={`bi-tab ${
-            activeTab === "empresas-tempo-abertura"
-              ? "bi-tab-active"
-              : ""
-          }`}
-        >
-          Empresas Tempo Abertura  
-        </button>
+        {[
+          { key: "geral", label: "Panorama das Empresas Ativas no Recife" },
+          { key: "empresas-ativas", label: "Empresas Ativas Recife" },
+          { key: "empresas-inativas", label: "Empresas Inativas Recife" },
+          { key: "empresas-ativas-inativas", label: "Empresas Ativas x Inativas Recife" },
+          { key: "empresas-naturezas", label: "Empresas Ativas Natureza Jurídica NE" },
+          { key: "empresas-classes", label: "Empresas Ativas Geral NE" },
+          { key: "comparativo-empresas-classes", label: "Empresas Ativas Geral NE Comparativo" },
+          { key: "empresas-abertas-fechadas", label: "Abertura e Fechamento de Empresas" },
+          { key: "empresas-tempo-abertura", label: "Empresas Tempo de Abertura" },
+        ].map((t) => (
+          <button
+            key={t.key}
+            onClick={() => handleNavigation(t.key)}
+            className={`bi-tab ${activeTab === t.key ? "bi-tab-active" : ""}`}
+          >
+            {t.label}
+          </button>
+        ))}
       </div>
       {renderContent()}
     </div>

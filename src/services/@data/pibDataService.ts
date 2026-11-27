@@ -51,6 +51,8 @@ export class PibDataService {
         past: filteredPastYearData,
         rawDataCurrent: current,
         rawDataPast: past,
+        // Todos os anos e municípios, sem filtro: painel do PIB (Recife x cidade comparada).
+        allData: all,
         id: "pib"
     };
   }

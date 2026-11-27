@@ -17,7 +17,8 @@ const Geral = ({
   porAno,
   porMes,
   months,
-}: ChartBuild<IpcaGeralHeaders[]> & { porAno?: any[]; porMes?: any[] }) => {
+  extra,
+}: ChartBuild<IpcaGeralHeaders[]> & { porAno?: any[]; porMes?: any[]; extra?: React.ReactNode }) => {
   const [chartOrder, setChartOrder] = useState(charts.map((_, index) => index));
   const sortableContainerRef = useRef<HTMLDivElement>(null);
 
@@ -41,6 +42,8 @@ const Geral = ({
         })}
        </SortableDiv>
     </div>
+      {/* Aba "IPCA" do Power BI: os gráficos por grupo entram logo abaixo. */}
+      {extra}
     </FitToScreen>
   );
 };

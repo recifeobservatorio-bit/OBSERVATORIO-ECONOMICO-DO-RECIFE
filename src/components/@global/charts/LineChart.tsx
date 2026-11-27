@@ -34,6 +34,9 @@ const LineChart = ({
   referenceLine,
   // area: gráfico de área (estilo Power BI) — todas as séries ganham preenchimento forte.
   area = false,
+  // Valores escritos nos pontos da linha. Desligado por padrão (pedido: "deixe só no
+  // eixo"); o Panorama liga para continuar como estava.
+  showPointLabels = false,
 }: any) => {
   const chartId = useId();
   const gradientId = `line-fill-${chartId.replace(/:/g, "")}`;
@@ -80,7 +83,7 @@ const LineChart = ({
   const NARROW_W = 420;
   const [chartWidth, setChartWidth] = useState(0);
   // Duas séries longas: os rótulos das duas pontas se sobrepunham — fica o eixo Y.
-  const labeled = lines.length === 1 || (lines.length === 2 && !dense);
+  const labeled = showPointLabels && (lines.length === 1 || (lines.length === 2 && !dense));
   const compactLabels = chartWidth > 0 && chartWidth < NARROW_W;
   // Índices relativos ao trecho exibido (o LabelList numera só os pontos do gráfico).
   const keyIndexes: Set<number>[] = lines.map((line: any) => keyPointIndexes(shownData.map((d: any) => d?.[line.dataKey]), compactLabels));

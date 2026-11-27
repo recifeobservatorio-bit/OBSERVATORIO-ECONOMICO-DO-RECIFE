@@ -34,6 +34,7 @@ const RankingCompetitividade = () => {
   return (
     <PanoramaCard title="Ranking Competitividade">
       <LineChart
+        showPointLabels
         data={chartData}
         xKey="ano"
         colors={ColorPalette.default}

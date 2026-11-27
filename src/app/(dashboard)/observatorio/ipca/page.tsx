@@ -53,16 +53,18 @@ const IpcaPage = () => {
     }
 
     switch (activeTab) {
+      // Aba "IPCA" do Power BI: resumo + grupos na mesma página (a antiga aba
+      // "Por Grupos" abre aqui também).
       case "geral":
+      case "grupos":
         return <Geral
             data={ipca || {}}
             rawData={ipcaRawData || {}}
             porAno={ipcaPorAno}
             porMes={ipcaPorMes}
             months={getMonths(filters)}
+            extra={<Grupos noFit />}
           />
-      case "grupos":
-        return <Grupos />
 
       case "analitico":
         return <Analitico
@@ -90,38 +92,20 @@ const IpcaPage = () => {
       <h1 className="bi-page-title">
         IPCA
       </h1>
+      {/* Abas na ordem e com os nomes do Power BI. */}
       <div className="bi-tabs">
-        {/* Botões de navegação */}
-        <button
-          onClick={() => handleNavigation("geral")}
-          className={`bi-tab ${
-            activeTab === "geral"
-              ? "bi-tab-active"
-              : ""
-          }`}
-        >
-          Resumo Geral
-        </button>
-        <button
-          onClick={() => handleNavigation("grupos")}
-          className={`bi-tab ${
-            activeTab === "grupos"
-              ? "bi-tab-active"
-              : ""
-          }`}
-        >
-          Por Grupos
-        </button>
-        <button
-          onClick={() => handleNavigation("analitico")}
-          className={`bi-tab ${
-            activeTab === "analitico"
-              ? "bi-tab-active"
-              : ""
-          }`}
-        >
-          Analítico
-        </button>
+        {[
+          { key: "geral", label: "IPCA" },
+          { key: "analitico", label: "IPCA Analítico" },
+        ].map((t) => (
+          <button
+            key={t.key}
+            onClick={() => handleNavigation(t.key)}
+            className={`bi-tab ${activeTab === t.key || (t.key === "geral" && activeTab === "grupos") ? "bi-tab-active" : ""}`}
+          >
+            {t.label}
+          </button>
+        ))}
       </div>
       {renderContent()}
     </div>

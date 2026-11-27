@@ -88,6 +88,7 @@ export const routeFiltersMap: Record<string, TabFiltersMap> = {
     geral: anacFilters,
     comparativo: anacComparativoFilters,
     embarque: anacFilters,
+    desembarque: anacFilters,
     aena: aenaFilters,
     // Se existirem outras tabs, adicione aqui.
   },
@@ -105,11 +106,15 @@ export const routeFiltersMap: Record<string, TabFiltersMap> = {
     analitico: {
       ...balancaComercialAnaliticoFilters
     },
+    comparativo: {
+      ...balancaComercialAnaliticoFilters
+    },
   },
 
   "/observatorio/empregos": {
     geral: empregosCagedFilters,
     comparativo: empregosCagedFilters,
+    estoque: empregosCagedFilters,
     desemprego: empregosDesempregoFilters,
   },
 

@@ -16,12 +16,12 @@ import IptuValores from "./(iptu-valores)/iptu-valores";
 import IptuPesquisa from "./(iptu-pesquisa)/iptu-pesquisa";
 
 const TABS = [
-  { key: "mercado-imobiliario",            label: "MERCADO IMOBILIÁRIO",            gradient: "from-orange-500 to-orange-700" },
-  { key: "mercado-imobiliario-avaliacoes", label: "MERCADO IMOBILIÁRIO AVALIAÇÕES", gradient: "from-blue-500 to-blue-700" },
-  { key: "mercado-imobiliario-pesquisa",   label: "MERCADO IMOBILIÁRIO PESQUISA",   gradient: "from-green-500 to-green-700" },
-  { key: "iptu-contribuintes",             label: "IPTU CONTRIBUINTES",             gradient: "from-purple-500 to-purple-700" },
-  { key: "iptu-valores",                   label: "IPTU VALORES",                  gradient: "from-red-500 to-red-700" },
-  { key: "iptu-pesquisa",                  label: "IPTU PESQUISA",                 gradient: "from-teal-500 to-teal-700" },
+  { key: "mercado-imobiliario",            label: "Mercado Imobiliário",            gradient: "from-orange-500 to-orange-700" },
+  { key: "mercado-imobiliario-avaliacoes", label: "Mercado Imobiliário Avaliações", gradient: "from-blue-500 to-blue-700" },
+  { key: "mercado-imobiliario-pesquisa",   label: "Mercado Imobiliário Pesquisa",   gradient: "from-green-500 to-green-700" },
+  { key: "iptu-contribuintes",             label: "IPTU Contribuintes",             gradient: "from-purple-500 to-purple-700" },
+  { key: "iptu-valores",                   label: "IPTU Valores",                  gradient: "from-red-500 to-red-700" },
+  { key: "iptu-pesquisa",                  label: "IPTU Pesquisa",                 gradient: "from-teal-500 to-teal-700" },
 ];
 
 const TributosPage = () => {
@@ -71,7 +71,7 @@ const TributosPage = () => {
   return (
     <div className="bi-page">
       <h1 className="bi-page-title">
-        Mercado Imobiliário e IPTU
+        Mercado Imobiliário
       </h1>
 
       {/* Abas */}

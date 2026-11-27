@@ -94,7 +94,15 @@ export class IpcaDataService {
 
     const yearsOptions = computeAvailableYears(geralAllYears, (r) => r.Ano);
 
-    return { geral: { ...geralFiltered, porAno, porMes, yearsOptions }, id: "ipca" };
+    // A aba "IPCA" do Power BI traz também os gráficos por grupo/subgrupo/item/subitem.
+    // Filtros que não existem na base de grupos são ignorados (senão zerariam tudo).
+    const gruposAllYears = await ipcaService.fetchProcessedGruposData();
+    const gruposAno = filterByYear(gruposAllYears, this.currentYear, "ANO");
+    const amostra: Record<string, any> = gruposAno[0] ?? {};
+    const semCampo = (filters.additionalFilters ?? []).map((f) => f.label).filter((label) => !(label in amostra));
+    const grupos = applyGenericFilters(gruposAno, filters, semCampo);
+
+    return { geral: { ...geralFiltered, porAno, porMes, yearsOptions }, grupos, id: "ipca" } as any;
   }
 
   private async fetchIpcaGruposData(filters: Filters): Promise<{ id: "ipca-grupos"; grupos: IpcaGrupoData }> {

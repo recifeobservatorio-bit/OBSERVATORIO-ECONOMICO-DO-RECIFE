@@ -16,13 +16,17 @@ const Analitico = ({
   data,
   toCompare = getUniqueValues<BalancaHeaders, "Município">(data, "Município"),
   monthRecent,
+  comparativo = false,
 }: {
   year: string;
   toCompare?: string[];
   data: BalancaHeaders[];
   monthRecent?: number;
+  // false = "Balança Analítico" (só Recife, com rosca/pizza); true = "Balança
+  // Analítico Comparativo" (busca de municípios e tabelas lado a lado).
+  comparativo?: boolean;
 }) => {
-  const [tempFiltred, setTempFiltred] = useState([]);
+  const [tempFiltred, setTempFiltred] = useState<string[]>(comparativo ? [] : ["Recife - PE"]);
   const [tablesRender, setTablesRender] = useState(tables);
 
   // Store selectCountry states for each index
@@ -62,16 +66,18 @@ const Analitico = ({
   return (
     <FitToScreen>
     <div>
-      <SelectPrincipal
-        options={toCompare}
-        filters={tempFiltred}
-        setFilters={setTempFiltred}
-        initialValue={["Recife - PE"]}
-        noRecife={false}
-      />
+      {comparativo && (
+        <SelectPrincipal
+          options={toCompare}
+          filters={tempFiltred}
+          setFilters={setTempFiltred}
+          initialValue={["Recife - PE"]}
+          noRecife={false}
+        />
+      )}
 
       {/* Rosca do período + pizza do mês, como no topo do Balança Analítico do Power BI. */}
-      {tempFiltred[0] && (
+      {!comparativo && tempFiltred[0] && (
         <div className="mb-4">
           <NegociadoPeriodoMes data={data} municipio={tempFiltred[0]} year={year} />
         </div>

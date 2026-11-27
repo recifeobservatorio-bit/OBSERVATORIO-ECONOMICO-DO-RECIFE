@@ -1,6 +1,4 @@
-import { title } from "process";
-
-export const menuItems = [
+const rawMenuItems = [
     {
       title: "MENU",
       items: [
@@ -236,3 +234,35 @@ export const menuItems = [
       ],
     },
   ];
+
+// Ordem e nomes iguais ao menu do relatório Power BI do Observatório.
+// [label atual no array acima, nome exibido]
+const POWER_BI_ORDER: [string, string][] = [
+  ["Voltar", "Voltar"],
+  ["Panorama Recife", "Panorama Recife"],
+  ["Empregos", "Mercado de Trabalho"],
+  ["PIB", "PIB"],
+  ["Empresas", "Empresas"],
+  ["IPCA", "IPCA"],
+  ["Ranking de Competitividade dos Municípios", "Indicadores Municipais"],
+  ["Balança Comercial", "Balança Comercial"],
+  ["Portos", "Portos"],
+  ["Aeroportos", "Aeroportos"],
+  ["Mercado Imobiliário", "Mercado Imobiliário"],
+  ["CAPAG", "Capacidade de Pagamento"],
+  ["Combustíveis", "Combustíveis ANP"],
+  ["Economia Criativa", "Economia Criativa"],
+];
+
+export const menuItems = rawMenuItems.map((section) =>
+  section.title !== "MENU"
+    ? section
+    : {
+        ...section,
+        items: POWER_BI_ORDER.map(([from, to]) => {
+          const item = section.items.find((it) => it.label === from);
+          if (!item) throw new Error(`menuIcons: item "${from}" não encontrado`);
+          return { ...item, label: to };
+        }),
+      }
+);

@@ -95,7 +95,7 @@ const RankingPage = () => {
   return (
     <div className="bi-page">
       <h1 className="bi-page-title">
-        Ranking Geral de Competitividade
+        Indicadores Municipais
       </h1>
       <div className="bi-tabs">
         {/* Botões de navegação */}
@@ -107,7 +107,7 @@ const RankingPage = () => {
               : ""
           }`}
         >
-          Resumo Geral
+          Ranking de Competitividade dos Municípios
         </button>
         <button
           onClick={() => handleNavigation("dimensao")}

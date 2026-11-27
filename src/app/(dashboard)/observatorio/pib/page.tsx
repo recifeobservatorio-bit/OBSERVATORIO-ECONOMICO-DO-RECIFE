@@ -5,12 +5,9 @@ import React, { useState, useEffect } from "react";
 
 import { LoadingScreen } from "@/components/home/LoadingScreen";
 import { useDashboard } from "@/context/DashboardContext";
-import { getMonths } from "@/utils/filters/@global/getMonths";
 import { getYearSelected } from "@/utils/filters/@global/getYearSelected";
 
-import Capita from "./(capita)/capita";
-import Comparativo from "./(comparativo)/comparativo";
-import Geral from "./(geral)/geral";
+import PibPainel from "./(geral)/PibPainel";
 
 const PibPage = () => {
   const searchParams = useSearchParams();
@@ -44,7 +41,8 @@ const PibPage = () => {
         geral: data?.geral?.filteredData,
         current: data?.current?.filteredData,
         past: data?.past?.filteredData,
-        rawDataCurrent: data?.rawDataCurrent
+        rawDataCurrent: data?.rawDataCurrent,
+        allData: data?.allData ?? [],
       });
 
     } else {
@@ -58,37 +56,15 @@ const PibPage = () => {
       return <div className="text-center text-gray-600">Construindo gráficos...</div>;
     }
 
-    switch (activeTab) {
-      case "geral":
-        return (
-          <Geral
-            data={pibData}
-            year={getYearSelected(filters)}
-            months={getMonths(filters)}
-          />
-        );
-      case "capita":
-        return (
-          <Capita
-            data={pibData}
-            year={getYearSelected(filters)}
-            months={getMonths(filters)}
-          />
-        );
-      case "comparativo":
-        return <Comparativo
-          data={pibData} 
-          year={getYearSelected(filters)}
-        />;
-      default:
-        return (
-          <Geral
-            data={pibData}
-            year={getYearSelected(filters)}
-            months={getMonths(filters)}
-          />
-        );
-    }
+    // Duas páginas como no Power BI ("PIB" e "PIB Per Capita"); a comparação com
+    // outra cidade fica dentro de cada uma (a antiga aba Comparativo abre o PIB).
+    return (
+      <PibPainel
+        data={pibData}
+        year={getYearSelected(filters)}
+        capita={activeTab === "capita"}
+      />
+    );
   };
 
   const handleNavigation = async (tab: string) => {
@@ -104,38 +80,19 @@ const PibPage = () => {
       </h1>
 
       <div className="bi-tabs">
-        <button
-          onClick={() => handleNavigation("geral")}
-          className={`bi-tab ${
-            activeTab === "geral"
-              ? "bi-tab-active"
-              : ""
-          }`}
-        >
-          Geral
-        </button>
-        <button
-          onClick={() => handleNavigation("capita")}
-          className={`bi-tab ${
-            activeTab === "capita"
-              ? "bi-tab-active"
-              : ""
-          }`}
-        >
-          PIB Per Capita
-        </button>
-        <button
-          onClick={() => handleNavigation("comparativo")}
-          className={`bi-tab ${
-            activeTab === "comparativo"
-              ? "bi-tab-active"
-              : ""
-          }`}
-        >
-          Comparativo
-        </button>
+        {[
+          { key: "geral", label: "PIB" },
+          { key: "capita", label: "PIB Per Capita" },
+        ].map((t) => (
+          <button
+            key={t.key}
+            onClick={() => handleNavigation(t.key)}
+            className={`bi-tab ${activeTab === t.key || (t.key === "geral" && activeTab === "comparativo") ? "bi-tab-active" : ""}`}
+          >
+            {t.label}
+          </button>
+        ))}
       </div>
-
       {renderContent()}
     </div>
   );

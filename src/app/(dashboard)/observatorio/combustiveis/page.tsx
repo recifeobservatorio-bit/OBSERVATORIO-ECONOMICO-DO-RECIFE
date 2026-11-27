@@ -15,11 +15,11 @@ import Municipal from "./(municipal)/municipal";
 import Regional from "./(regional)/regional";
 
 const TABS = [
-  { key: "geral",       label: "ANP GERAL",    gradient: "from-orange-500 to-orange-700" },
-  { key: "comparativo", label: "COMPARATIVO",  gradient: "from-blue-500 to-blue-700" },
-  { key: "regional",    label: "REGIONAL",     gradient: "from-green-500 to-green-700" },
-  { key: "estadual",    label: "ESTADUAL",     gradient: "from-purple-500 to-purple-700" },
-  { key: "municipal",   label: "MUNICIPAL",    gradient: "from-red-500 to-red-700" },
+  { key: "geral",       label: "ANP Geral",    gradient: "from-orange-500 to-orange-700" },
+  { key: "comparativo", label: "ANP Comparativo",  gradient: "from-blue-500 to-blue-700" },
+  { key: "regional",    label: "ANP Regional",     gradient: "from-green-500 to-green-700" },
+  { key: "estadual",    label: "ANP Estadual",     gradient: "from-purple-500 to-purple-700" },
+  { key: "municipal",   label: "ANP Municipal",    gradient: "from-red-500 to-red-700" },
 ];
 
 const CombustiveisPage = () => {
@@ -70,7 +70,7 @@ const CombustiveisPage = () => {
   return (
     <div className="bi-page">
       <h1 className="bi-page-title">
-        Combustíveis — ANP
+        Combustíveis ANP
       </h1>
 
       {/* Abas */}

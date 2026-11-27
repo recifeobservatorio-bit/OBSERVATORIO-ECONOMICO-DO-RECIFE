@@ -75,9 +75,12 @@ const AeroportosPage = () => {
           months={getMonths(filters)}
         />;
       case "embarque":
+      case "desembarque":
         return <Embarque 
+          key={activeTab}
           data={anac || []}
           toCompare={filters.additionalFilters[4]?.selected}
+          fixedType={activeTab === "desembarque" ? "Desembarque" : "Embarque"}
         />;
       case "aena":
         return <AenaPage months={getMonths(filters)} year={getYearSelected(filters)} />;
@@ -101,50 +104,25 @@ const AeroportosPage = () => {
   return (
     <div className="bi-page">
       <h1 className="bi-page-title">
-        Movimentação de Aeroportos
+        Aeroportos
       </h1>
+      {/* Abas na ordem e com os nomes do Power BI. */}
       <div className="bi-tabs">
-        {/* Botões de navegação */}
-        <button
-          onClick={() => handleNavigation("geral")}
-          className={`bi-tab ${
-            activeTab === "geral"
-              ? "bi-tab-active"
-              : ""
-          }`}
-        >
-          Resumo Geral
-        </button>
-        <button
-          onClick={() => handleNavigation("comparativo")}
-          className={`bi-tab ${
-            activeTab === "comparativo"
-              ? "bi-tab-active"
-              : ""
-          }`}
-        >
-          Comparativo
-        </button>
-        <button
-          onClick={() => handleNavigation("embarque")}
-          className={`bi-tab ${
-            activeTab === "embarque"
-              ? "bi-tab-active"
-              : ""
-          }`}
-        >
-          Embarque/Desembarque
-        </button>
-        <button
-          onClick={() => handleNavigation("aena")}
-          className={`bi-tab ${
-            activeTab === "aena"
-              ? "bi-tab-active"
-              : ""
-          }`}
-        >
-          <i>AENA</i>
-        </button>
+        {[
+          { key: "geral", label: "Movimentação dos Aeroportos Geral" },
+          { key: "embarque", label: "Movimentação dos Aeroportos Embarque" },
+          { key: "desembarque", label: "Movimentação dos Aeroportos Desembarque" },
+          { key: "comparativo", label: "Movimentação dos Aeroportos Comparativo" },
+          { key: "aena", label: "Movimentação dos Aeroportos AENA" },
+        ].map((t) => (
+          <button
+            key={t.key}
+            onClick={() => handleNavigation(t.key)}
+            className={`bi-tab ${activeTab === t.key ? "bi-tab-active" : ""}`}
+          >
+            {t.label}
+          </button>
+        ))}
       </div>
       {renderContent()}
     </div>

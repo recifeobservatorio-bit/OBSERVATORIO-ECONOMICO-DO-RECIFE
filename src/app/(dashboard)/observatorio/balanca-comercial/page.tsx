@@ -60,11 +60,13 @@ const BalancaComercialPage = () => {
 
     switch (activeTab) {
       case "analitico":
+      case "comparativo":
         return (
           <Analitico
-            // Exemplo: se "data.geral?.filteredData" serve pro analítico também
+            key={activeTab}
             data={balanca}
             year={getYearSelected(filters)}
+            comparativo={activeTab === "comparativo"}
           />
         );
 
@@ -94,29 +96,21 @@ const BalancaComercialPage = () => {
         Balança Comercial
       </h1>
 
-      {/* Botões de navegação de aba */}
+      {/* Abas na ordem e com os nomes do Power BI. */}
       <div className="bi-tabs">
-        <button
-          onClick={() => handleNavigation("geral")}
-          className={`bi-tab ${
-            activeTab === "geral"
-              ? "bi-tab-active"
-              : ""
-          }`}
-        >
-          Balança Comercial
-        </button>
-
-        <button
-          onClick={() => handleNavigation("analitico")}
-          className={`bi-tab ${
-            activeTab === "analitico"
-              ? "bi-tab-active"
-              : ""
-          }`}
-        >
-          Analítico
-        </button>
+        {[
+          { key: "geral", label: "Balança Comercial" },
+          { key: "analitico", label: "Balança Analítico" },
+          { key: "comparativo", label: "Balança Analítico Comparativo" },
+        ].map((t) => (
+          <button
+            key={t.key}
+            onClick={() => handleNavigation(t.key)}
+            className={`bi-tab ${activeTab === t.key ? "bi-tab-active" : ""}`}
+          >
+            {t.label}
+          </button>
+        ))}
       </div>
 
       {renderContent()}

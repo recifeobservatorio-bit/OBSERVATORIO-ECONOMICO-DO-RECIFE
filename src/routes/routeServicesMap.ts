@@ -49,6 +49,7 @@ export const routeServicesMap: Record<
     geral: aeroportoDataService,
     comparativo: aeroportoDataService,
     embarque: aeroportoDataService,
+    desembarque: aeroportoDataService,
     aena: aeroportoDataService,
     // etc. Se quiser mesmo service, ok
   },
@@ -66,12 +67,14 @@ export const routeServicesMap: Record<
     // Se tiver tabs diferentes ("geral", "analitico", etc.), aponte para balancaDataService
     geral: balancaDataService,
     analitico: balancaDataService,
+    comparativo: balancaDataService,
   },
 
   "/observatorio/empregos": {
     geral: empregosDataService,
     comparativo: empregosDataService,
     desemprego: empregosDataService,
+    estoque: empregosDataService,
   },
 
   "/observatorio/rais": {

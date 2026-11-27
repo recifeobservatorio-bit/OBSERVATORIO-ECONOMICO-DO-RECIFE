@@ -11,12 +11,16 @@ import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
 
 import charts from "./@imports/charts";
 
-const Embarque: React.FC<ChartBuild> = ({
+// fixedType: abas separadas "Embarque" e "Desembarque", como no Power BI
+// (sem o botão de alternar).
+const Embarque: React.FC<ChartBuild & { fixedType?: "Embarque" | "Desembarque" }> = ({
   toCompare,
   monthRecent,
   data,
+  fixedType,
 }) => {
-  const [type, setType] = useState(['Embarque']);
+  const [chosenType, setType] = useState(['Embarque']);
+  const type = fixedType ? [fixedType] : chosenType;
   const [chartOrder, setChartOrder] = useState(charts.map((_, index) => index));
 
   const sortableContainerRef = useRef<HTMLDivElement>(null);
@@ -24,7 +28,7 @@ const Embarque: React.FC<ChartBuild> = ({
   return (
     <FitToScreen>
     <div>
-      <div className="flex items-center justify-center mb-2">
+      <div className={`items-center justify-center mb-2 ${fixedType ? "hidden" : "flex"}`}>
           <div className="bg-[#D1D5DB] dark:bg-gray-600 rounded-full p-1">
             <div className="bg-white dark:bg-gray-800 rounded-full font-semibold items-center grid grid-cols-2  gap-2 text-center relative text-gray-500 dark:text-gray-400 px-1 py-0.5 text-sm">
              <div className={`transition duration-300 absolute bg-gradient-to-r from-blue-500 to-blue-700 w-1/2 h-full rounded-full ${type[0] === 'Embarque' ? 'transform translate-x-0' : 'transform translate-x-full'} `}></div>

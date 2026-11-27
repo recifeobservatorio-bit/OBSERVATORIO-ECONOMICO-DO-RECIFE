@@ -28,7 +28,7 @@ const CapagPage = () => {
   return (
     <div className="bi-page">
       <h1 className="bi-page-title">
-        CAPAG — Capacidade de Pagamento
+        Capacidade de Pagamento
       </h1>
 
       {!capagData ? (

@@ -39,6 +39,7 @@ const IpcaMensal = () => {
       source="Fonte: IBGE"
     >
       <LineChart
+        showPointLabels
         data={chartData}
         xKey="mes"
         colors={ColorPalette.default}

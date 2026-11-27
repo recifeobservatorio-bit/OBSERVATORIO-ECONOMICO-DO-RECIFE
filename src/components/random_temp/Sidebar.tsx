@@ -23,14 +23,10 @@ export const ArrowIcon = () => {
   </svg>)
 }
 
-// Nome curto mostrado embaixo de cada ícone na barra do topo.
+// Na barra do topo os itens usam os nomes do menu do Power BI (quebram em até
+// 2 linhas); só estes dois têm nome curto.
 const SHORT_LABELS: Record<string, string> = {
   "Voltar": "Início",
-  "Panorama Recife": "Panorama",
-  "Ranking de Competitividade dos Municípios": "Ranking",
-  "Balança Comercial": "Balança",
-  "Mercado Imobiliário": "Imobiliário",
-  "Economia Criativa": "Eco. Criativa",
   "Acesse o Boletim Econômico": "Boletim",
 };
 
@@ -142,12 +138,12 @@ export const Sidebar = () => {
                       key={item.label}
                       href={item.href}
                       title={item.label}
-                      className={`flex flex-col items-center justify-center gap-0.5 min-w-[60px] px-1 py-1 rounded-md text-gray-500 dark:text-gray-200 hover:bg-lamaSkyLight dark:hover:bg-[#15273b] menu-item-wrapper ${
+                      className={`flex flex-col items-center justify-start gap-0.5 min-w-[48px] max-w-[84px] px-1 py-1 rounded-md text-gray-500 dark:text-gray-200 hover:bg-lamaSkyLight dark:hover:bg-[#15273b] menu-item-wrapper ${
                         active ? "bg-lamaSkyLight dark:bg-[#15273b] text-[#2976C0]" : ""
                       }`}
                     >
                       {item.icon}
-                      <span className="text-[10px] leading-3 whitespace-nowrap">
+                      <span className="text-[10px] leading-[11px] text-center line-clamp-2">
                         {SHORT_LABELS[item.label] ?? item.label}
                       </span>
                     </Link>

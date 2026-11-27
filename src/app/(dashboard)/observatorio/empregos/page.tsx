@@ -11,7 +11,7 @@ import { getYearSelected } from '@/utils/filters/@global/getYearSelected'
 
 import Comparativo from './(comparativo)/comparativo'
 import Desemprego from './(desemprego)/desemprego'
-import Embarque from './(embarque)/embarque'
+import Estoque from './(estoque)/estoque'
 import Geral from './(geral)/geral'
 
 
@@ -31,8 +31,9 @@ const EmpregosPage = () => {
     if (tab && tab !== activeTab) {
       setActiveTab(tab)
     } else if (!tab) {
-      setActiveTab('geral')
-      router.replace(`?tab=geral`)
+      // 1ª aba do Mercado de Trabalho no Power BI.
+      setActiveTab('desemprego')
+      router.replace(`?tab=desemprego`)
     }
   }, [searchParams, activeTab, router])
 
@@ -111,6 +112,8 @@ const EmpregosPage = () => {
         )
       case 'comparativo':
         return <Comparativo data={caged} year={getYearSelected(filters)} />
+      case 'estoque':
+        return <Estoque data={caged} year={getYearSelected(filters)} />
       case 'desemprego':
         return (
           <Desemprego
@@ -139,59 +142,29 @@ const EmpregosPage = () => {
   return (
     <div className="bi-page">
       <h1 className="bi-page-title">
-        Variação e Atividade dos Empregos
+        Mercado de Trabalho
       </h1>
+      {/* Abas na ordem e com os nomes do Power BI. */}
       <div className="bi-tabs">
-        {/* Botões de navegação */}
-        <button
-          onClick={() => handleNavigation('geral')}
-          className={`bi-tab ${
-            activeTab === 'geral'
-              ? 'bi-tab-active'
-              : ''
-          }`}
-        >
-          Resumo Geral
-        </button>
-        <button
-          onClick={() => handleNavigation('comparativo')}
-          className={`bi-tab ${
-            activeTab === 'comparativo'
-              ? 'bi-tab-active'
-              : ''
-          }`}
-        >
-          Comparativo
-        </button>
-        <button
-          onClick={() => handleNavigation('desemprego')}
-          className={`bi-tab ${
-            activeTab === 'desemprego'
-              ? 'bi-tab-active'
-              : ''
-          }`}
-        >
-          Desemprego
-        </button>
-        <Link
-          href={'rais?tab=geral'}
-          className={`bi-tab flex items-center justify-center ${
-            activeTab === 'rais'
-              ? 'bi-tab-active'
-              : ''
-          }`}
-        >
-          <i>RAIS</i>
+        {[
+          { key: "desemprego", label: "Desemprego" },
+          { key: "estoque", label: "Estoque de Vagas" },
+          { key: "geral", label: "Movimentação de Empregos" },
+          { key: "comparativo", label: "Movimentação de Empregos Comparativo" },
+        ].map((t) => (
+          <button
+            key={t.key}
+            onClick={() => handleNavigation(t.key)}
+            className={`bi-tab ${activeTab === t.key ? "bi-tab-active" : ""}`}
+          >
+            {t.label}
+          </button>
+        ))}
+        <Link href={"rais?tab=geral"} className="bi-tab flex items-center justify-center">
+          RAIS Recife
         </Link>
-        <Link
-          href={'micro-caged?tab=geral'}
-          className={`bi-tab flex items-center justify-center ${
-            activeTab === 'rais'
-              ? 'bi-tab-active'
-              : ''
-          }`}
-        >
-          <i>Microdados (CAGED)</i>
+        <Link href={"micro-caged?tab=geral"} className="bi-tab flex items-center justify-center">
+          Caged Microdados
         </Link>
       </div>
       {renderContent()}

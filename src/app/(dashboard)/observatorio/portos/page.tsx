@@ -100,7 +100,7 @@ const PortosPage = () => {
   return (
     <div className="bi-page">
       <h1 className="bi-page-title">
-        Movimentação dos Portos
+        Portos
       </h1>
       <div className="max-w-3xl mx-auto mb-3 px-4 py-3 rounded-lg border border-amber-400 bg-amber-50 text-amber-800 dark:border-amber-500 dark:bg-amber-950 dark:text-amber-200 text-center text-sm font-medium">
         Site da Antaq em manutenção. Último mês divulgado foi fevereiro/2026.
@@ -115,7 +115,7 @@ const PortosPage = () => {
               : ""
           }`}
         >
-          Geral
+          Porto Movimentação
         </button>
         <button
           onClick={() => handleNavigation("operacao")}
@@ -125,7 +125,7 @@ const PortosPage = () => {
               : ""
           }`}
         >
-          Operação
+          Porto Operação
         </button>
         <button
           onClick={() => handleNavigation("comparativo")}
@@ -135,7 +135,7 @@ const PortosPage = () => {
               : ""
           }`}
         >
-          Comparativo
+          Porto Comparativo
         </button>
         <button
           onClick={() => handleNavigation("passageiro")}
@@ -145,7 +145,7 @@ const PortosPage = () => {
               : ""
           }`}
         >
-          Movimentação de Passageiros (Recife)
+          Porto Recife Movimentação Passageiros
         </button>
       </div>
       {renderContent()}
