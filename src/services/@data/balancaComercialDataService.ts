@@ -37,6 +37,11 @@ export class BalancaDataService {
     const filtered = {
       ...applyGenericFilters(raw, filters),
       filteredDataSemMes: applyGenericFilters(raw, filters, ["Mês"]).filteredData,
+      // Mesmo recorte no ano anterior (card "Total Negociado" da Balança Analítico).
+      filteredDataPast: applyGenericFilters(
+        allYears.filter((r: any) => Number(r.Ano) === Number(this.currentYear) - 1),
+        filters
+      ).filteredData,
       yearsOptions: computeAvailableYears(allYears, (r: any) => r.Ano),
     };
 

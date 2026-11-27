@@ -25,6 +25,7 @@ const BalancaComercialPage = () => {
   const router = useRouter();
   const [balanca, setBalanca] = useState<BalancaHeaders[]>([]);
   const [balancaSemMes, setBalancaSemMes] = useState<BalancaHeaders[]>([]);
+  const [balancaPast, setBalancaPast] = useState<BalancaHeaders[]>([]);
 
   const { isLoading, data, filters } = useDashboard();
 
@@ -45,6 +46,7 @@ const BalancaComercialPage = () => {
             const balancaData = data?.geral || {};
             setBalanca(balancaData?.filteredData || {});
             setBalancaSemMes(balancaData?.filteredDataSemMes || []);
+            setBalancaPast(balancaData?.filteredDataPast || []);
 
           }
 
@@ -67,6 +69,7 @@ const BalancaComercialPage = () => {
             data={balanca}
             year={getYearSelected(filters)}
             comparativo={activeTab === "comparativo"}
+            dataPast={balancaPast}
           />
         );
 
