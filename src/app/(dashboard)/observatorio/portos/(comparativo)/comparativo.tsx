@@ -72,6 +72,16 @@ useEffect(() => {
   const absoluteDivRef = useRef<HTMLDivElement>(null);
 
   const singlePorto = tablesRender.length === 1;
+  // Como no Power BI, a aba já abre comparando o Porto do Recife com Suape.
+  const suape = (toCompare as string[]).find((p) => /suape/i.test(String(p)));
+  // A lista de portos chega depois que a busca monta: escolhe Suape uma vez, quando aparecer.
+  const autoSuape = useRef(false);
+  useEffect(() => {
+    if (!autoSuape.current && suape && tempFiltred.length === 0) {
+      autoSuape.current = true;
+      setTempFiltered([suape] as any);
+    }
+  }, [suape, tempFiltred.length]);
 
   return (
     <FitToScreen>
@@ -84,36 +94,33 @@ useEffect(() => {
         placeholder="Digite para buscar um porto"
         notFoundMessage="Nenhum porto encontrado"
         unique
+        initialValue={suape ? [suape] : undefined}
       />
 
-      <CardsCarousel absoluteDivRef={absoluteDivRef} dataPassed={attTempFiltred} pageCompare={pageCompare} setPageCompare={setPageCompare} textDefault="Selecione um aeroporto para as informações serem comparadas" >
-        {attTempFiltred.map((toCompare: string, index: number) => {
-          return cards.slice(0, 1).map(({ Component }) => {
-                      
-            return (
-              <React.Suspense fallback={<div>Carregando...</div>} key={index}>
-                <div
-                 ref={absoluteDivRef} 
-                 className={`${
-                    toCompare === attTempFiltred[pageCompare]
-                     ? ''
-                     : 'translate-x-[100%]'
-                    } absolute inset-x-0`}
-                 >
-                 <ErrorBoundary>
-                    <Component local={attTempFiltred[pageCompare]} 
-                    data={{ 
-                      ...data, 
-                      atracacao: portosDataFiltered.find((obj) => obj.porto == ["Recife", ...tempFiltred][index])?.['atracacao'] || [] as PortoAtracacaoHeaders[], 
-                      carga: portosDataFiltered.find((obj) => obj.porto == ["Recife", ...tempFiltred][index])?.['cargas'] || [], 
+      {/* Cards de cada porto (Power BI: "Principais Totalizadores"), um porto por linha — lado a lado os números cortavam. */}
+      <div className="grid grid-cols-1 gap-3 mb-6">
+        {attTempFiltred.map((porto: string, index: number) =>
+          cards.slice(0, 1).map(({ Component }) => (
+            <React.Suspense fallback={<div>Carregando...</div>} key={porto}>
+              <div className="min-w-0">
+                <ErrorBoundary>
+                  <Component
+                    local={porto}
+                    data={{
+                      ...data,
+                      atracacao: portosDataFiltered.find((obj) => obj.porto == porto)?.['atracacao'] || [] as PortoAtracacaoHeaders[],
+                      carga: portosDataFiltered.find((obj) => obj.porto == porto)?.['cargas'] || [],
                     } as PortoGeralData & PortoOperacaoData[]}
-                      cards={cards.slice(1)} year={year ?? "2024"} color={ColorPalette.default} />
-                  </ErrorBoundary>
-                  </div>
-                </React.Suspense>
-                      )});
-                    })}
-       </CardsCarousel>
+                    cards={cards.slice(1)}
+                    year={year ?? "2024"}
+                    color={ColorPalette.default}
+                  />
+                </ErrorBoundary>
+              </div>
+            </React.Suspense>
+          ))
+        )}
+      </div>
 
       {/* Só Recife (sem porto comparado): linha + 3 gráficos numa grade 2×2 —
           antes a linha ocupava a largura toda e os outros 3 iam pra baixo. Os

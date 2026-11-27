@@ -88,7 +88,9 @@ const Analitico = ({
         {/* Tela única: com um município só, as seções Negociações e Grupos de
             Produtos ficam lado a lado (empilhadas a aba não cabia na tela). Com
             comparação, cada seção mostra os dois municípios lado a lado. */}
-        <div className={tablesRender.length === 1 ? "grid grid-cols-1 lg:grid-cols-2 gap-4 w-full bi-tables-fill-screen" : "flex flex-col gap-6 w-full"}>
+        {/* Balança Analítico (só Recife): tabela de países na largura toda, como a
+            matriz do Power BI, e grupos de produtos embaixo. No Comparativo, lado a lado. */}
+        <div className={tablesRender.length === 1 && comparativo ? "grid grid-cols-1 lg:grid-cols-2 gap-4 w-full bi-tables-fill-screen" : "flex flex-col gap-6 w-full"}>
         <div className="flex flex-col gap-3 min-w-0">
          <div className="flex items-center justify-between gap-2">
             <div className="flex-1 h-[1px] bg-gray-800 dark:bg-gray-200"></div>
@@ -96,7 +98,7 @@ const Analitico = ({
             <div className="flex-1 h-[1px] bg-gray-800 dark:bg-gray-200"></div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className={`grid grid-cols-1 gap-6 ${tablesRender.length > 1 ? "lg:grid-cols-2" : ""}`}>
               {tablesRender.map(({ Component }, index) => {
               if (!selectCountries[index]) {
                 selectCountries[index] = "";
@@ -118,6 +120,7 @@ const Analitico = ({
                           updateSelectCountry(index, country)
                         }
                         monthRecent={monthRecent}
+                        dataPast={dataPast}
                       />
                     </div>
                 </React.Suspense>
@@ -133,7 +136,7 @@ const Analitico = ({
             <div className="flex-1 h-[1px] bg-gray-800 dark:bg-gray-200"></div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className={`grid grid-cols-1 gap-6 ${tablesRender.length > 1 ? "lg:grid-cols-2" : ""}`}>
               {tablesRender.map(({ Secundary }, index) => {
               if (!selectCountries[index]) {
                 selectCountries[index] = "";

@@ -13,6 +13,8 @@ import GraphSkeleton from "@/components/random_temp/GraphSkeleton";
 import { getUniqueValues } from "@/utils/filters/@global/getUniqueValues";
 import ColorPalette from "@/utils/palettes/charts/ColorPalette";
 
+import RankingAeroportos from "@/components/@build/observatorio/cards/aeroporto/comparativo/RankingAeroportos";
+
 import cards from "./@imports/cards";
 import charts from "./@imports/charts";
 import tables from "./@imports/tables";
@@ -78,6 +80,12 @@ const Comparativo: React.FC<ChartBuild> = ({
         label="Compare Aeroportos"
         placeholder="Digite para buscar um aeroporto"
         notFoundMessage="Nenhum aeroporto encontrado"
+      />
+
+      {/* Cards de ranking como no Power BI: Recife e o 1º aeroporto comparado. */}
+      <RankingAeroportos
+        data={data as any[]}
+        outro={(tempFiltred as string[]).find((a) => a !== "Recife")}
       />
 
       <div className="mb-2 dark:text-gray-200">
