@@ -24,7 +24,8 @@ const IpcaPorMeses = ({
 
   const selectedColors = [
     ...categorias.map((_, index) => colors[index % colors.length]),
-    ...(hasBrasil ? [ColorPalette.status.neutral] : []),
+    // Brasil no mesmo laranja das barras "IPCA Acumulado ... no Brasil".
+    ...(hasBrasil ? [ColorPalette.default[2]] : []),
   ];
 
   return (
