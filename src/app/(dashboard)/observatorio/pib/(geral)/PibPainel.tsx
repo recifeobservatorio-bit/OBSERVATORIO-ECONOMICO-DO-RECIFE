@@ -24,7 +24,7 @@ const MUN = "Município - UF";
 const RECIFE = "Recife - PE";
 
 const brl = (v: number, digits = 2) =>
-  `R$ ${Number(v).toLocaleString("pt-BR", { minimumFractionDigits: digits, maximumFractionDigits: digits })}`;
+  `R$${Number(v).toLocaleString("pt-BR", { minimumFractionDigits: digits, maximumFractionDigits: digits })}`;
 const pct = (v: number | null) => (v == null ? "" : `${v.toLocaleString("pt-BR", { maximumFractionDigits: 2 })}%`);
 
 type Linha = { ano: number; atual: number; anterior: number | null; variacao: number | null };
@@ -45,26 +45,29 @@ const serieDo = (rows: any[], municipio: string, field: string): Linha[] => {
   });
 };
 
+// Estilo direto nas células: o CSS global de tabelas quebrava "R$" numa linha à parte.
+const CELULA: React.CSSProperties = { whiteSpace: "nowrap", fontSize: 11, lineHeight: "16px" };
+
 const TabelaAnual = ({ titulo, linhas, destaque }: { titulo: string; linhas: Linha[]; destaque?: boolean }) => (
   <div className="flex flex-col h-full min-h-0">
     <h3 className={`bi-chart-title text-center font-semibold ${destaque ? "!bg-[#E66C37]" : ""}`}>{titulo}</h3>
     <div className="flex-1 min-h-[220px] max-h-[330px] overflow-auto">
-      <table className="w-full text-xs">
+      <table className="w-full text-xs whitespace-nowrap">
         <thead className="sticky top-0 bg-[#12239E] text-white">
           <tr>
-            <th className="px-2 py-1 text-left">Ano</th>
-            <th className="px-2 py-1 text-right">Ano Corrente</th>
-            <th className="px-2 py-1 text-right">Ano Anterior</th>
-            <th className="px-2 py-1 text-right">% Variação</th>
+            <th style={CELULA} className="px-2 py-1 text-left">Ano</th>
+            <th style={CELULA} className="px-2 py-1 text-right">Ano Corrente</th>
+            <th style={CELULA} className="px-2 py-1 text-right">Ano Anterior</th>
+            <th style={CELULA} className="px-2 py-1 text-right">% Variação</th>
           </tr>
         </thead>
         <tbody>
           {linhas.map((l) => (
             <tr key={l.ano} className="border-b border-gray-100 dark:border-gray-700">
-              <td className="px-2 py-1">{l.ano}</td>
-              <td className="px-2 py-1 text-right">{brl(l.atual)}</td>
-              <td className="px-2 py-1 text-right">{l.anterior == null ? "" : brl(l.anterior)}</td>
-              <td className={`px-2 py-1 text-right ${l.variacao != null && l.variacao < 0 ? "text-red-600" : ""}`}>{pct(l.variacao)}</td>
+              <td style={CELULA} className="px-2 py-1">{l.ano}</td>
+              <td style={CELULA} className="px-2 py-1 text-right">{brl(l.atual)}</td>
+              <td style={CELULA} className="px-2 py-1 text-right">{l.anterior == null ? "" : brl(l.anterior)}</td>
+              <td style={CELULA} className={`px-2 py-1 text-right ${l.variacao != null && l.variacao < 0 ? "text-red-600" : ""}`}>{pct(l.variacao)}</td>
             </tr>
           ))}
         </tbody>
@@ -73,8 +76,10 @@ const TabelaAnual = ({ titulo, linhas, destaque }: { titulo: string; linhas: Lin
   </div>
 );
 
+// bi-no-fill: altura fixa — dois gráficos empilhados no mesmo card faziam o
+// ajuste de tela (FitToScreen) oscilar.
 const Linhas = ({ nome, linhas, capita, cor }: { nome: string; linhas: Linha[]; capita: boolean; cor: string }) => (
-  <div className="flex flex-col gap-2 h-full">
+  <div className="bi-no-fill flex flex-col gap-2 h-full">
     <div className="chart-wrapper">
       <ChartGrabber>
         <LineChart

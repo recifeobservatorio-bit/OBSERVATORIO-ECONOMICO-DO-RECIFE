@@ -182,7 +182,9 @@ const FitToScreen = ({
       // --bi-chart-h que o CSS aplica em todo .bi-chart-box. As linhas são
       // contadas pelo topo dos cards. Só depois disso, se ainda não couber
       // (gráficos já no mínimo), entra a escala.
-      const boxes = Array.from(inner.querySelectorAll<HTMLElement>(".bi-chart-box"));
+      // Gráficos dentro de .bi-no-fill têm altura fixa (ex.: dois gráficos
+      // empilhados num card — mexer neles fazia a conta passar do ponto e oscilar).
+      const boxes = Array.from(inner.querySelectorAll<HTMLElement>(".bi-chart-box")).filter((box) => !box.closest(".bi-no-fill"));
       if (boxes.length && (fillPasses < MAX_FILL_PASSES || locked)) {
         const cards = new Set(boxes.map((box) => (box.closest(".chart-content-wrapper") as HTMLElement | null) ?? box));
         const rows = new Set(Array.from(cards).map((card) => Math.round(card.getBoundingClientRect().top / 8))).size;

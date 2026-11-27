@@ -652,6 +652,14 @@
   flex: 1 1 0;
 }
 
+/* Áreas que não entram no preenchimento da tela (FitToScreen ignora): os
+   gráficos mantêm a altura própria. Usado nos dois gráficos empilhados do PIB. */
+.bi-fit .bi-no-fill .bi-chart-box {
+  min-height: 0;
+  height: var(--bi-no-fill-h, 150px) !important;
+  flex: none;
+}
+
 /* O gráfico preenche o card. Antes tinha altura fixa: quando um vizinho de
    linha era mais alto (pizza com botão + legenda), o card esticava e sobrava
    um vão vazio de 40–150px embaixo do gráfico. Agora cada wrapper entre o
